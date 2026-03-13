@@ -28,25 +28,22 @@
         .container { max-width: 500px; margin: 0 auto; }
         h2 { text-align: center; margin-bottom: 10px; }
 
-        .leaderboard-card {
-            background: linear-gradient(135deg, #3a3a4d 0%, #2b2b36 100%);
-            border-radius: 12px; padding: 15px; margin-bottom: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
+        .install-banner { display: none; background-color: var(--primary); color: white; padding: 10px; border-radius: 8px; margin-bottom: 20px; position: relative; font-size: 13px; text-align: center; }
+        .install-arrow { position: absolute; top: -15px; right: 15px; font-size: 18px; }
+
+        .leaderboard-card { background: linear-gradient(135deg, #3a3a4d 0%, #2b2b36 100%); border-radius: 12px; padding: 15px; margin-bottom: 20px; border: 1px solid rgba(255, 255, 255, 0.1); }
         .leader-section { margin-bottom: 12px; }
         .leader-title { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: block; }
         .leader-name { font-size: 15px; font-weight: bold; margin-top: 2px; display: block; }
         .gold-txt { color: var(--gold); }
         .silver-txt { color: var(--silver); }
         
-        .top-list-btn { 
-            width: 100%; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); 
-            color: white; padding: 8px; border-radius: 6px; font-size: 12px; cursor: pointer; margin-top: 5px;
-        }
+        .top-list-btn { width: 100%; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 8px; border-radius: 6px; font-size: 12px; cursor: pointer; margin-top: 5px; }
         #top-list-content { display: none; margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; }
 
         .panel { background-color: var(--card-bg); padding: 15px; border-radius: 10px; margin-bottom: 20px; }
-        input[type=text], input[type=number] { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: none; background-color: #3f3f4e; color: white; box-sizing: border-box; font-size: 16px; }
+        
+        input[type=text] { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: none; background-color: #3f3f4e; color: white; box-sizing: border-box; font-size: 16px; }
         input[type=range] { width: 100%; accent-color: var(--primary); margin-bottom: 10px; }
         
         button { width: 100%; padding: 15px; background-color: var(--primary); color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; }
@@ -54,24 +51,9 @@
         .loading-msg { text-align: center; color: var(--primary); font-weight: bold; margin-top: 20px; font-size: 14px; }
 
         .station-card { background-color: var(--card-bg); border-radius: 10px; padding: 15px; margin-bottom: 15px; display: flex; flex-direction: column; border: 2px solid transparent; }
-        .best-price-card { border-color: var(--gold); }
         .main-info { display: flex; justify-content: space-between; align-items: center; width: 100%; }
         .station-info { flex: 1; display: flex; align-items: flex-start; }
-        
-        /* FIKSEN ER HER */
-        .brand-icon { 
-            width: 40px; 
-            height: 40px; 
-            flex-shrink: 0; /* NYTT: Forhindrer at sirkelen krympes og blir oval */
-            border-radius: 50%; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            font-weight: bold; 
-            margin-right: 12px; 
-            background: #4a4a5a; 
-        }
-        
+        .brand-icon { width: 40px; height: 40px; flex-shrink: 0; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 12px; background: #4a4a5a; }
         .prices-container { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
         .price-row { display: flex; align-items: center; gap: 8px; position: relative; }
         .price-label { font-size: 10px; font-weight: bold; border-radius: 4px; padding: 2px 5px; width: 40px; text-align: center; color: white; }
@@ -92,10 +74,7 @@
 
         .footer { margin-top: 40px; text-align: center; padding: 20px; border-top: 1px solid #2b2b36; }
         .footer-text { font-size: 12px; color: var(--text-muted); line-height: 1.6; margin-bottom: 15px; }
-        .feedback-btn { 
-            background: transparent; border: 1px solid var(--share-color); color: var(--share-color); 
-            padding: 10px 20px; border-radius: 8px; font-size: 13px; display: inline-block; text-decoration: none;
-        }
+        .feedback-btn { background: transparent; border: 1px solid var(--share-color); color: var(--share-color); padding: 10px 20px; border-radius: 8px; font-size: 13px; display: inline-block; text-decoration: none; }
 
         #update-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); z-index: 1000; }
         .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: var(--card-bg); padding: 25px; border-radius: 15px; width: 90%; max-width: 350px; box-sizing: border-box; }
@@ -105,6 +84,11 @@
 <body>
 
 <div class="container">
+    <div id="install-banner" class="install-banner">
+        <span>Legg til på startskjermen for full app-opplevelse</span>
+        <span class="install-arrow">⬆️</span>
+    </div>
+
     <h2>Drivstoff Norge ⛽</h2>
 
     <div class="leaderboard-card">
@@ -113,8 +97,8 @@
             <span id="best-day" class="leader-name gold-txt">Laster...</span>
         </div>
         <div class="leader-section">
-            <span class="leader-title">Ukens bidragsyter 🥈</span>
-            <span id="best-week" class="leader-name silver-txt">Laster...</span>
+            <span class="leader-title">Ukens bidragsyter 🥇</span>
+            <span id="best-week" class="leader-name gold-txt">Laster...</span>
         </div>
         <button class="top-list-btn" onclick="toggleTopList()">Se Topp 10 bidragsytere</button>
         <div id="top-list-content"><div id="top-list-items"></div></div>
@@ -151,11 +135,11 @@
         </div>
         <div style="margin-bottom:12px">
             <label style="color: var(--diesel-color); font-size:12px">Diesel</label>
-            <input type="number" id="input-diesel" step="0.01">
+            <input type="text" inputmode="decimal" id="input-diesel" oninput="this.value = this.value.replace(',', '.')">
         </div>
         <div style="margin-bottom:12px">
             <label style="color: var(--bensin-color); font-size:12px">Bensin 95</label>
-            <input type="number" id="input-bensin" step="0.01">
+            <input type="text" inputmode="decimal" id="input-bensin" oninput="this.value = this.value.replace(',', '.')">
         </div>
         <div style="display:flex; gap:10px">
             <button style="background-color:#555" onclick="lukkModal()">Avbryt</button>
@@ -183,6 +167,13 @@
 
     let myUid = localStorage.getItem('drivstoff_uid') || ('u-' + Math.random().toString(36).substr(2, 9));
     localStorage.setItem('drivstoff_uid', myUid);
+
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+    const installBanner = document.getElementById('install-banner');
+
+    if (!isStandalone) {
+        installBanner.style.display = 'block';
+    }
 
     let valgtStasjonId = null;
     let gjeldendeStasjoner = [];
@@ -225,23 +216,37 @@
     }
 
     window.lagrePris = async function() {
-        const d = document.getElementById('input-diesel').value;
-        const b = document.getElementById('input-bensin').value;
+        let d = document.getElementById('input-diesel').value.trim();
+        let b = document.getElementById('input-bensin').value.trim();
         const n = document.getElementById('input-nickname').value.trim();
-        if(!n || !d || !b) return;
+        
+        const modalError = document.getElementById('modal-error');
+
+        if(!n) {
+            modalError.innerText = "Du må fylle inn et kallenavn!";
+            modalError.style.display = "block"; return;
+        }
+
+        if (!d && !b) {
+            modalError.innerText = "Du må fylle inn minst én pris!";
+            modalError.style.display = "block"; return;
+        }
 
         const nameRef = ref(db, 'users/' + n.toLowerCase());
         const nameSnap = await get(nameRef);
         if (nameSnap.exists() && nameSnap.val() !== myUid) {
-            document.getElementById('modal-error').innerText = "Navnet er tatt!";
-            document.getElementById('modal-error').style.display = "block"; return;
+            modalError.innerText = "Kallenavnet er tatt av en annen!";
+            modalError.style.display = "block"; return;
         }
 
         await set(nameRef, myUid);
         localStorage.setItem('drivstoff_navn', n);
 
         const currentRef = ref(db, 'priser/' + valgtStasjonId);
-        const oldData = skylagredePriser[valgtStasjonId];
+        const oldData = skylagredePriser[valgtStasjonId] || {};
+
+        if (!d) d = oldData.diesel || "--";
+        if (!b) b = oldData.bensin || "--";
 
         let verified = false;
         if (oldData && oldData.uid !== myUid && oldData.diesel === d && oldData.bensin === b) {
@@ -268,15 +273,14 @@
         p.innerHTML = h.length ? h.map(i => `<div class="history-item"><span>D: ${i.diesel} | 95: ${i.bensin}</span><span>${new Date(i.timestamp).toLocaleDateString()}</span></div>`).join('') : "Ingen tidligere data.";
     }
 
-    // NY HJELPEFUNKSJON for merke-stil
     function getBrandStyle(name) {
         const n = name.toLowerCase();
-        if (n.includes("circle k")) return { char: 'C', color: '#ed1c24' }; // Rød
-        if (n.includes("shell")) return { char: 'S', color: '#ffcc00', text: '#ed1c24' }; // Gul/Rød
-        if (n.includes("uno-x")) return { char: 'U', color: '#ffcc00', text: '#000' }; // Gul/Svart
-        if (n.includes("yx")) return { char: 'Y', color: '#0055b8' }; // Blå
-        if (n.includes("esso")) return { char: 'E', color: '#ed1c24' }; // Rød
-        return { char: '⛽', color: '#4a4a5a' }; // Standard
+        if (n.includes("circle k")) return { char: 'C', color: '#ed1c24' }; 
+        if (n.includes("shell")) return { char: 'S', color: '#ffcc00', text: '#ed1c24' }; 
+        if (n.includes("uno-x")) return { char: 'U', color: '#ffcc00', text: '#000' }; 
+        if (n.includes("yx")) return { char: 'Y', color: '#0055b8' }; 
+        if (n.includes("esso")) return { char: 'E', color: '#ed1c24' }; 
+        return { char: '⛽', color: '#4a4a5a' }; 
     }
 
     function visStasjoner(stasjoner, lat, lon) {
@@ -294,17 +298,19 @@
             const navn = s.tags.name || s.tags.brand || "Stasjon";
             const escapedName = navn.replace(/'/g, "\\'");
             
-            // Fiks for merke-ikon
             const style = getBrandStyle(navn);
             
             const card = document.createElement('div'); card.className = `station-card`;
-            card.innerHTML = `<div class="main-info"><div class="station-info"><div class="brand-icon" style="background-color: ${style.color}; color: ${style.text || '#fff'}">${style.char}</div><div class="station-details"><h3>${navn}</h3><p>${dist.toFixed(1)} km unna</p></div></div><div class="prices-container"><div class="price-row"><span class="price-label lbl-diesel">DIESEL</span><div class="price-value">${p.diesel}</div> ${p.verified?'<span class="verify-badge">✅</span>':''}</div><div class="price-row"><span class="price-label lbl-bensin">BENSIN 95</span><div class="price-value">${p.bensin}</div> ${p.verified?'<span class="verify-badge">✅</span>':''}</div></div></div><div class="action-buttons"><div class="update-btn" onclick="apneModal(${id},'${escapedName}')">OPPDATER</div><a class="nav-btn" href="http://googleusercontent.com/http://googleusercontent.com/http://googleusercontent.com/http://googleusercontent.com/maps.google.com/4{s.lat},${s.lon}" target="_blank">KJØR HIT</a><div class="hist-btn" onclick="visHistorikk(${id})">⌛ HISTORIKK</div></div><div id="hist-${id}" class="history-panel"></div><div class="time-ago">${formaterTid(p.timestamp, p.user)}</div>`;
+            card.innerHTML = `<div class="main-info"><div class="station-info"><div class="brand-icon" style="background-color: ${style.color}; color: ${style.text || '#fff'}">${style.char}</div><div class="station-details"><h3>${navn}</h3><p>${dist.toFixed(1)} km unna</p></div></div><div class="prices-container"><div class="price-row"><span class="price-label lbl-diesel">DIESEL</span><div class="price-value">${p.diesel}</div> ${p.verified?'<span class="verify-badge">✅</span>':''}</div><div class="price-row"><span class="price-label lbl-bensin">BENSIN 95</span><div class="price-value">${p.bensin}</div> ${p.verified?'<span class="verify-badge">✅</span>':''}</div></div></div><div class="action-buttons"><div class="update-btn" onclick="apneModal(${id},'${escapedName}')">OPPDATER</div><a class="nav-btn" href="https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lon}" target="_blank">KJØR HIT</a><div class="hist-btn" onclick="visHistorikk(${id})">⌛ HISTORIKK</div></div><div id="hist-${id}" class="history-panel"></div><div class="time-ago">${formaterTid(p.timestamp, p.user)}</div>`;
             list.appendChild(card);
         });
     }
 
     window.toggleTopList = () => { const c = document.getElementById('top-list-content'); c.style.display = c.style.display==='block'?'none':'block'; };
-    window.lukkModal = () => document.getElementById('update-modal').style.display='none';
+    window.lukkModal = () => {
+        document.getElementById('update-modal').style.display='none';
+        document.getElementById('modal-error').style.display='none';
+    };
     window.oppdaterRadiusText = () => document.getElementById('radius-val').innerText = document.getElementById('radius').value;
     
     window.apneModal = (id, n) => { 
@@ -312,8 +318,8 @@
         document.getElementById('modal-station-name').innerText = n; 
         document.getElementById('input-nickname').value = localStorage.getItem('drivstoff_navn') || ""; 
         const p = skylagredePriser[id] || { diesel: "", bensin: "" };
-        document.getElementById('input-diesel').value = p.diesel;
-        document.getElementById('input-bensin').value = p.bensin;
+        document.getElementById('input-diesel').value = p.diesel === "--" ? "" : p.diesel;
+        document.getElementById('input-bensin').value = p.bensin === "--" ? "" : p.bensin;
         document.getElementById('update-modal').style.display = 'block'; 
     };
 
