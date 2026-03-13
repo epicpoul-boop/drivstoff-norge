@@ -51,12 +51,13 @@
         /* Stasjonskort */
         .station-card {
             background-color: var(--card-bg); border-radius: 10px; padding: 15px;
-            margin-bottom: 15px; display: flex; justify-content: space-between; 
-            align-items: center; border: 2px solid transparent; transition: 0.3s;
+            margin-bottom: 15px; display: flex; flex-direction: column; /* Ny: Column layout */
+            border: 2px solid transparent; transition: 0.3s;
         }
         .best-price-card { border-color: var(--gold); box-shadow: 0 0 15px rgba(255, 215, 0, 0.15); }
         .best-label { color: var(--gold); font-size: 10px; font-weight: bold; text-transform: uppercase; margin-bottom: 4px; display: block; }
 
+        .main-info { display: flex; justify-content: space-between; align-items: center; width: 100%; }
         .station-info { flex: 1; display: flex; align-items: flex-start; }
         .station-details { flex: 1; }
         .station-details h3 { margin: 0 0 3px 0; font-size: 16px; line-height: 1.2; }
@@ -69,12 +70,14 @@
         .lbl-bensin { background-color: var(--bensin-color); color: #fff; }
         .price-value { font-size: 16px; font-weight: bold; background-color: #3f3f4e; padding: 4px 8px; border-radius: 6px; min-width: 55px; text-align: right;}
         
-        .time-ago { font-size: 10px; color: #7a7a8c; margin-top: 4px; font-style: italic; text-align: right; }
-        .old-price { color: var(--danger) !important; font-weight: bold; }
-
-        .action-buttons { display: flex; gap: 8px; margin-top: 12px; }
+        /* Oppdatert: Plassering av handlingsknapper */
+        .action-buttons { display: flex; gap: 8px; margin-top: 15px; width: 100%; border-top: 1px solid #3f3f4e; padding-top: 10px; }
         .update-btn { border: 1px solid var(--primary); color: var(--primary); background: transparent; padding: 8px; font-size: 12px; border-radius: 6px; flex: 1; font-weight: bold; cursor: pointer; }
         .nav-btn { border: 1px solid #4a4a5a; color: #a0a0a0; background: transparent; padding: 8px; font-size: 12px; border-radius: 6px; flex: 1; text-decoration: none; text-align: center; font-weight: bold; }
+
+        /* Oppdatert: Stil for tidsstempelet på bunnen */
+        .time-ago { font-size: 10px; color: #7a7a8c; margin-top: 10px; font-style: italic; text-align: center; width: 100%; }
+        .old-price { color: var(--danger) !important; font-weight: bold; }
 
         /* Modal */
         #update-modal {
@@ -235,23 +238,25 @@
             const card = document.createElement('div');
             card.className = `station-card ${erBilligst ? 'best-price-card' : ''}`;
             card.innerHTML = `
-                <div class="station-info">
-                    <div class="brand-icon" style="background-color: ${style.color}; color: ${style.text || '#fff'}">${style.char}</div>
-                    <div class="station-details">
-                        ${erBilligst ? '<span class="best-label">⭐ Billigst i området</span>' : ''}
-                        <h3>${navn}</h3>
-                        <p>${avstand.toFixed(1)} km unna</p>
-                        <div class="action-buttons">
-                            <button class="update-btn" onclick="apneModal(${id}, '${navn}')">Oppdater</button>
-                            <a class="nav-btn" href="https://www.google.com/maps/dir/?api=1&destination=${stasjon.lat},${stasjon.lon}" target="_blank">Kjør hit</a>
+                <div class="main-info">
+                    <div class="station-info">
+                        <div class="brand-icon" style="background-color: ${style.color}; color: ${style.text || '#fff'}">${style.char}</div>
+                        <div class="station-details">
+                            ${erBilligst ? '<span class="best-label">⭐ Billigst i området</span>' : ''}
+                            <h3>${navn}</h3>
+                            <p>${avstand.toFixed(1)} km unna</p>
                         </div>
                     </div>
+                    <div class="prices-container">
+                        <div class="price-row"><span class="price-label lbl-diesel">DIESEL</span><div class="price-value">${p.diesel}</div></div>
+                        <div class="price-row"><span class="price-label lbl-bensin">BENSIN</span><div class="price-value">${p.bensin}</div></div>
+                    </div>
                 </div>
-                <div class="prices-container">
-                    <div class="price-row"><span class="price-label lbl-diesel">DIESEL</span><div class="price-value">${p.diesel}</div></div>
-                    <div class="price-row"><span class="price-label lbl-bensin">BENSIN</span><div class="price-value">${p.bensin}</div></div>
-                    <div class="time-ago">${formaterTid(p.timestamp, p.user)}</div>
+                <div class="action-buttons">
+                    <button class="update-btn" onclick="apneModal(${id}, '${navn}')">Oppdater pris</button>
+                    <a class="nav-btn" href="https://www.google.com/maps/dir/?api=1&destination=${stasjon.lat},${stasjon.lon}" target="_blank">Kjør hit</a>
                 </div>
+                <div class="time-ago">${formaterTid(p.timestamp, p.user)}</div>
             `;
             list.appendChild(card);
         });
