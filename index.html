@@ -28,25 +28,6 @@
         .container { max-width: 500px; margin: 0 auto; }
         h2 { text-align: center; margin-bottom: 10px; }
 
-        /* NY Stil for installasjonsbanner */
-        .install-banner {
-            display: none; /* Skjult som standard */
-            background-color: var(--primary); /* Tydelig oransje farge */
-            color: white;
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            position: relative;
-            font-size: 13px;
-            text-align: center;
-        }
-        .install-arrow {
-            position: absolute;
-            top: -15px; /* Flytter pilen opp for å peke mot nettlesermenyen */
-            right: 15px;
-            font-size: 18px;
-        }
-
         .leaderboard-card {
             background: linear-gradient(135deg, #3a3a4d 0%, #2b2b36 100%);
             border-radius: 12px; padding: 15px; margin-bottom: 20px;
@@ -73,11 +54,16 @@
         .loading-msg { text-align: center; color: var(--primary); font-weight: bold; margin-top: 20px; font-size: 14px; }
 
         .station-card { background-color: var(--card-bg); border-radius: 10px; padding: 15px; margin-bottom: 15px; display: flex; flex-direction: column; border: 2px solid transparent; }
+        .best-price-card { border-color: var(--gold); }
         .main-info { display: flex; justify-content: space-between; align-items: center; width: 100%; }
         .station-info { flex: 1; display: flex; align-items: flex-start; }
         .brand-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 12px; background: #4a4a5a; }
+        
         .prices-container { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
-        .price-row { display: flex; align-items: center; gap: 8px; }
+        .price-row { display: flex; align-items: center; gap: 8px; position: relative; }
+        .price-label { font-size: 10px; font-weight: bold; border-radius: 4px; padding: 2px 5px; width: 40px; text-align: center; color: white; }
+        .lbl-diesel { background-color: var(--diesel-color); }
+        .lbl-bensin { background-color: var(--bensin-color); }
         .price-value { font-size: 16px; font-weight: bold; background-color: #3f3f4e; padding: 4px 8px; border-radius: 6px; min-width: 55px; text-align: right; }
         .verify-badge { color: var(--success); font-size: 14px; margin-left: -5px; }
 
@@ -106,11 +92,6 @@
 <body>
 
 <div class="container">
-    <div id="install-banner" class="install-banner">
-        <span>Legg til på startskjermen for full app-opplevelse</span>
-        <span class="install-arrow">⬆️</span>
-    </div>
-
     <h2>Drivstoff Norge ⛽</h2>
 
     <div class="leaderboard-card">
@@ -119,7 +100,8 @@
             <span id="best-day" class="leader-name gold-txt">Laster...</span>
         </div>
         <div class="leader-section">
-            <span class="leader-title">Ukens bidragsyter 🗓️</span> <span id="best-week" class="leader-name silver-txt">Laster...</span>
+            <span class="leader-title">Ukens bidragsyter 🥈</span>
+            <span id="best-week" class="leader-name silver-txt">Laster...</span>
         </div>
         <button class="top-list-btn" onclick="toggleTopList()">Se Topp 10 bidragsytere</button>
         <div id="top-list-content"><div id="top-list-items"></div></div>
@@ -188,15 +170,6 @@
 
     let myUid = localStorage.getItem('drivstoff_uid') || ('u-' + Math.random().toString(36).substr(2, 9));
     localStorage.setItem('drivstoff_uid', myUid);
-
-    // NY A2HS-Logikk: Sjekk installasjonsstatus
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-    const installBanner = document.getElementById('install-banner');
-
-    if (!isStandalone) {
-        // Vis banneret hvis appen ikke er installert/ standalone
-        installBanner.style.display = 'block';
-    }
 
     let valgtStasjonId = null;
     let gjeldendeStasjoner = [];
@@ -282,6 +255,17 @@
         p.innerHTML = h.length ? h.map(i => `<div class="history-item"><span>D: ${i.diesel} | 95: ${i.bensin}</span><span>${new Date(i.timestamp).toLocaleDateString()}</span></div>`).join('') : "Ingen tidligere data.";
     }
 
+    // NY HJELPEFUNKSJON for merke-stil
+    function getBrandStyle(name) {
+        const n = name.toLowerCase();
+        if (n.includes("circle k")) return { char: 'C', color: '#ed1c24' }; // Rød
+        if (n.includes("shell")) return { char: 'S', color: '#ffcc00', text: '#ed1c24' }; // Gul/Rød
+        if (n.includes("uno-x")) return { char: 'U', color: '#ffcc00', text: '#000' }; // Gul/Svart
+        if (n.includes("yx")) return { char: 'Y', color: '#0055b8' }; // Blå
+        if (n.includes("esso")) return { char: 'E', color: '#ed1c24' }; // Rød
+        return { char: '⛽', color: '#4a4a5a' }; // Standard
+    }
+
     function visStasjoner(stasjoner, lat, lon) {
         const list = document.getElementById('station-list'); list.innerHTML = "";
         const sorted = [...stasjoner].sort((a,b) => (parseFloat(skylagredePriser[a.id]?.diesel)||99) - (parseFloat(skylagredePriser[b.id]?.diesel)||99));
@@ -294,10 +278,14 @@
         sorted.forEach(s => {
             const id = s.id; const p = skylagredePriser[id] || { diesel: "--", bensin: "--" };
             const dist = regnUtAvstand(lat, lon, s.lat, s.lon);
-            const escapedName = (s.tags.name || s.tags.brand || "Stasjon").replace(/'/g, "\\'");
+            const navn = s.tags.name || s.tags.brand || "Stasjon";
+            const escapedName = navn.replace(/'/g, "\\'");
+            
+            // Fiks for merke-ikon
+            const style = getBrandStyle(navn);
             
             const card = document.createElement('div'); card.className = `station-card`;
-            card.innerHTML = `<div class="main-info"><div class="station-info"><div class="brand-icon">⛽</div><div class="station-details"><h3>${s.tags.name || "Stasjon"}</h3><p>${dist.toFixed(1)} km unna</p></div></div><div class="prices-container"><div class="price-row">D <div class="price-value">${p.diesel}</div> ${p.verified?'<span class="verify-badge">✅</span>':''}</div><div class="price-row">95 <div class="price-value">${p.bensin}</div> ${p.verified?'<span class="verify-badge">✅</span>':''}</div></div></div><div class="action-buttons"><div class="update-btn" onclick="apneModal(${id},'${escapedName}')">OPPDATER</div><a class="nav-btn" href="https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lon}" target="_blank">KJØR HIT</a><div class="hist-btn" onclick="visHistorikk(${id})">⌛ HISTORIKK</div></div><div id="hist-${id}" class="history-panel"></div><div class="time-ago">${formaterTid(p.timestamp, p.user)}</div>`;
+            card.innerHTML = `<div class="main-info"><div class="station-info"><div class="brand-icon" style="background-color: ${style.color}; color: ${style.text || '#fff'}">${style.char}</div><div class="station-details"><h3>${navn}</h3><p>${dist.toFixed(1)} km unna</p></div></div><div class="prices-container"><div class="price-row"><span class="price-label lbl-diesel">DIESEL</span><div class="price-value">${p.diesel}</div> ${p.verified?'<span class="verify-badge">✅</span>':''}</div><div class="price-row"><span class="price-label lbl-bensin">BENSIN 95</span><div class="price-value">${p.bensin}</div> ${p.verified?'<span class="verify-badge">✅</span>':''}</div></div></div><div class="action-buttons"><div class="update-btn" onclick="apneModal(${id},'${escapedName}')">OPPDATER</div><a class="nav-btn" href="http://googleusercontent.com/http://googleusercontent.com/maps.google.com/3{s.lat},${s.lon}" target="_blank">KJØR HIT</a><div class="hist-btn" onclick="visHistorikk(${id})">⌛ HISTORIKK</div></div><div id="hist-${id}" class="history-panel"></div><div class="time-ago">${formaterTid(p.timestamp, p.user)}</div>`;
             list.appendChild(card);
         });
     }
