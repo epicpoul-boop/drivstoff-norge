@@ -15,6 +15,7 @@
             --bensin-color: #4caf50;
             --danger: #ff4444;
             --gold: #ffd700;
+            --silver: #c0c0c0;
             --share-color: #4a90e2;
             --success: #4caf50;
         }
@@ -22,16 +23,23 @@
         .container { max-width: 500px; margin: 0 auto; }
         h2 { text-align: center; margin-bottom: 10px; }
 
+        /* Oppdatert Toppliste-kort */
         .leaderboard-card {
             background: linear-gradient(135deg, #3a3a4d 0%, #2b2b36 100%);
             border-radius: 12px; padding: 15px; margin-bottom: 20px;
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        .leader-header { display: flex; justify-content: space-between; align-items: center; }
-        .leader-title { font-size: 14px; color: var(--text-muted); text-transform: uppercase; }
-        .leader-name { font-size: 16px; font-weight: bold; color: var(--gold); display: block; }
-        .top-list-btn { background: rgba(255,255,255,0.1); border: none; color: white; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
-        #top-list-content { display: none; margin-top: 10px; }
+        .leader-section { margin-bottom: 12px; }
+        .leader-title { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: block; }
+        .leader-name { font-size: 15px; font-weight: bold; margin-top: 2px; display: block; }
+        .gold-txt { color: var(--gold); }
+        .silver-txt { color: var(--silver); }
+        
+        .top-list-btn { 
+            width: 100%; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); 
+            color: white; padding: 8px; border-radius: 6px; font-size: 12px; cursor: pointer; margin-top: 5px;
+        }
+        #top-list-content { display: none; margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; }
 
         .panel { background-color: var(--card-bg); padding: 15px; border-radius: 10px; margin-bottom: 20px; }
         input[type=text], input[type=number] { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: none; background-color: #3f3f4e; color: white; box-sizing: border-box; }
@@ -47,7 +55,7 @@
         .brand-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 12px; background: #4a4a5a; }
         
         .prices-container { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
-        .price-row { display: flex; align-items: center; gap: 8px; position: relative; }
+        .price-row { display: flex; align-items: center; gap: 8px; }
         .price-value { font-size: 16px; font-weight: bold; background-color: #3f3f4e; padding: 4px 8px; border-radius: 6px; min-width: 55px; text-align: right; }
         .verify-badge { color: var(--success); font-size: 14px; margin-left: -5px; }
 
@@ -59,7 +67,6 @@
 
         .history-panel { display: none; background: #1e1e24; border-radius: 8px; margin-top: 10px; padding: 10px; font-size: 11px; color: var(--text-muted); }
         .history-item { display: flex; justify-content: space-between; border-bottom: 1px solid #333; padding: 4px 0; }
-        
         .time-ago { font-size: 10px; color: #7a7a8c; margin-top: 10px; text-align: center; }
 
         #update-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); z-index: 1000; }
@@ -73,11 +80,19 @@
     <h2>Drivstoff Norge ⛽</h2>
 
     <div class="leaderboard-card">
-        <div class="leader-header">
-            <div><span class="leader-title">Dagens bidragsyter 🏆</span><span id="best-contributor" class="leader-name">Laster...</span></div>
-            <button class="top-list-btn" onclick="toggleTopList()">Topp 10</button>
+        <div class="leader-section">
+            <span class="leader-title">Dagens bidragsyter 🏆</span>
+            <span id="best-day" class="leader-name gold-txt">Laster...</span>
         </div>
-        <div id="top-list-content"><div id="top-list-items"></div></div>
+        <div class="leader-section">
+            <span class="leader-title">Ukens bidragsyter 🥈</span>
+            <span id="best-week" class="leader-name silver-txt">Laster...</span>
+        </div>
+        <button class="top-list-btn" onclick="toggleTopList()">Se Topp 10 bidragsytere</button>
+        
+        <div id="top-list-content">
+            <div id="top-list-items"></div>
+        </div>
     </div>
     
     <div class="panel">
@@ -138,11 +153,46 @@
     let gjeldendeStasjoner = [];
     let sisteLat, sisteLon;
 
-    onValue(ref(db, 'priser'), (snapshot) => {
-        const data = snapshot.val() || {};
-        beregnToppliste(data);
-        if (gjeldendeStasjoner.length > 0) visStasjoner(gjeldendeStasjoner, sisteLat, sisteLon, data);
+    // Henter priser og historikk for å beregne topplister
+    onValue(ref(db, 'priser'), async (snapshot) => {
+        const priser = snapshot.val() || {};
+        const histSnap = await get(ref(db, 'alle_oppdateringer')); // Ny mappe for å telle alt
+        beregnTopplister(histSnap.val() || {});
+        if (gjeldendeStasjoner.length > 0) visStasjoner(gjeldendeStasjoner, sisteLat, sisteLon, priser);
     });
+
+    function beregnTopplister(alleData) {
+        const dagTellere = {};
+        const ukeTellere = {};
+        const naa = Date.now();
+        const enDag = 24 * 60 * 60 * 1000;
+        const enUke = 7 * enDag;
+
+        Object.values(alleData).forEach(p => {
+            if (!p.user) return;
+            const alder = naa - p.timestamp;
+            if (alder < enDag) dagTellere[p.user] = (dagTellere[p.user] || 0) + 1;
+            if (alder < enUke) ukeTellere[p.user] = (ukeTellere[p.user] || 0) + 1;
+        });
+
+        const dagSortert = Object.entries(dagTellere).sort((a,b) => b[1]-a[1]);
+        const ukeSortert = Object.entries(ukeTellere).sort((a,b) => b[1]-a[1]);
+
+        document.getElementById('best-day').innerText = dagSortert.length ? `${dagSortert[0][0]} (${dagSortert[0][1]} stk)` : "Ingen enda i dag";
+        document.getElementById('best-week').innerText = ukeSortert.length ? `${ukeSortert[0][0]} (${ukeSortert[0][1]} stk)` : "Ingen enda denne uken";
+
+        document.getElementById('top-list-items').innerHTML = ukeSortert.slice(0, 10).map((u, i) => `
+            <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #333; font-size:13px">
+                <span>${i+1}. ${u[0]}</span>
+                <span>${u[1]} oppd.</span>
+            </div>
+        `).join('');
+    }
+
+    window.toggleTopList = function() {
+        const c = document.getElementById('top-list-content');
+        c.style.display = c.style.display === 'block' ? 'none' : 'block';
+    }
 
     window.lagrePris = async function() {
         const d = document.getElementById('input-diesel').value;
@@ -164,113 +214,51 @@
         const currentSnap = await get(currentRef);
         const oldData = currentSnap.val();
 
-        // Verifiseringslogikk
         let verified = false;
         if (oldData && oldData.uid !== myUid && oldData.diesel === d && oldData.bensin === b) {
-            const diff = Date.now() - oldData.timestamp;
-            if (diff < 86400000) verified = true;
+            if (Date.now() - oldData.timestamp < 86400000) verified = true;
         }
 
         const newData = { diesel: d, bensin: b, timestamp: Date.now(), user: n, uid: myUid, verified: verified };
         
-        // Lagre nåværende pris
         await set(currentRef, newData);
-        
-        // Lagre i historikk
         push(ref(db, 'historikk/' + valgtStasjonId), newData);
+        push(ref(db, 'alle_oppdateringer'), newData); // Lagrer her for toppliste-beregning
         
         lukkModal();
     };
 
+    // --- Standard visnings- og søkefunksjoner ---
+    window.visHistorikk = async function(id) {
+        const p = document.getElementById('hist-' + id);
+        if (p.style.display === 'block') { p.style.display = 'none'; return; }
+        p.style.display = 'block'; p.innerText = "Henter...";
+        const snap = await get(ref(db, 'historikk/' + id));
+        const data = snap.val();
+        if (!data) { p.innerText = "Ingen historikk."; return; }
+        const h = Object.values(data).reverse().slice(1, 4);
+        p.innerHTML = h.length ? h.map(i => `<div class="history-item"><span>D: ${i.diesel} | 95: ${i.bensin}</span><span>${new Date(i.timestamp).toLocaleDateString()}</span></div>`).join('') : "Ingen tidligere data.";
+    }
+
     function visStasjoner(stasjoner, lat, lon, priser) {
-        const list = document.getElementById('station-list');
-        list.innerHTML = "";
+        const list = document.getElementById('station-list'); list.innerHTML = "";
         const sorted = [...stasjoner].sort((a,b) => (parseFloat(priser[a.id]?.diesel)||99) - (parseFloat(priser[b.id]?.diesel)||99));
-        
         sorted.forEach(s => {
-            const id = s.id; const p = priser[id] || { diesel: "--", bensin: "--", verified: false };
+            const id = s.id; const p = priser[id] || { diesel: "--", bensin: "--" };
             const dist = regnUtAvstand(lat, lon, s.lat, s.lon);
-            const card = document.createElement('div');
-            card.className = `station-card`;
-            card.innerHTML = `
-                <div class="main-info">
-                    <div class="station-info">
-                        <div class="brand-icon">⛽</div>
-                        <div class="station-details">
-                            <h3>${s.tags.name || "Stasjon"}</h3>
-                            <p>${dist.toFixed(1)} km unna</p>
-                        </div>
-                    </div>
-                    <div class="prices-container">
-                        <div class="price-row"><span style="font-size:10px">D</span> <div class="price-value">${p.diesel}</div> ${p.verified?'<span class="verify-badge">✅</span>':''}</div>
-                        <div class="price-row"><span style="font-size:10px">95</span> <div class="price-value">${p.bensin}</div> ${p.verified?'<span class="verify-badge">✅</span>':''}</div>
-                    </div>
-                </div>
-                <div class="action-buttons">
-                    <div class="update-btn" onclick="apneModal(${id},'${s.tags.name||'Stasjon'}',${JSON.stringify(priser)})">OPPDATER</div>
-                    <a class="nav-btn" href="https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lon}" target="_blank">KJØR HIT</a>
-                    <div class="hist-btn" onclick="visHistorikk(${id})">⌛ HISTORIKK</div>
-                </div>
-                <div id="hist-${id}" class="history-panel">Laster...</div>
-                <div class="time-ago">${formaterTid(p.timestamp, p.user)}</div>`;
+            const card = document.createElement('div'); card.className = `station-card`;
+            card.innerHTML = `<div class="main-info"><div class="station-info"><div class="brand-icon">⛽</div><div class="station-details"><h3>${s.tags.name || "Stasjon"}</h3><p>${dist.toFixed(1)} km unna</p></div></div><div class="prices-container"><div class="price-row">D <div class="price-value">${p.diesel}</div> ${p.verified?'<span class="verify-badge">✅</span>':''}</div><div class="price-row">95 <div class="price-value">${p.bensin}</div> ${p.verified?'<span class="verify-badge">✅</span>':''}</div></div></div><div class="action-buttons"><div class="update-btn" onclick="apneModal(${id},'${s.tags.name||'Stasjon'}',${JSON.stringify(priser)})">OPPDATER</div><a class="nav-btn" href="https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lon}" target="_blank">KJØR HIT</a><div class="hist-btn" onclick="visHistorikk(${id})">⌛ HISTORIKK</div></div><div id="hist-${id}" class="history-panel"></div><div class="time-ago">${formaterTid(p.timestamp, p.user)}</div>`;
             list.appendChild(card);
         });
     }
 
-    window.visHistorikk = async function(id) {
-        const panel = document.getElementById('hist-' + id);
-        if (panel.style.display === 'block') { panel.style.display = 'none'; return; }
-        panel.style.display = 'block';
-        
-        const snap = await get(ref(db, 'historikk/' + id));
-        const data = snap.val();
-        if (!data) { panel.innerText = "Ingen historikk enda."; return; }
-        
-        const h = Object.values(data).reverse().slice(1, 4); // Vis de 3 forrige
-        if (h.length === 0) { panel.innerText = "Kun én registrering så langt."; return; }
-        
-        panel.innerHTML = h.map(item => `
-            <div class="history-item">
-                <span>D: ${item.diesel} | 95: ${item.bensin}</span>
-                <span>${new Date(item.timestamp).toLocaleDateString('no-NO')}</span>
-            </div>
-        `).join('');
-    }
-
-    // --- standardfunksjoner ---
-    window.toggleTopList = () => { const c = document.getElementById('top-list-content'); c.style.display = c.style.display==='block'?'none':'block'; };
     window.lukkModal = () => document.getElementById('update-modal').style.display='none';
     window.oppdaterRadiusText = () => document.getElementById('radius-val').innerText = document.getElementById('radius').value;
-    window.apneModal = (id, n, priser) => {
-        valgtStasjonId = id; document.getElementById('modal-station-name').innerText = n;
-        document.getElementById('input-nickname').value = localStorage.getItem('drivstoff_navn') || "";
-        document.getElementById('update-modal').style.display = 'block';
-    };
-    window.sokPaaSted = async function() {
-        const s = document.getElementById('stedsnavn').value;
-        const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(s)},Norge&format=json&limit=1`);
-        const d = await res.json();
-        if(d.length>0) hentStasjoner(parseFloat(d[0].lat), parseFloat(d[0].lon));
-    };
+    window.apneModal = (id, n) => { valgtStasjonId = id; document.getElementById('modal-station-name').innerText = n; document.getElementById('input-nickname').value = localStorage.getItem('drivstoff_navn') || ""; document.getElementById('update-modal').style.display = 'block'; };
+    window.sokPaaSted = async function() { const s = document.getElementById('stedsnavn').value; const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(s)},Norge&format=json&limit=1`); const d = await res.json(); if(d.length>0) hentStasjoner(parseFloat(d[0].lat), parseFloat(d[0].lon)); };
     window.startGpsSok = () => navigator.geolocation.getCurrentPosition(p => hentStasjoner(p.coords.latitude, p.coords.longitude));
-    async function hentStasjoner(lat, lon) {
-        sisteLat=lat; sisteLon=lon; const r=document.getElementById('radius').value*1000;
-        const res = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(`[out:json];node["amenity"="fuel"](around:${r},${lat},${lon});out;`)}`);
-        const data = await res.json(); gjeldendeStasjoner = data.elements;
-        get(ref(db, 'priser')).then(snap => visStasjoner(gjeldendeStasjoner, lat, lon, snap.val()||{}));
-    }
-    function beregnToppliste(data) {
-        const t = {}; const f = Date.now()-86400000;
-        Object.values(data).forEach(p => { if(p.user && p.timestamp > f) t[p.user] = (t[p.user]||0)+1; });
-        const s = Object.entries(t).sort((a,b)=>b[1]-a[1]);
-        document.getElementById('best-contributor').innerText = s.length ? `${s[0][0]} (${s[0][1]} stk)` : "Ingen enda!";
-        document.getElementById('top-list-items').innerHTML = s.slice(0,10).map((u,i)=>`<div style="display:flex; justify-content:space-between"><span>${i+1}. ${u[0]}</span><span>${u[1]}</span></div>`).join('');
-    }
-    function formaterTid(ts, u) {
-        if(!ts) return "Aldri"; const d = Math.floor((Date.now()-ts)/1000);
-        let txt = d<60?"nå":d<3600?Math.floor(d/60)+"m":d<86400?Math.floor(d/3600)+"t":Math.floor(d/86400)+"d";
-        return `Sist: ${txt} siden ${u?'av '+u:''}`;
-    }
+    async function hentStasjoner(lat, lon) { sisteLat=lat; sisteLon=lon; const r=document.getElementById('radius').value*1000; const res = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(`[out:json];node["amenity"="fuel"](around:${r},${lat},${lon});out;`)}`); const data = await res.json(); gjeldendeStasjoner = data.elements; get(ref(db, 'priser')).then(snap => visStasjoner(gjeldendeStasjoner, lat, lon, snap.val()||{})); }
+    function formaterTid(ts, u) { if(!ts) return "Aldri"; const d = Math.floor((Date.now()-ts)/1000); let txt = d<60?"nå":d<3600?Math.floor(d/60)+"m":d<86400?Math.floor(d/3600)+"t":Math.floor(d/86400)+"d"; return `Sist: ${txt} siden ${u?'av '+u:''}`; }
     function regnUtAvstand(l1,o1,l2,o2){const R=6371;const dL=(l2-l1)*Math.PI/180;const dO=(o2-o1)*Math.PI/180;const a=Math.sin(dL/2)**2+Math.cos(l1*Math.PI/180)*Math.cos(l2*Math.PI/180)*Math.sin(dO/2)**2;return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));}
 </script>
 </body>
