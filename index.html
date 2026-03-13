@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Drivstoff Norge</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="logo192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#1e1e24">
     <style>
         :root {
             --bg-color: #1e1e24;
@@ -151,12 +156,13 @@
     let valgtStasjonId = null;
     let gjeldendeStasjoner = [];
     let sisteLat, sisteLon;
+    let skylagredePriser = {}; // Hovedlisten i minnet
 
     onValue(ref(db, 'priser'), async (snapshot) => {
-        const priser = snapshot.val() || {};
+        skylagredePriser = snapshot.val() || {};
         const histSnap = await get(ref(db, 'alle_oppdateringer'));
         beregnTopplister(histSnap.val() || {});
-        if (gjeldendeStasjoner.length > 0) visStasjoner(gjeldendeStasjoner, sisteLat, sisteLon, priser);
+        if (gjeldendeStasjoner.length > 0) visStasjoner(gjeldendeStasjoner, sisteLat, sisteLon);
     });
 
     function beregnTopplister(alleData) {
@@ -204,8 +210,7 @@
         localStorage.setItem('drivstoff_navn', n);
 
         const currentRef = ref(db, 'priser/' + valgtStasjonId);
-        const currentSnap = await get(currentRef);
-        const oldData = currentSnap.val();
+        const oldData = skylagredePriser[valgtStasjonId];
 
         let verified = false;
         if (oldData && oldData.uid !== myUid && oldData.diesel === d && oldData.bensin === b) {
@@ -232,14 +237,18 @@
         p.innerHTML = h.length ? h.map(i => `<div class="history-item"><span>D: ${i.diesel} | 95: ${i.bensin}</span><span>${new Date(i.timestamp).toLocaleDateString()}</span></div>`).join('') : "Ingen tidligere data.";
     }
 
-    function visStasjoner(stasjoner, lat, lon, priser) {
+    function visStasjoner(stasjoner, lat, lon) {
         const list = document.getElementById('station-list'); list.innerHTML = "";
-        const sorted = [...stasjoner].sort((a,b) => (parseFloat(priser[a.id]?.diesel)||99) - (parseFloat(priser[b.id]?.diesel)||99));
+        const sorted = [...stasjoner].sort((a,b) => (parseFloat(skylagredePriser[a.id]?.diesel)||99) - (parseFloat(skylagredePriser[b.id]?.diesel)||99));
         sorted.forEach(s => {
-            const id = s.id; const p = priser[id] || { diesel: "--", bensin: "--" };
+            const id = s.id; const p = skylagredePriser[id] || { diesel: "--", bensin: "--" };
             const dist = regnUtAvstand(lat, lon, s.lat, s.lon);
+            
+            // Fiks for stasjonsnavn med enkle fnutter '
+            const escapedName = (s.tags.name || s.tags.brand || "Stasjon").replace(/'/g, "\\'");
+            
             const card = document.createElement('div'); card.className = `station-card`;
-            card.innerHTML = `<div class="main-info"><div class="station-info"><div class="brand-icon">⛽</div><div class="station-details"><h3>${s.tags.name || "Stasjon"}</h3><p>${dist.toFixed(1)} km unna</p></div></div><div class="prices-container"><div class="price-row">D <div class="price-value">${p.diesel}</div> ${p.verified?'<span class="verify-badge">✅</span>':''}</div><div class="price-row">95 <div class="price-value">${p.bensin}</div> ${p.verified?'<span class="verify-badge">✅</span>':''}</div></div></div><div class="action-buttons"><div class="update-btn" onclick="apneModal(${id},'${s.tags.name||'Stasjon'}',${JSON.stringify(priser)})">OPPDATER</div><a class="nav-btn" href="https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lon}" target="_blank">KJØR HIT</a><div class="hist-btn" onclick="visHistorikk(${id})">⌛ HISTORIKK</div></div><div id="hist-${id}" class="history-panel"></div><div class="time-ago">${formaterTid(p.timestamp, p.user)}</div>`;
+            card.innerHTML = `<div class="main-info"><div class="station-info"><div class="brand-icon">⛽</div><div class="station-details"><h3>${s.tags.name || "Stasjon"}</h3><p>${dist.toFixed(1)} km unna</p></div></div><div class="prices-container"><div class="price-row">D <div class="price-value">${p.diesel}</div> ${p.verified?'<span class="verify-badge">✅</span>':''}</div><div class="price-row">95 <div class="price-value">${p.bensin}</div> ${p.verified?'<span class="verify-badge">✅</span>':''}</div></div></div><div class="action-buttons"><div class="update-btn" onclick="apneModal(${id},'${escapedName}')">OPPDATER</div><a class="nav-btn" href="http://googleusercontent.com/https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lon}" target="_blank">KJØR HIT</a><div class="hist-btn" onclick="visHistorikk(${id})">⌛ HISTORIKK</div></div><div id="hist-${id}" class="history-panel"></div><div class="time-ago">${formaterTid(p.timestamp, p.user)}</div>`;
             list.appendChild(card);
         });
     }
@@ -247,10 +256,23 @@
     window.toggleTopList = () => { const c = document.getElementById('top-list-content'); c.style.display = c.style.display==='block'?'none':'block'; };
     window.lukkModal = () => document.getElementById('update-modal').style.display='none';
     window.oppdaterRadiusText = () => document.getElementById('radius-val').innerText = document.getElementById('radius').value;
-    window.apneModal = (id, n) => { valgtStasjonId = id; document.getElementById('modal-station-name').innerText = n; document.getElementById('input-nickname').value = localStorage.getItem('drivstoff_navn') || ""; document.getElementById('update-modal').style.display = 'block'; };
+    
+    // Forenklet modal-åpner: henter data fra hovedlisten skylagredePriser
+    window.apneModal = (id, n) => { 
+        valgtStasjonId = id; 
+        document.getElementById('modal-station-name').innerText = n; 
+        document.getElementById('input-nickname').value = localStorage.getItem('drivstoff_navn') || ""; 
+        
+        const p = skylagredePriser[id] || { diesel: "", bensin: "" };
+        document.getElementById('input-diesel').value = p.diesel;
+        document.getElementById('input-bensin').value = p.bensin;
+        
+        document.getElementById('update-modal').style.display = 'block'; 
+    };
+
     window.sokPaaSted = async function() { const s = document.getElementById('stedsnavn').value; const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(s)},Norge&format=json&limit=1`); const d = await res.json(); if(d.length>0) hentStasjoner(parseFloat(d[0].lat), parseFloat(d[0].lon)); };
     window.startGpsSok = () => navigator.geolocation.getCurrentPosition(p => hentStasjoner(p.coords.latitude, p.coords.longitude));
-    async function hentStasjoner(lat, lon) { sisteLat=lat; sisteLon=lon; const r=document.getElementById('radius').value*1000; const res = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(`[out:json];node["amenity"="fuel"](around:${r},${lat},${lon});out;`)}`); const data = await res.json(); gjeldendeStasjoner = data.elements; get(ref(db, 'priser')).then(snap => visStasjoner(gjeldendeStasjoner, lat, lon, snap.val()||{})); }
+    async function hentStasjoner(lat, lon) { sisteLat=lat; sisteLon=lon; const r=document.getElementById('radius').value*1000; const res = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(`[out:json];node["amenity"="fuel"](around:${r},${lat},${lon});out;`)}`); const data = await res.json(); gjeldendeStasjoner = data.elements; visStasjoner(gjeldendeStasjoner, lat, lon); }
     function formaterTid(ts, u) { if(!ts) return "Aldri"; const d = Math.floor((Date.now()-ts)/1000); let txt = d<60?"nå":d<3600?Math.floor(d/60)+"m":d<86400?Math.floor(d/3600)+"t":Math.floor(d/86400)+"d"; return `Sist: ${txt} siden ${u?'av '+u:''}`; }
     function regnUtAvstand(l1,o1,l2,o2){const R=6371;const dL=(l2-l1)*Math.PI/180;const dO=(o2-o1)*Math.PI/180;const a=Math.sin(dL/2)**2+Math.cos(l1*Math.PI/180)*Math.cos(l2*Math.PI/180)*Math.sin(dO/2)**2;return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));}
 </script>
