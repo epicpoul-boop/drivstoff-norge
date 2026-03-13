@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drivstoff Norge</title>
+    <style>
+        :root {
+            --bg-color: #1e1e24;
+            --card-bg: #2b2b36;
+            --primary: #ff7a00;
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+            --diesel-color: #ff9800;
+            --bensin-color: #4caf50;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 15px;
+        }
+        .container { max-width: 500px; margin: 0 auto; }
+        h2 { text-align: center; }
+        
+        .panel {
+            background-color: var(--card-bg); padding: 15px; border-radius: 10px; margin-bottom: 20px;
+        }
+        
+        input[type=text] {
+            width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px;
+            border: none; background-color: #3f3f4e; color: white; font-size: 16px; box-sizing: border-box;
+        }
+        input[type=range] { width: 100%; accent-color: var(--primary); margin-bottom: 10px; }
+        
+        button {
+            width: 100%; padding: 15px; background-color: var(--primary); color: white;
+            border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; margin-bottom: 10px;
+        }
+        button.gps-btn { background-color: #3f3f4e; }
+        
+        #status { text-align: center; color: var(--primary); margin-bottom: 15px; font-weight: bold; }
+        
+        .station-card {
+            background-color: var(--card-bg); border-radius: 10px; padding: 15px;
+            margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .station-info { flex: 1; }
+        .station-info h3 { margin: 0 0 5px 0; font-size: 16px; line-height: 1.2; }
+        .station-info p { margin: 0; color: var(--text-muted); font-size: 13px; }
+        
+        .prices-container { display: flex; flex-direction: column; gap: 8px; align-items: flex-end;}
+        
+        .price-row { display: flex; align-items: center; gap: 10px; }
+        .price-label { font-size: 12px; font-weight: bold; border-radius: 4px; padding: 2px 6px; }
+        .lbl-diesel { background-color: var(--diesel-color); color: #fff; }
+        .lbl-bensin { background-color: var(--bensin-color); color: #fff; }
+        
+        .price-value { font-size: 16px; font-weight: bold; background-color: #3f3f4e; padding: 5px 10px; border-radius: 6px; min-width: 60px; text-align: right;}
+        
+        /* NY: Stil for tidsstempelet */
+        .time-ago {
+            font-size: 11px;
+            color: #7a7a8c;
+            margin-top: 5px;
+            font-style: italic;
+        }
+
+        .update-btn { 
+            border: 1px solid var(--primary); color: var(--primary); background: transparent; 
+            padding: 8px 12px; font-size: 14px; margin-top: 8px; width: 100%;
+        }
+
+        #update-modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.8); z-index: 1000;
+        }
+        .modal-content {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background-color: var(--card-bg); padding: 25px; border-radius: 15px; 
+            width: 85%; max-width: 350px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); box-sizing: border-box;
+        }
+        .modal-content h3 { margin-top: 0; margin-bottom: 20px; text-align: center; }
+        
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; margin-bottom: 5px; font-weight: bold; }
+        .input-group input {
+            width: 100%; padding: 15px; border-radius: 8px; border: none;
+            background-color: #3f3f4e; color: white; font-size: 20px; text-align: center; box-sizing: border-box;
+        }
+        
+        .modal-buttons { display: flex; gap: 10px; margin-top: 20px; }
+        .btn-save { background-color: var(--primary); }
+        .btn-cancel { background-color: #555; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Drivstoff Norge ⛽</h2>
+    
+    <div class="panel">
+        <label for="radius">Søk innenfor: <span id="radius-val">10</span> km</label>
+        <input type="range" id="radius" min="1" max="50" value="10" oninput="oppdaterRadiusText()">
+        
+        <input type="text" id="stedsnavn" placeholder="Søk etter by eller tettsted (f.eks. Voss)">
+        <button onclick="sokPaaSted()">Søk på sted</button>
+        <button class="gps-btn" onclick="startGpsSok()">📍 Bruk min GPS-posisjon</button>
+    </div>
+
+    <p id="status">Koblet til skyen! Skriv inn et sted og trykk søk.</p>
+    <div id="station-list"></div>
+</div>
+
+<div id="update-modal">
+    <div class="modal-content">
+        <h3 id="modal-station-name">Stasjonsnavn</h3>
+        
+        <div class="input-group">
+            <label style="color: var(--diesel-color);">Diesel</label>
+            <input type="number" id="input-diesel" step="0.01" placeholder="Pris...">
+        </div>
+        
+        <div class="input-group">
+            <label style="color: var(--bensin-color);">Bensin 95</label>
+            <input type="number" id="input-bensin" step="0.01" placeholder="Pris...">
+        </div>
+
+        <div class="modal-buttons">
+            <button class="btn-cancel" onclick="lukkModal()">Avbryt</button>
+            <button class="btn-save" onclick="lagrePris()">Lagre til skyen</button>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBlEIj2yxM-mJdBPw7zgDsirF9yAipdPkw",
+      authDomain: "drivstoff-norge-caeaa.firebaseapp.com",
+      databaseURL: "https://drivstoff-norge-caeaa-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "drivstoff-norge-caeaa",
+      storageBucket: "drivstoff-norge-caeaa.firebasestorage.app",
+      messagingSenderId: "18889820365",
+      appId: "1:18889820365:web:0bd8c054f70452c1ab4184"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    let valgtStasjonId = null;
+    let skylagredePriser = {}; 
+    
+    const STANDARD_DIESEL = "21.50";
+    const STANDARD_BENSIN = "22.50";
+
+    const priserRef = ref(db, 'priser');
+    onValue(priserRef, (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+            skylagredePriser = data;
+            
+            // Oppdaterer alle kort som er synlige på skjermen
+            for (const [id, priser] of Object.entries(skylagredePriser)) {
+                const dieselVisning = document.getElementById(`vis-diesel-${id}`);
+                const bensinVisning = document.getElementById(`vis-bensin-${id}`);
+                const tidVisning = document.getElementById(`vis-tid-${id}`);
+                
+                if (dieselVisning && bensinVisning) {
+                    dieselVisning.innerText = priser.diesel;
+                    bensinVisning.innerText = priser.bensin;
+                    if(tidVisning) tidVisning.innerText = formaterTid(priser.timestamp);
+                }
+            }
+        }
+    });
+
+    // --- NY FUNKSJON: Gjør millisekunder om til menneskespråk ---
+    function formaterTid(timestamp) {
+        if (!timestamp) return "Standardpris (Ikke oppdatert)";
+        
+        const naa = Date.now();
+        const diffISekunder = Math.floor((naa - timestamp) / 1000);
+        
+        if (diffISekunder < 60) return "🕒 Oppdatert akkurat nå";
+        
+        const minutter = Math.floor(diffISekunder / 60);
+        if (minutter < 60) return `🕒 Oppdatert for ${minutter} min siden`;
+        
+        const timer = Math.floor(minutter / 60);
+        if (timer < 24) return `🕒 Oppdatert for ${timer} t siden`;
+        
+        const dager = Math.floor(timer / 24);
+        return `🕒 Oppdatert for ${dager} d siden`;
+    }
+
+    window.oppdaterRadiusText = function() {
+        document.getElementById('radius-val').innerText = document.getElementById('radius').value;
+    }
+
+    window.sokPaaSted = async function() {
+        const sted = document.getElementById('stedsnavn').value;
+        const statusText = document.getElementById('status');
+        if (!sted) return statusText.innerText = "Vennligst skriv inn et stedsnavn.";
+        statusText.innerText = `Leter etter koordinater for ${sted}...`;
+        try {
+            const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(sted)},Norge&format=json&limit=1`);
+            const data = await res.json();
+            if (data.length === 0) return statusText.innerText = "Fant ikke stedet. Prøv et annet navn.";
+            hentStasjonerFraKoordinater(parseFloat(data[0].lat), parseFloat(data[0].lon));
+        } catch (e) { statusText.innerText = "Feil ved stedsøk."; }
+    }
+
+    window.startGpsSok = function() {
+        const statusText = document.getElementById('status');
+        statusText.innerText = "Ber om GPS-tilgang...";
+        if (!navigator.geolocation) return statusText.innerText = "Nettleseren støtter ikke GPS.";
+        navigator.geolocation.getCurrentPosition(
+            (pos) => hentStasjonerFraKoordinater(pos.coords.latitude, pos.coords.longitude),
+            (err) => { statusText.innerText = "Fikk ikke GPS-tilgang. Bruk tekstsøket i stedet!"; }
+        );
+    }
+
+    async function hentStasjonerFraKoordinater(lat, lon) {
+        const radiusMeter = document.getElementById('radius').value * 1000;
+        const statusText = document.getElementById('status');
+        statusText.innerText = "Henter bensinstasjoner...";
+        const query = `[out:json];node["amenity"="fuel"](around:${radiusMeter},${lat},${lon});out;`;
+        try {
+            const res = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`);
+            const data = await res.json();
+            visStasjoner(data.elements, lat, lon);
+        } catch (e) { statusText.innerText = "Klarte ikke hente stasjoner."; }
+    }
+
+    function visStasjoner(stasjoner, baseLat, baseLon) {
+        const list = document.getElementById('station-list');
+        list.innerHTML = ""; 
+        if(stasjoner.length === 0) return document.getElementById('status').innerText = "Fant ingen stasjoner i dette området.";
+        document.getElementById('status').innerText = `Fant ${stasjoner.length} stasjoner!`;
+
+        stasjoner.forEach(stasjon => {
+            const avstand = regnUtAvstand(baseLat, baseLon, stasjon.lat, stasjon.lon);
+            const navn = stasjon.tags.name || stasjon.tags.brand || "Ukjent Stasjon";
+            const stasjonId = stasjon.id;
+            
+            const priser = skylagredePriser[stasjonId] || { diesel: STANDARD_DIESEL, bensin: STANDARD_BENSIN, timestamp: null };
+            const tidTekst = formaterTid(priser.timestamp);
+
+            const card = document.createElement('div');
+            card.className = 'station-card';
+            card.innerHTML = `
+                <div class="station-info">
+                    <h3>${navn}</h3>
+                    <p>${avstand.toFixed(1)} km unna</p>
+                    <button class="update-btn" onclick="apneModal(${stasjonId}, '${navn}')">Oppdater pris</button>
+                </div>
+                <div class="prices-container">
+                    <div class="price-row">
+                        <span class="price-label lbl-diesel">Diesel</span>
+                        <div class="price-value" id="vis-diesel-${stasjonId}">${priser.diesel}</div>
+                    </div>
+                    <div class="price-row">
+                        <span class="price-label lbl-bensin">95</span>
+                        <div class="price-value" id="vis-bensin-${stasjonId}">${priser.bensin}</div>
+                    </div>
+                    <div class="time-ago" id="vis-tid-${stasjonId}">${tidTekst}</div>
+                </div>
+            `;
+            list.appendChild(card);
+        });
+    }
+
+    window.apneModal = function(id, navn) {
+        valgtStasjonId = id;
+        document.getElementById('modal-station-name').innerText = navn;
+        
+        const priser = skylagredePriser[id] || { diesel: STANDARD_DIESEL, bensin: STANDARD_BENSIN };
+        document.getElementById('input-diesel').value = priser.diesel;
+        document.getElementById('input-bensin').value = priser.bensin;
+        
+        document.getElementById('update-modal').style.display = 'block';
+    }
+
+    window.lukkModal = function() { document.getElementById('update-modal').style.display = 'none'; }
+
+    window.lagrePris = function() {
+        const nyDiesel = document.getElementById('input-diesel').value || STANDARD_DIESEL;
+        const nyBensin = document.getElementById('input-bensin').value || STANDARD_BENSIN;
+        
+        // --- OPPDATERT: Nå lagrer vi også nøyaktig tidspunkt (Date.now()) ---
+        set(ref(db, 'priser/' + valgtStasjonId), {
+            diesel: nyDiesel,
+            bensin: nyBensin,
+            timestamp: Date.now() 
+        }).then(() => {
+            window.lukkModal();
+            document.getElementById('status').innerText = "Priser oppdatert for hele Norge! 🇳🇴";
+        }).catch((error) => {
+            document.getElementById('status').innerText = "Feil ved lagring.";
+        });
+    }
+
+    function regnUtAvstand(lat1, lon1, lat2, lon2) {
+        const R = 6371; 
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
+        return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
+    }
+</script>
+
+</body>
+</html>
