@@ -86,6 +86,39 @@
         .footer { margin-top: 40px; text-align: center; padding: 20px; border-top: 1px solid #2b2b36; }
         .footer-text { font-size: 12px; color: var(--text-muted); line-height: 1.6; margin-bottom: 15px; }
         .feedback-btn { background: transparent; border: 1px solid var(--share-color); color: var(--share-color); padding: 10px 20px; border-radius: 8px; font-size: 13px; display: inline-block; text-decoration: none; }
+        
+        /* NYTT: Uthevet lenke for App Store-forklaring */
+        .appstore-link { display: inline-block; margin-top: 20px; color: var(--primary); text-decoration: underline; cursor: pointer; font-weight: bold; font-size: 13px; }
+
+        /* NYTT: Modal for App Store info */
+        #info-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); z-index: 2000; overflow-y: auto; }
+        .info-content { position: relative; margin: 40px auto; background-color: var(--card-bg); padding: 25px; border-radius: 15px; width: 90%; max-width: 350px; box-sizing: border-box; line-height: 1.5; font-size: 14px; }
+        .info-content h3 { margin-top: 0; color: var(--primary); font-size: 18px; }
+        .info-content ul { padding-left: 20px; margin-bottom: 20px; }
+        .info-content li { margin-bottom: 10px; }
+
+        /* NYTT: Pil ned knapp (Floating Action Button) */
+        #scroll-down-btn {
+            display: none; /* Skjult som standard */
+            position: fixed;
+            bottom: 25px;
+            right: 20px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 22px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            cursor: pointer;
+            z-index: 999;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.9;
+            transition: opacity 0.3s, transform 0.2s;
+        }
+        #scroll-down-btn:active { transform: scale(0.9); }
 
         #update-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); z-index: 1000; overflow-y: auto; }
         .modal-content { position: relative; margin: 40px auto; background-color: var(--card-bg); padding: 25px; border-radius: 15px; width: 90%; max-width: 350px; box-sizing: border-box; }
@@ -137,6 +170,24 @@
         <a href="mailto:thaldling@gmail.com?subject=Tilbakemelding%20Drivstoff%20Norge" class="feedback-btn">
             ✉️ Send tilbakemelding
         </a>
+        <br>
+        <a class="appstore-link" onclick="visInfoModal()">Hvorfor er ikke appen i App Store?</a>
+    </div>
+</div>
+
+<button id="scroll-down-btn" onclick="blaNedover()">⬇️</button>
+
+<div id="info-modal" onclick="if(event.target==this) lukkInfoModal()">
+    <div class="info-content">
+        <h3>Hvorfor ikke App Store? 📱</h3>
+        <p>For å holde appen lynrask, 100% gratis og <b>helt fri for reklame og mas om abonnement</b>, er den bygget som en moderne web-app.</p>
+        <p>App-butikkene tar høye avgifter og har strenge regler, noe som ofte tvinger apper til å bli dårligere over tid (reklame/betalingsmurer).</p>
+        <h4>Slik installerer du den gratis:</h4>
+        <ul>
+            <li><b>iPhone (Safari):</b> Trykk på <svg style="vertical-align: middle; margin: 0 4px;" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg> (Del-ikonet) nederst, bla ned og velg <i>"Legg til på hjemskjerm"</i>.</li>
+            <li><b>Android (Chrome):</b> Trykk på <b>⋮</b> (Tre prikker) øverst til høyre og velg <i>"Legg til på startskjermen"</i>.</li>
+        </ul>
+        <button style="width:100%;" onclick="lukkInfoModal()">Skjønner, lukk denne</button>
     </div>
 </div>
 
@@ -191,7 +242,6 @@
     let myUid = localStorage.getItem('drivstoff_uid') || ('u-' + Math.random().toString(36).substr(2, 9));
     localStorage.setItem('drivstoff_uid', myUid);
 
-    // --- NY LOGIKK FOR FACEBOOK / IN-APP BROWSER ---
     const ua = navigator.userAgent || navigator.vendor || window.opera;
     const isFacebookApp = (ua.indexOf("FBAN") > -1) || (ua.indexOf("FBAV") > -1) || (ua.indexOf("Instagram") > -1);
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
@@ -201,15 +251,40 @@
     const bannerArrow = document.getElementById('banner-arrow');
 
     if (isFacebookApp) {
-        // Brukeren er fanget i Facebook - vis advarsel og instruksjoner
         installBanner.style.display = 'block';
-        installBanner.style.backgroundColor = 'var(--danger)'; // Gjør den rød for å tiltrekke oppmerksomhet
-        bannerArrow.style.display = 'none'; // Skjul den lille pilen
+        installBanner.style.backgroundColor = 'var(--danger)'; 
+        bannerArrow.style.display = 'none'; 
         bannerText.innerHTML = `⚠️ <b>Du er i Facebook sin nettleser.</b><br>Appen fungerer best utenfor FB. For å installere appen:<br>Trykk på de tre prikkene ⋯ og velg <b>"Åpne i ekstern nettleser"</b>.`;
     } else if (!isStandalone) {
-        // Brukeren er i Chrome/Safari, men har ikke installert appen enda
         installBanner.style.display = 'block';
     }
+
+    // --- NYTT: Logikk for Pil Ned og Sjekk av innhold ---
+    const scrollBtn = document.getElementById('scroll-down-btn');
+    
+    function sjekkScroll() {
+        // Sjekk om siden er lengre enn skjermen OG at vi ikke allerede er i bunnen
+        const erLangNok = document.documentElement.scrollHeight > window.innerHeight;
+        const erIkkeIBunnen = window.innerHeight + window.scrollY < document.documentElement.scrollHeight - 100;
+        
+        if (erLangNok && erIkkeIBunnen) {
+            scrollBtn.style.display = 'flex';
+        } else {
+            scrollBtn.style.display = 'none';
+        }
+    }
+    
+    window.addEventListener('scroll', sjekkScroll);
+    window.addEventListener('resize', sjekkScroll);
+
+    window.blaNedover = () => {
+        // Blar nedover 70% av skjermhøyden i en myk bevegelse
+        window.scrollBy({ top: window.innerHeight * 0.7, behavior: 'smooth' });
+    };
+
+    window.visInfoModal = () => document.getElementById('info-modal').style.display = 'block';
+    window.lukkInfoModal = () => document.getElementById('info-modal').style.display = 'none';
+
 
     let valgtStasjonId = null;
     let valgtStasjonLat = null; 
@@ -224,6 +299,7 @@
         beregnTopplister(histSnap.val() || {});
         visGlobalSisteOppdatering();
         if (gjeldendeStasjoner.length > 0) visStasjoner(gjeldendeStasjoner, sisteLat, sisteLon);
+        setTimeout(sjekkScroll, 500); // Sjekk om vi trenger pil ned etter innlasting
     });
 
     function beregnTopplister(alleData) {
@@ -406,9 +482,16 @@
                 </div>
             `;
         }
+        
+        // Etter at stasjonene er lagt til, sjekk om vi skal vise piltasten
+        setTimeout(sjekkScroll, 200);
     }
 
-    window.toggleTopList = () => { const c = document.getElementById('top-list-content'); c.style.display = c.style.display==='block'?'none':'block'; };
+    window.toggleTopList = () => { 
+        const c = document.getElementById('top-list-content'); 
+        c.style.display = c.style.display==='block'?'none':'block'; 
+        setTimeout(sjekkScroll, 200); // Sjekk pil ned etter listen er åpen/lukket
+    };
     window.lukkModal = () => { document.getElementById('update-modal').style.display='none'; document.getElementById('modal-error').style.display='none'; };
     window.oppdaterRadiusText = () => document.getElementById('radius-val').innerText = document.getElementById('radius').value;
     
