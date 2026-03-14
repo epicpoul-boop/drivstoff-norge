@@ -49,7 +49,7 @@
         .featured-prices { display: flex; gap: 10px; flex-wrap: wrap; }
         .f-price-box { background: rgba(0,0,0,0.4); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); backdrop-filter: blur(4px); }
         .f-lbl { font-size: 10px; display: block; margin-bottom: 2px; color: #eee; }
-        .f-val { font-size: 18px; font-weight: bold; }
+        .f-val { font-size: 18px; font-weight: bold; display: flex; align-items: center; gap: 4px; }
         .f-user { margin-top: 15px; font-size: 11px; opacity: 0.8; }
         .f-icon-bg { position: absolute; right: -20px; bottom: -20px; font-size: 100px; opacity: 0.15; transform: rotate(-15deg); }
 
@@ -70,7 +70,12 @@
         .lbl-diesel { background-color: var(--diesel-color); }
         .lbl-bensin { background-color: var(--bensin-color); }
         .lbl-bensin98 { background-color: var(--bensin98-color); }
-        .price-value { font-size: 16px; font-weight: bold; background-color: #3f3f4e; padding: 4px 8px; border-radius: 6px; min-width: 55px; text-align: right; }
+        .price-value { font-size: 16px; font-weight: bold; background-color: #3f3f4e; padding: 4px 8px; border-radius: 6px; min-width: 65px; text-align: right; display: flex; justify-content: flex-end; align-items: center; gap: 4px; }
+        
+        /* NYTT: Pil opp/ned farger */
+        .trend-up { color: var(--success); font-size: 14px; } /* Grønn pil opp */
+        .trend-down { color: var(--danger); font-size: 14px; } /* Rød pil ned */
+        
         .verify-badge { color: var(--success); font-size: 14px; margin-left: -5px; }
 
         .action-buttons { display: flex; gap: 5px; margin-top: 15px; border-top: 1px solid #3f3f4e; padding-top: 10px; }
@@ -83,42 +88,20 @@
         .history-item { display: flex; justify-content: space-between; border-bottom: 1px solid #333; padding: 4px 0; }
         .time-ago { font-size: 10px; color: #7a7a8c; margin-top: 10px; text-align: center; }
 
-        .footer { margin-top: 40px; text-align: center; padding: 20px; border-top: 1px solid #2b2b36; }
+        /* NYTT: Legg til stasjon knapp under listen */
+        #add-station-container { display: none; text-align: center; margin-bottom: 30px; border-top: 1px solid #3f3f4e; padding-top: 20px; }
+        .btn-add-station { background-color: transparent; border: 1px dashed var(--primary); color: var(--primary); padding: 12px; border-radius: 8px; font-size: 14px; display: inline-block; cursor: pointer; width: 100%; }
+
+        .footer { margin-top: 10px; text-align: center; padding: 20px; border-top: 1px solid #2b2b36; }
         .footer-text { font-size: 12px; color: var(--text-muted); line-height: 1.6; margin-bottom: 15px; }
         .feedback-btn { background: transparent; border: 1px solid var(--share-color); color: var(--share-color); padding: 10px 20px; border-radius: 8px; font-size: 13px; display: inline-block; text-decoration: none; }
-        
-        /* NYTT: Uthevet lenke for App Store-forklaring */
         .appstore-link { display: inline-block; margin-top: 20px; color: var(--primary); text-decoration: underline; cursor: pointer; font-weight: bold; font-size: 13px; }
 
-        /* NYTT: Modal for App Store info */
-        #info-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); z-index: 2000; overflow-y: auto; }
+        #info-modal, #add-station-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); z-index: 2000; overflow-y: auto; }
         .info-content { position: relative; margin: 40px auto; background-color: var(--card-bg); padding: 25px; border-radius: 15px; width: 90%; max-width: 350px; box-sizing: border-box; line-height: 1.5; font-size: 14px; }
         .info-content h3 { margin-top: 0; color: var(--primary); font-size: 18px; }
-        .info-content ul { padding-left: 20px; margin-bottom: 20px; }
-        .info-content li { margin-bottom: 10px; }
 
-        /* NYTT: Pil ned knapp (Floating Action Button) */
-        #scroll-down-btn {
-            display: none; /* Skjult som standard */
-            position: fixed;
-            bottom: 25px;
-            right: 20px;
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            font-size: 22px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-            cursor: pointer;
-            z-index: 999;
-            align-items: center;
-            justify-content: center;
-            opacity: 0.9;
-            transition: opacity 0.3s, transform 0.2s;
-        }
-        #scroll-down-btn:active { transform: scale(0.9); }
+        #scroll-down-btn { display: none; position: fixed; bottom: 25px; right: 20px; background-color: var(--primary); color: white; border: none; border-radius: 50%; width: 50px; height: 50px; font-size: 22px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); cursor: pointer; z-index: 999; align-items: center; justify-content: center; opacity: 0.9; }
 
         #update-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); z-index: 1000; overflow-y: auto; }
         .modal-content { position: relative; margin: 40px auto; background-color: var(--card-bg); padding: 25px; border-radius: 15px; width: 90%; max-width: 350px; box-sizing: border-box; }
@@ -162,6 +145,11 @@
 
     <div id="station-list"></div>
 
+    <div id="add-station-container">
+        <p style="font-size: 13px; color: var(--text-muted); margin-top: 0;">Finner du ikke stasjonen du leter etter?</p>
+        <button class="btn-add-station" onclick="apneLeggTilStasjonModal()">+ Legg til manglende stasjon</button>
+    </div>
+
     <div class="footer">
         <div class="footer-text">
             <strong>Personvern:</strong> Vi sporer deg ikke. Posisjonen din brukes kun lokalt for å finne stasjoner. 
@@ -181,13 +169,26 @@
     <div class="info-content">
         <h3>Hvorfor ikke App Store? 📱</h3>
         <p>For å holde appen lynrask, 100% gratis og <b>helt fri for reklame og mas om abonnement</b>, er den bygget som en moderne web-app.</p>
-        <p>App-butikkene tar høye avgifter og har strenge regler, noe som ofte tvinger apper til å bli dårligere over tid (reklame/betalingsmurer).</p>
+        <p>App-butikkene tar høye avgifter og har strenge regler, noe som ofte tvinger apper til å bli dårligere over tid.</p>
         <h4>Slik installerer du den gratis:</h4>
-        <ul>
-            <li><b>iPhone (Safari):</b> Trykk på <svg style="vertical-align: middle; margin: 0 4px;" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg> (Del-ikonet) nederst, bla ned og velg <i>"Legg til på hjemskjerm"</i>.</li>
-            <li><b>Android (Chrome):</b> Trykk på <b>⋮</b> (Tre prikker) øverst til høyre og velg <i>"Legg til på startskjermen"</i>.</li>
+        <ul style="padding-left: 20px;">
+            <li style="margin-bottom: 10px;"><b>iPhone (Safari):</b> Trykk på <svg style="vertical-align: middle; margin: 0 4px;" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg> nederst, bla ned og velg <i>"Legg til på hjemskjerm"</i>.</li>
+            <li><b>Android (Chrome):</b> Trykk på <b>⋮</b> øverst til høyre og velg <i>"Legg til på startskjermen"</i>.</li>
         </ul>
         <button style="width:100%;" onclick="lukkInfoModal()">Skjønner, lukk denne</button>
+    </div>
+</div>
+
+<div id="add-station-modal" onclick="if(event.target==this) lukkLeggTilStasjonModal()">
+    <div class="info-content">
+        <h3>Legg til stasjon 📍</h3>
+        <p style="font-size:12px; color:var(--text-muted); margin-bottom: 15px;">Appen vil bruke din nåværende posisjon. Sørg for at du er i nærheten av stasjonen!</p>
+        <label style="font-size:12px; color:var(--text-muted)">Stasjonsnavn (eks: YX Kjørbekk)</label>
+        <input type="text" id="new-station-name" placeholder="Navn på stasjon">
+        <div style="display:flex; gap:10px; margin-top:15px">
+            <button style="background-color:#555" onclick="lukkLeggTilStasjonModal()">Avbryt</button>
+            <button id="btn-save-station" onclick="lagreNyStasjon()">Lagre med GPS</button>
+        </div>
     </div>
 </div>
 
@@ -251,56 +252,83 @@
     const bannerArrow = document.getElementById('banner-arrow');
 
     if (isFacebookApp) {
-        installBanner.style.display = 'block';
-        installBanner.style.backgroundColor = 'var(--danger)'; 
+        installBanner.style.display = 'block'; installBanner.style.backgroundColor = 'var(--danger)'; 
         bannerArrow.style.display = 'none'; 
         bannerText.innerHTML = `⚠️ <b>Du er i Facebook sin nettleser.</b><br>Appen fungerer best utenfor FB. For å installere appen:<br>Trykk på de tre prikkene ⋯ og velg <b>"Åpne i ekstern nettleser"</b>.`;
-    } else if (!isStandalone) {
-        installBanner.style.display = 'block';
-    }
+    } else if (!isStandalone) { installBanner.style.display = 'block'; }
 
-    // --- NYTT: Logikk for Pil Ned og Sjekk av innhold ---
     const scrollBtn = document.getElementById('scroll-down-btn');
-    
     function sjekkScroll() {
-        // Sjekk om siden er lengre enn skjermen OG at vi ikke allerede er i bunnen
         const erLangNok = document.documentElement.scrollHeight > window.innerHeight;
         const erIkkeIBunnen = window.innerHeight + window.scrollY < document.documentElement.scrollHeight - 100;
-        
-        if (erLangNok && erIkkeIBunnen) {
-            scrollBtn.style.display = 'flex';
-        } else {
-            scrollBtn.style.display = 'none';
-        }
+        if (erLangNok && erIkkeIBunnen) { scrollBtn.style.display = 'flex'; } else { scrollBtn.style.display = 'none'; }
     }
-    
-    window.addEventListener('scroll', sjekkScroll);
-    window.addEventListener('resize', sjekkScroll);
-
-    window.blaNedover = () => {
-        // Blar nedover 70% av skjermhøyden i en myk bevegelse
-        window.scrollBy({ top: window.innerHeight * 0.7, behavior: 'smooth' });
-    };
+    window.addEventListener('scroll', sjekkScroll); window.addEventListener('resize', sjekkScroll);
+    window.blaNedover = () => { window.scrollBy({ top: window.innerHeight * 0.7, behavior: 'smooth' }); };
 
     window.visInfoModal = () => document.getElementById('info-modal').style.display = 'block';
     window.lukkInfoModal = () => document.getElementById('info-modal').style.display = 'none';
-
+    
+    // NYTT: Funksjoner for å legge til egen stasjon
+    window.apneLeggTilStasjonModal = () => document.getElementById('add-station-modal').style.display = 'block';
+    window.lukkLeggTilStasjonModal = () => document.getElementById('add-station-modal').style.display = 'none';
+    
+    window.lagreNyStasjon = () => {
+        const btn = document.getElementById('btn-save-station');
+        const navn = document.getElementById('new-station-name').value.trim();
+        if(!navn) { alert("Du må skrive inn et stasjonsnavn!"); return; }
+        
+        btn.innerText = "Henter posisjon...";
+        navigator.geolocation.getCurrentPosition(async (p) => {
+            const nyId = 'egen_' + Date.now();
+            await set(ref(db, 'egne_stasjoner/' + nyId), {
+                navn: navn,
+                lat: p.coords.latitude,
+                lon: p.coords.longitude,
+                opprettetAv: myUid
+            });
+            btn.innerText = "Lagre med GPS";
+            document.getElementById('new-station-name').value = '';
+            lukkLeggTilStasjonModal();
+            alert("Stasjonen er lagt til kartet! Oppdaterer søket ditt nå.");
+            if(sisteLat && sisteLon) hentStasjoner(sisteLat, sisteLon);
+        }, e => {
+            btn.innerText = "Lagre med GPS";
+            alert("Kunne ikke hente GPS. Sjekk at du har gitt nettleseren lov til å se posisjonen din.");
+        });
+    }
 
     let valgtStasjonId = null;
-    let valgtStasjonLat = null; 
-    let valgtStasjonLon = null; 
+    let valgtStasjonLat = null; let valgtStasjonLon = null; 
     let gjeldendeStasjoner = [];
     let sisteLat = null, sisteLon = null;
     let skylagredePriser = {}; 
+    let egneStasjoner = {}; // NYTT: Lagrer egendefinerte stasjoner
 
+    // Lytter på både priser og egne stasjoner
     onValue(ref(db, 'priser'), async (snapshot) => {
         skylagredePriser = snapshot.val() || {};
         const histSnap = await get(ref(db, 'alle_oppdateringer'));
         beregnTopplister(histSnap.val() || {});
         visGlobalSisteOppdatering();
         if (gjeldendeStasjoner.length > 0) visStasjoner(gjeldendeStasjoner, sisteLat, sisteLon);
-        setTimeout(sjekkScroll, 500); // Sjekk om vi trenger pil ned etter innlasting
+        setTimeout(sjekkScroll, 500); 
     });
+
+    onValue(ref(db, 'egne_stasjoner'), (snapshot) => {
+        egneStasjoner = snapshot.val() || {};
+        if (gjeldendeStasjoner.length > 0) hentStasjoner(sisteLat, sisteLon); // Oppdaterer visning om en ny legges til
+    });
+
+    // NYTT: Hjelpefunksjon for piler
+    function getTrendHtml(curr, prev) {
+        if(!curr || !prev || curr==="--" || prev==="--") return "";
+        let c = parseFloat(curr.replace(',', '.'));
+        let p = parseFloat(prev.replace(',', '.'));
+        if(c > p) return '<span class="trend-up">↑</span>'; // Grønn opp (per instruksjon)
+        if(c < p) return '<span class="trend-down">↓</span>'; // Rød ned (per instruksjon)
+        return "";
+    }
 
     function beregnTopplister(alleData) {
         const dagTellere = {}; const ukeTellere = {}; const naa = Date.now();
@@ -341,7 +369,7 @@
             const style = getBrandStyle(nyesteData.navn);
             let textColor = style.color === '#ffcc00' ? '#000' : '#fff';
 
-            let b98Html = (nyesteData.bensin98 && nyesteData.bensin98 !== "--") ? `<div class="f-price-box"><span class="f-lbl">BENSIN 98</span><span class="f-val">${nyesteData.bensin98}</span></div>` : '';
+            let b98Html = (nyesteData.bensin98 && nyesteData.bensin98 !== "--") ? `<div class="f-price-box"><span class="f-lbl">BENSIN 98</span><span class="f-val">${nyesteData.bensin98} ${getTrendHtml(nyesteData.bensin98, nyesteData.prev_bensin98)}</span></div>` : '';
 
             globalContainer.style.display = 'block';
             globalContainer.innerHTML = `
@@ -351,8 +379,8 @@
                     <h3 class="featured-title" style="margin-bottom: 5px;">${nyesteData.navn}</h3>
                     ${distStr}
                     <div class="featured-prices">
-                        <div class="f-price-box"><span class="f-lbl">DIESEL</span><span class="f-val">${nyesteData.diesel}</span></div>
-                        <div class="f-price-box"><span class="f-lbl">BENSIN 95</span><span class="f-val">${nyesteData.bensin}</span></div>
+                        <div class="f-price-box"><span class="f-lbl">DIESEL</span><span class="f-val">${nyesteData.diesel} ${getTrendHtml(nyesteData.diesel, nyesteData.prev_diesel)}</span></div>
+                        <div class="f-price-box"><span class="f-lbl">BENSIN 95</span><span class="f-val">${nyesteData.bensin} ${getTrendHtml(nyesteData.bensin, nyesteData.prev_bensin)}</span></div>
                         ${b98Html}
                     </div>
                     <div class="f-user">${formaterTid(nyesteData.timestamp, nyesteData.user)}</div>
@@ -379,22 +407,32 @@
 
         const nameRef = ref(db, 'users/' + n.toLowerCase());
         const nameSnap = await get(nameRef);
-        
         if (nameSnap.exists() && nameSnap.val() !== myUid) {
-            myUid = nameSnap.val();
-            localStorage.setItem('drivstoff_uid', myUid);
+            myUid = nameSnap.val(); localStorage.setItem('drivstoff_uid', myUid);
         } else if (!nameSnap.exists()) {
             await set(nameRef, myUid);
         }
-
         localStorage.setItem('drivstoff_navn', n);
 
         const currentRef = ref(db, 'priser/' + valgtStasjonId);
         const oldData = skylagredePriser[valgtStasjonId] || {};
 
+        // NYTT: Lagrer forrige pris for trend-pilene
+        let prev_d = oldData.diesel || "--";
+        let prev_b = oldData.bensin || "--";
+        let prev_b98 = oldData.bensin98 || "--";
+
         if (!d) d = oldData.diesel || "--";
+        else if (d !== oldData.diesel && oldData.diesel && oldData.diesel !== "--") prev_d = oldData.diesel;
+        else prev_d = oldData.prev_diesel || "--";
+
         if (!b) b = oldData.bensin || "--";
+        else if (b !== oldData.bensin && oldData.bensin && oldData.bensin !== "--") prev_b = oldData.bensin;
+        else prev_b = oldData.prev_bensin || "--";
+
         if (!b98) b98 = oldData.bensin98 || "--";
+        else if (b98 !== oldData.bensin98 && oldData.bensin98 && oldData.bensin98 !== "--") prev_b98 = oldData.bensin98;
+        else prev_b98 = oldData.prev_bensin98 || "--";
 
         let verified = false;
         if (oldData && oldData.uid !== myUid && oldData.diesel === d && oldData.bensin === b) {
@@ -402,7 +440,10 @@
         }
 
         const newData = { 
-            diesel: d, bensin: b, bensin98: b98, timestamp: Date.now(), user: n, uid: myUid, verified: verified,
+            diesel: d, prev_diesel: prev_d, 
+            bensin: b, prev_bensin: prev_b, 
+            bensin98: b98, prev_bensin98: prev_b98, 
+            timestamp: Date.now(), user: n, uid: myUid, verified: verified,
             navn: stasjonNavn, lat: valgtStasjonLat, lon: valgtStasjonLon 
         };
         
@@ -443,7 +484,9 @@
 
         const sorted = [...stasjoner].sort((a,b) => (parseFloat(skylagredePriser[a.id]?.diesel)||99) - (parseFloat(skylagredePriser[b.id]?.diesel)||99));
         
-        if (sorted.length === 0) { list.innerHTML = "<p style='text-align:center; color:var(--text-muted); margin-top:20px;'>Ingen stasjoner funnet i dette området.</p>"; return; }
+        if (sorted.length === 0) { 
+            list.innerHTML = "<p style='text-align:center; color:var(--text-muted); margin-top:20px;'>Ingen stasjoner funnet i dette området.</p>"; 
+        }
 
         let nyesteTid = 0; let nyesteStasjon = null; let nyesteData = null;
 
@@ -456,16 +499,21 @@
 
             if (p.timestamp > nyesteTid) { nyesteTid = p.timestamp; nyesteStasjon = { id, navn, escapedName, dist, style }; nyesteData = p; }
             
-            let b98Html = (p.bensin98 && p.bensin98 !== "--") ? `<div class="price-row"><span class="price-label lbl-bensin98">BENSIN 98</span><div class="price-value">${p.bensin98}</div></div>` : '';
+            // Piler for trender
+            const trendD = getTrendHtml(p.diesel, p.prev_diesel);
+            const trendB = getTrendHtml(p.bensin, p.prev_bensin);
+            const trendB98 = getTrendHtml(p.bensin98, p.prev_bensin98);
+
+            let b98Html = (p.bensin98 && p.bensin98 !== "--") ? `<div class="price-row"><span class="price-label lbl-bensin98">BENSIN 98</span><div class="price-value">${p.bensin98} ${trendB98}</div></div>` : '';
 
             const card = document.createElement('div'); card.className = `station-card`;
-            card.innerHTML = `<div class="main-info"><div class="station-info"><div class="brand-icon" style="background-color: ${style.color}; color: ${style.text || '#fff'}">${style.char}</div><div class="station-details"><h3>${navn}</h3><p>${dist.toFixed(1)} km unna</p></div></div><div class="prices-container"><div class="price-row"><span class="price-label lbl-diesel">DIESEL</span><div class="price-value">${p.diesel}</div> ${p.verified?'<span class="verify-badge">✅</span>':''}</div><div class="price-row"><span class="price-label lbl-bensin">BENSIN 95</span><div class="price-value">${p.bensin}</div> ${p.verified?'<span class="verify-badge">✅</span>':''}</div>${b98Html}</div></div><div class="action-buttons"><div class="update-btn" onclick="apneModal(${id},'${escapedName}', ${s.lat}, ${s.lon})">OPPDATER</div><a class="nav-btn" href="https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lon}" target="_blank">KJØR HIT</a><div class="hist-btn" onclick="visHistorikk(${id})">⌛ HISTORIKK</div></div><div id="hist-${id}" class="history-panel"></div><div class="time-ago">${formaterTid(p.timestamp, p.user)}</div>`;
+            card.innerHTML = `<div class="main-info"><div class="station-info"><div class="brand-icon" style="background-color: ${style.color}; color: ${style.text || '#fff'}">${style.char}</div><div class="station-details"><h3>${navn}</h3><p>${dist.toFixed(1)} km unna</p></div></div><div class="prices-container"><div class="price-row"><span class="price-label lbl-diesel">DIESEL</span><div class="price-value">${p.diesel} ${trendD}</div> ${p.verified?'<span class="verify-badge">✅</span>':''}</div><div class="price-row"><span class="price-label lbl-bensin">BENSIN 95</span><div class="price-value">${p.bensin} ${trendB}</div> ${p.verified?'<span class="verify-badge">✅</span>':''}</div>${b98Html}</div></div><div class="action-buttons"><div class="update-btn" onclick="apneModal('${id}','${escapedName}', ${s.lat}, ${s.lon})">OPPDATER</div><a class="nav-btn" href="https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lon}" target="_blank">KJØR HIT</a><div class="hist-btn" onclick="visHistorikk('${id}')">⌛ HISTORIKK</div></div><div id="hist-${id}" class="history-panel"></div><div class="time-ago">${formaterTid(p.timestamp, p.user)}</div>`;
             list.appendChild(card);
         });
 
         if (nyesteStasjon && nyesteTid > (Date.now() - (3 * 24 * 60 * 60 * 1000))) {
             let textColor = nyesteStasjon.style.color === '#ffcc00' ? '#000' : '#fff';
-            let b98Html = (nyesteData.bensin98 && nyesteData.bensin98 !== "--") ? `<div class="f-price-box"><span class="f-lbl">BENSIN 98</span><span class="f-val">${nyesteData.bensin98}</span></div>` : '';
+            let b98Html = (nyesteData.bensin98 && nyesteData.bensin98 !== "--") ? `<div class="f-price-box"><span class="f-lbl">BENSIN 98</span><span class="f-val">${nyesteData.bensin98} ${getTrendHtml(nyesteData.bensin98, nyesteData.prev_bensin98)}</span></div>` : '';
             
             featuredContainer.style.display = 'block';
             featuredContainer.innerHTML = `
@@ -474,8 +522,8 @@
                     <div class="featured-header">⚡ Sist oppdatert i ditt søk</div>
                     <h3 class="featured-title">${nyesteStasjon.navn}</h3>
                     <div class="featured-prices">
-                        <div class="f-price-box"><span class="f-lbl">DIESEL</span><span class="f-val">${nyesteData.diesel}</span></div>
-                        <div class="f-price-box"><span class="f-lbl">BENSIN 95</span><span class="f-val">${nyesteData.bensin}</span></div>
+                        <div class="f-price-box"><span class="f-lbl">DIESEL</span><span class="f-val">${nyesteData.diesel} ${getTrendHtml(nyesteData.diesel, nyesteData.prev_diesel)}</span></div>
+                        <div class="f-price-box"><span class="f-lbl">BENSIN 95</span><span class="f-val">${nyesteData.bensin} ${getTrendHtml(nyesteData.bensin, nyesteData.prev_bensin)}</span></div>
                         ${b98Html}
                     </div>
                     <div class="f-user">${formaterTid(nyesteData.timestamp, nyesteData.user)}</div>
@@ -483,15 +531,11 @@
             `;
         }
         
-        // Etter at stasjonene er lagt til, sjekk om vi skal vise piltasten
+        document.getElementById('add-station-container').style.display = 'block'; // Vis knappen for å legge til
         setTimeout(sjekkScroll, 200);
     }
 
-    window.toggleTopList = () => { 
-        const c = document.getElementById('top-list-content'); 
-        c.style.display = c.style.display==='block'?'none':'block'; 
-        setTimeout(sjekkScroll, 200); // Sjekk pil ned etter listen er åpen/lukket
-    };
+    window.toggleTopList = () => { const c = document.getElementById('top-list-content'); c.style.display = c.style.display==='block'?'none':'block'; setTimeout(sjekkScroll, 200); };
     window.lukkModal = () => { document.getElementById('update-modal').style.display='none'; document.getElementById('modal-error').style.display='none'; };
     window.oppdaterRadiusText = () => document.getElementById('radius-val').innerText = document.getElementById('radius').value;
     
@@ -511,7 +555,6 @@
             document.getElementById('div-bensin98').style.display = 'none';
             document.getElementById('btn-show-98').style.display = 'block';
         }
-        
         document.getElementById('update-modal').style.display = 'block'; 
     };
 
@@ -519,7 +562,7 @@
         const s = document.getElementById('stedsnavn').value; 
         if(!s) return;
         document.getElementById('station-list').innerHTML = "<p class='loading-msg'>🔍 Henter stasjoner for " + s + "...</p>";
-        document.getElementById('featured-station-container').style.display = 'none'; document.getElementById('global-featured-container').style.display = 'none';
+        document.getElementById('featured-station-container').style.display = 'none'; document.getElementById('global-featured-container').style.display = 'none'; document.getElementById('add-station-container').style.display = 'none';
         try {
             const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(s)},Norge&format=json&limit=1`); 
             const d = await res.json(); 
@@ -530,7 +573,7 @@
 
     window.startGpsSok = () => {
         document.getElementById('station-list').innerHTML = "<p class='loading-msg'>📍 Finner din posisjon...</p>";
-        document.getElementById('featured-station-container').style.display = 'none'; document.getElementById('global-featured-container').style.display = 'none';
+        document.getElementById('featured-station-container').style.display = 'none'; document.getElementById('global-featured-container').style.display = 'none'; document.getElementById('add-station-container').style.display = 'none';
         navigator.geolocation.getCurrentPosition(
             p => { sisteLat = p.coords.latitude; sisteLon = p.coords.longitude; hentStasjoner(p.coords.latitude, p.coords.longitude); },
             e => { document.getElementById('station-list').innerHTML = "<p style='text-align:center; color:var(--danger);'>GPS-feil.</p>"; }
@@ -543,7 +586,23 @@
         try {
             const res = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(`[out:json];node["amenity"="fuel"](around:${r},${lat},${lon});out;`)}`); 
             const data = await res.json(); 
-            gjeldendeStasjoner = data.elements; visStasjoner(gjeldendeStasjoner, lat, lon);
+            gjeldendeStasjoner = data.elements; 
+            
+            // NYTT: Slår sammen stasjoner fra kartet med dine egne stasjoner!
+            for (const key in egneStasjoner) {
+                const cs = egneStasjoner[key];
+                const dist = regnUtAvstand(lat, lon, cs.lat, cs.lon);
+                if (dist <= r/1000) {
+                    gjeldendeStasjoner.push({
+                        id: key,
+                        lat: cs.lat,
+                        lon: cs.lon,
+                        tags: { name: cs.navn, brand: cs.navn }
+                    });
+                }
+            }
+            
+            visStasjoner(gjeldendeStasjoner, lat, lon);
         } catch (e) { document.getElementById('station-list').innerHTML = "<p style='text-align:center; color:var(--danger);'>Kartfeil. Prøv igjen.</p>"; }
     }
 
