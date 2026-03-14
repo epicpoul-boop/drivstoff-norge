@@ -487,9 +487,20 @@
 
         const nameRef = ref(db, 'users/' + n.toLowerCase());
         const nameSnap = await get(nameRef);
+        
         if (nameSnap.exists() && nameSnap.val() !== myUid) {
+            // NY OPPDATERING: Sjekker om brukeren er klar over at de tar over et kallenavn
+            const bekreft = confirm(`Kallenavnet '${n}' er allerede i bruk av noen andre (eller din gamle profil).\n\nEr dette deg? Trykk OK for å hente tilbake profilen din.\nTrykk Avbryt for å velge et annet navn.`);
+            
+            if (!bekreft) {
+                return; // Stopper lagringen hvis de trykket Avbryt
+            }
+            
             myUid = nameSnap.val(); localStorage.setItem('drivstoff_uid', myUid);
-        } else if (!nameSnap.exists()) { await set(nameRef, myUid); }
+        } else if (!nameSnap.exists()) { 
+            await set(nameRef, myUid); 
+        }
+        
         localStorage.setItem('drivstoff_navn', n);
 
         const currentRef = ref(db, 'priser/' + valgtStasjonId);
