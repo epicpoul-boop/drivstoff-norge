@@ -45,7 +45,6 @@
         .top-list-item { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #333; font-size: 13px; align-items: center; }
         .user-title { font-size: 11px; color: var(--primary); opacity: 0.9; margin-left: 5px; }
 
-        /* OPPDATERT: Kompakt Featured Card */
         #global-featured-container, #featured-station-container { display: none; margin-bottom: 20px; }
         .featured-card { border-radius: 10px; padding: 12px 15px; color: white; position: relative; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
         .featured-header { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; opacity: 0.9; font-weight: bold; display: flex; align-items: center; z-index: 2; position: relative; }
@@ -164,7 +163,7 @@
             <strong>Personvern:</strong> Vi sporer deg ikke. Posisjonen din brukes kun lokalt for å finne stasjoner. 
             Vi lagrer kun kallenavnet ditt og en anonym ID for å sikre bidragene dine. Ingen reklame, ingen abonnement.
             <br><br>
-            <span style="color: var(--danger);">⚠️ Viktig:</span> Siden det ikke er innlogging, kan du miste tilgang til kallenavnet ditt (og oppdateringene/titlene dine) hvis du sletter nettleserdataen på telefonen din.
+            <span style="color: var(--primary);">⚠️ Viktig om kallenavn:</span> Appen har ingen passord for å holde ting lynraskt og enkelt. Hvis du sletter nettleserdataen din, får du tilbake poengene og titlene dine ved å bare skrive inn nøyaktig samme kallenavn neste gang du oppdaterer en pris! Vi stoler på dugnadsånden, så vi håper ingen utnytter dette til å stjele andres kallenavn. 🤞
         </div>
         <a href="mailto:thaldling@gmail.com?subject=Tilbakemelding%20Drivstoff%20Norge" class="feedback-btn">
             ✉️ Send tilbakemelding
@@ -272,13 +271,11 @@
     function oppdaterKlokker() {
         let now = new Date();
         
-        // Dagens midnatt
         let tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
         let diffDay = tomorrow - now;
         let hDay = Math.floor((diffDay / (1000 * 60 * 60)) % 24);
         let mDay = Math.floor((diffDay / 1000 / 60) % 60);
         
-        // Ukens (Neste mandag midnatt)
         let dayOfWeek = now.getDay();
         let daysUntilMonday = (7 - dayOfWeek + 1) % 7;
         if (daysUntilMonday === 0) daysUntilMonday = 7;
@@ -290,7 +287,7 @@
         document.getElementById('cd-day').innerText = `(Restarter om ${hDay}t ${mDay}m)`;
         document.getElementById('cd-week').innerText = `(Restarter om ${dWeek}d ${hWeek}t)`;
     }
-    setInterval(oppdaterKlokker, 60000); // Oppdaterer hvert minutt
+    setInterval(oppdaterKlokker, 60000);
     oppdaterKlokker();
 
     const scrollBtn = document.getElementById('scroll-down-btn');
@@ -357,7 +354,6 @@
         return "";
     }
 
-    // NYTT: Funksjon for å regne ut Tittel basert på antall
     function getTittel(antall) {
         if (antall >= 1000) return "Drivstoff-Gud 👑";
         if (antall >= 800) return "Pumpemester 🧙‍♂️";
@@ -387,14 +383,11 @@
         Object.values(alleData).forEach(p => {
             if (!p.user) return;
             
-            // Total-teller for titler
             totalTellere[p.user] = (totalTellere[p.user] || 0) + 1;
 
-            // Teller siden midnatt i dag
             if (p.timestamp >= startOfDay) {
                 dagTellere[p.user] = (dagTellere[p.user] || 0) + 1;
                 
-                // Prisjeger: Sjekker Dagens priser som er over 10kr, og som ER VERIFISERT
                 if (p.verified === true) {
                     let dPris = parseFloat(p.diesel ? p.diesel.replace(',', '.') : 999);
                     let bPris = parseFloat(p.bensin ? p.bensin.replace(',', '.') : 999);
@@ -406,7 +399,6 @@
                 }
             }
             
-            // Teller siden mandag midnatt
             if (p.timestamp >= startOfWeek) {
                 ukeTellere[p.user] = (ukeTellere[p.user] || 0) + 1;
             }
@@ -419,7 +411,6 @@
         document.getElementById('best-week').innerText = ukeSortert.length ? `${ukeSortert[0][0]} (${ukeSortert[0][1]} stk)` : "Ingen enda denne uken";
         document.getElementById('best-hunter').innerText = besteJegerStr;
 
-        // Viser Topp 10 med deres nyeste titler (basert på total)
         document.getElementById('top-list-items').innerHTML = ukeSortert.slice(0, 10).map((u, i) => {
             let tittel = getTittel(totalTellere[u[0]]);
             return `<div class="top-list-item">
@@ -456,7 +447,7 @@
             globalContainer.innerHTML = `
                 <div class="featured-card" style="background: ${style.bg}; color: ${textColor};">
                     <div class="f-icon-bg">${style.char}</div>
-                    <div class="featured-header">⚡ NYESTE OPPDATERING</div>
+                    <div class="featured-header">⚡ NYESTE OPPDATERING I NORGE</div>
                     <div class="featured-title">${nyesteData.navn} ${distStr}</div>
                     <div class="featured-prices">
                         <div class="f-price-box" style="border-color:${borderColor}"><span class="f-lbl">D</span><span class="f-val">${nyesteData.diesel} ${getTrendHtml(nyesteData.diesel, nyesteData.prev_diesel)}</span></div>
@@ -471,7 +462,6 @@
 
     window.vis98Felt = function() { document.getElementById('div-bensin98').style.display = 'block'; document.getElementById('btn-show-98').style.display = 'none'; }
 
-    // NY OPPDATERING: Sperrer for priser under 10 og over 35 kr
     function validerPris(pris) {
         if (!pris || pris === "--") return true; 
         let val = parseFloat(pris.replace(',', '.'));
@@ -595,7 +585,7 @@
             featuredContainer.innerHTML = `
                 <div class="featured-card" style="background: ${nyesteStasjon.style.bg}; color: ${textColor};">
                     <div class="f-icon-bg">${nyesteStasjon.style.char}</div>
-                    <div class="featured-header">⚡ NYESTE OPPDATERING</div>
+                    <div class="featured-header">⚡ NYESTE OPPDATERING I DITT SØK</div>
                     <div class="featured-title">${nyesteStasjon.navn} <span class="featured-dist">📍 ${nyesteStasjon.dist.toFixed(1)} km</span></div>
                     <div class="featured-prices">
                         <div class="f-price-box" style="border-color:${borderColor}"><span class="f-lbl">D</span><span class="f-val">${nyesteData.diesel} ${getTrendHtml(nyesteData.diesel, nyesteData.prev_diesel)}</span></div>
