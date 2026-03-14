@@ -43,7 +43,7 @@
         .top-list-btn { width: 100%; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 8px; border-radius: 6px; font-size: 12px; cursor: pointer; margin-top: 5px; }
         #top-list-content { display: none; margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; }
         .top-list-item { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #333; font-size: 13px; align-items: center; }
-        .user-title { font-size: 11px; color: var(--primary); opacity: 0.9; margin-left: 5px; }
+        .user-title { font-size: 11px; color: var(--primary); opacity: 0.9; margin-left: 5px; font-weight: normal; }
 
         #global-featured-container, #featured-station-container { display: none; margin-bottom: 20px; }
         .featured-card { border-radius: 10px; padding: 12px 15px; color: white; position: relative; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
@@ -139,7 +139,7 @@
             <span id="best-hunter" class="leader-name" style="color: var(--success); font-size: 14px;">Leter etter priser...</span>
         </div>
 
-        <button class="top-list-btn" onclick="toggleTopList()">Se Topp 10 & Titler</button>
+        <button class="top-list-btn" onclick="toggleTopList()">Se Topp 10</button>
         <div id="top-list-content"><div id="top-list-items"></div></div>
     </div>
     
@@ -368,8 +368,10 @@
         return "Fersking 🐣";
     }
 
+    // NYTT: Utregning av STREAKS og stasjonsnavn på Prisjeger
     function beregnTopplister(alleData) {
         const dagTellere = {}; const ukeTellere = {}; const totalTellere = {};
+        const userDays = {}; 
         
         let now = new Date();
         let startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
@@ -385,6 +387,12 @@
             
             totalTellere[p.user] = (totalTellere[p.user] || 0) + 1;
 
+            // Fanger opp alle dager en bruker har oppdatert (for streaks)
+            const d = new Date(p.timestamp);
+            d.setHours(0,0,0,0);
+            if (!userDays[p.user]) userDays[p.user] = new Set();
+            userDays[p.user].add(d.getTime());
+
             if (p.timestamp >= startOfDay) {
                 dagTellere[p.user] = (dagTellere[p.user] || 0) + 1;
                 
@@ -392,10 +400,12 @@
                     let dPris = parseFloat(p.diesel ? p.diesel.replace(',', '.') : 999);
                     let bPris = parseFloat(p.bensin ? p.bensin.replace(',', '.') : 999);
                     let b98Pris = parseFloat(p.bensin98 ? p.bensin98.replace(',', '.') : 999);
+                    let sNavn = p.navn || "Stasjon"; // Legger til stasjonsnavnet
                     
-                    if (dPris >= 10 && dPris < lavestePris) { lavestePris = dPris; besteJegerStr = `${p.user} (${lavestePris} kr for Diesel)`; }
-                    if (bPris >= 10 && bPris < lavestePris) { lavestePris = bPris; besteJegerStr = `${p.user} (${lavestePris} kr for Bensin)`; }
-                    if (b98Pris >= 10 && b98Pris < lavestePris) { lavestePris = b98Pris; besteJegerStr = `${p.user} (${lavestePris} kr for 98)`; }
+                    // OPPDATERT: Inkluderer stasjonsnavnet i teksten!
+                    if (dPris >= 10 && dPris < lavestePris) { lavestePris = dPris; besteJegerStr = `${p.user} (${lavestePris} kr for Diesel på ${sNavn})`; }
+                    if (bPris >= 10 && bPris < lavestePris) { lavestePris = bPris; besteJegerStr = `${p.user} (${lavestePris} kr for Bensin på ${sNavn})`; }
+                    if (b98Pris >= 10 && b98Pris < lavestePris) { lavestePris = b98Pris; besteJegerStr = `${p.user} (${lavestePris} kr for 98 på ${sNavn})`; }
                 }
             }
             
@@ -404,18 +414,52 @@
             }
         });
 
+        // REGN UT STREAKS (Antall dager på rad)
+        const userStreaks = {};
+        const todayTime = startOfDay;
+        const yesterdayTime = todayTime - 86400000;
+
+        for (const user in userDays) {
+            const days = Array.from(userDays[user]).sort((a,b) => b-a);
+            let streak = 0;
+            // Hvis de har oppdatert i dag ELLER i går, er streaken i live
+            if (days[0] === todayTime || days[0] === yesterdayTime) {
+                let currentExpected = days[0];
+                for (let i = 0; i < days.length; i++) {
+                    if (days[i] === currentExpected) {
+                        streak++;
+                        currentExpected -= 86400000; // Sjekk forrige dag
+                    } else {
+                        break;
+                    }
+                }
+            }
+            userStreaks[user] = streak;
+        }
+
         const dagSortert = Object.entries(dagTellere).sort((a,b) => b[1]-a[1]);
         const ukeSortert = Object.entries(ukeTellere).sort((a,b) => b[1]-a[1]);
 
-        document.getElementById('best-day').innerText = dagSortert.length ? `${dagSortert[0][0]} (${dagSortert[0][1]} stk)` : "Ingen enda i dag";
-        document.getElementById('best-week').innerText = ukeSortert.length ? `${ukeSortert[0][0]} (${ukeSortert[0][1]} stk)` : "Ingen enda denne uken";
+        // Hjelpefunksjon for å formatere vinnere med evt. flamme
+        const formatName = (user) => {
+            let streak = userStreaks[user] || 0;
+            return streak > 1 ? `${user} 🔥${streak}` : user;
+        };
+
+        // OPPDATERT: Fjernet "stk"
+        document.getElementById('best-day').innerText = dagSortert.length ? `${formatName(dagSortert[0][0])} (${dagSortert[0][1]})` : "Ingen enda i dag";
+        document.getElementById('best-week').innerText = ukeSortert.length ? `${formatName(ukeSortert[0][0])} (${ukeSortert[0][1]})` : "Ingen enda denne uken";
+        
         document.getElementById('best-hunter').innerText = besteJegerStr;
 
+        // OPPDATERT: Lagt til streak og fjernet "oppd."
         document.getElementById('top-list-items').innerHTML = ukeSortert.slice(0, 10).map((u, i) => {
             let tittel = getTittel(totalTellere[u[0]]);
+            let streak = userStreaks[u[0]] || 0;
+            let streakHtml = streak > 1 ? `<span style="color:var(--primary); font-size:12px; margin-left:5px;">🔥${streak}</span>` : '';
             return `<div class="top-list-item">
-                <div><span>${i+1}. ${u[0]}</span> <span class="user-title">${tittel}</span></div>
-                <span>${u[1]} oppd.</span>
+                <div><span>${i+1}. ${u[0]}</span>${streakHtml} <span class="user-title">${tittel}</span></div>
+                <span>${u[1]}</span>
             </div>`;
         }).join('');
     }
@@ -489,11 +533,10 @@
         const nameSnap = await get(nameRef);
         
         if (nameSnap.exists() && nameSnap.val() !== myUid) {
-            // NY OPPDATERING: Sjekker om brukeren er klar over at de tar over et kallenavn
             const bekreft = confirm(`Kallenavnet '${n}' er allerede i bruk av noen andre (eller din gamle profil).\n\nEr dette deg? Trykk OK for å hente tilbake profilen din.\nTrykk Avbryt for å velge et annet navn.`);
             
             if (!bekreft) {
-                return; // Stopper lagringen hvis de trykket Avbryt
+                return; 
             }
             
             myUid = nameSnap.val(); localStorage.setItem('drivstoff_uid', myUid);
