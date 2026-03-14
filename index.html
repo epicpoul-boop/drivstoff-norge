@@ -18,7 +18,7 @@
             --text-muted: #a0a0a0;
             --diesel-color: #ff9800;
             --bensin-color: #4caf50;
-            --bensin98-color: #2196f3; /* Blåfarge for 98 oktan */
+            --bensin98-color: #2196f3;
             --danger: #ff4444;
             --gold: #ffd700;
             --silver: #c0c0c0;
@@ -29,7 +29,7 @@
         .container { max-width: 500px; margin: 0 auto; }
         h2 { text-align: center; margin-bottom: 10px; }
 
-        .install-banner { display: none; background-color: var(--primary); color: white; padding: 10px; border-radius: 8px; margin-bottom: 20px; position: relative; font-size: 13px; text-align: center; }
+        .install-banner { display: none; background-color: var(--primary); color: white; padding: 12px; border-radius: 8px; margin-bottom: 20px; position: relative; font-size: 13px; text-align: center; line-height: 1.4; }
         .install-arrow { position: absolute; top: -15px; right: 15px; font-size: 18px; }
 
         .leaderboard-card { background: linear-gradient(135deg, #3a3a4d 0%, #2b2b36 100%); border-radius: 12px; padding: 15px; margin-bottom: 20px; border: 1px solid rgba(255, 255, 255, 0.1); }
@@ -97,8 +97,8 @@
 
 <div class="container">
     <div id="install-banner" class="install-banner">
-        <span>Legg til på startskjermen for full app-opplevelse</span>
-        <span class="install-arrow">⬆️</span>
+        <span id="banner-text">Legg til på startskjermen for full app-opplevelse</span>
+        <span id="banner-arrow" class="install-arrow">⬆️</span>
     </div>
 
     <h2>Drivstoff Norge ⛽</h2>
@@ -191,9 +191,25 @@
     let myUid = localStorage.getItem('drivstoff_uid') || ('u-' + Math.random().toString(36).substr(2, 9));
     localStorage.setItem('drivstoff_uid', myUid);
 
+    // --- NY LOGIKK FOR FACEBOOK / IN-APP BROWSER ---
+    const ua = navigator.userAgent || navigator.vendor || window.opera;
+    const isFacebookApp = (ua.indexOf("FBAN") > -1) || (ua.indexOf("FBAV") > -1) || (ua.indexOf("Instagram") > -1);
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+    
     const installBanner = document.getElementById('install-banner');
-    if (!isStandalone) installBanner.style.display = 'block';
+    const bannerText = document.getElementById('banner-text');
+    const bannerArrow = document.getElementById('banner-arrow');
+
+    if (isFacebookApp) {
+        // Brukeren er fanget i Facebook - vis advarsel og instruksjoner
+        installBanner.style.display = 'block';
+        installBanner.style.backgroundColor = 'var(--danger)'; // Gjør den rød for å tiltrekke oppmerksomhet
+        bannerArrow.style.display = 'none'; // Skjul den lille pilen
+        bannerText.innerHTML = `⚠️ <b>Du er i Facebook sin nettleser.</b><br>Appen fungerer best utenfor FB. For å installere appen:<br>Trykk på de tre prikkene ⋯ og velg <b>"Åpne i ekstern nettleser"</b>.`;
+    } else if (!isStandalone) {
+        // Brukeren er i Chrome/Safari, men har ikke installert appen enda
+        installBanner.style.display = 'block';
+    }
 
     let valgtStasjonId = null;
     let valgtStasjonLat = null; 
@@ -249,7 +265,6 @@
             const style = getBrandStyle(nyesteData.navn);
             let textColor = style.color === '#ffcc00' ? '#000' : '#fff';
 
-            // HTML for 98 oktan hvis den finnes
             let b98Html = (nyesteData.bensin98 && nyesteData.bensin98 !== "--") ? `<div class="f-price-box"><span class="f-lbl">BENSIN 98</span><span class="f-val">${nyesteData.bensin98}</span></div>` : '';
 
             globalContainer.style.display = 'block';
@@ -289,7 +304,6 @@
         const nameRef = ref(db, 'users/' + n.toLowerCase());
         const nameSnap = await get(nameRef);
         
-        // OPPDATERT: Hvis navnet eksisterer, men eies av en annen ID, adopterer vi den gamle IDen (Løser FB-browser problemet)
         if (nameSnap.exists() && nameSnap.val() !== myUid) {
             myUid = nameSnap.val();
             localStorage.setItem('drivstoff_uid', myUid);
@@ -407,7 +421,6 @@
         document.getElementById('input-bensin').value = p.bensin === "--" ? "" : p.bensin;
         document.getElementById('input-bensin98').value = p.bensin98 === "--" || !p.bensin98 ? "" : p.bensin98;
         
-        // Viser 98-feltet kun hvis det allerede ligger en pris inne
         if (p.bensin98 && p.bensin98 !== "--") {
             document.getElementById('div-bensin98').style.display = 'block';
             document.getElementById('btn-show-98').style.display = 'none';
