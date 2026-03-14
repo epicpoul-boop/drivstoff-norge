@@ -34,24 +34,29 @@
 
         .leaderboard-card { background: linear-gradient(135deg, #3a3a4d 0%, #2b2b36 100%); border-radius: 12px; padding: 15px; margin-bottom: 20px; border: 1px solid rgba(255, 255, 255, 0.1); }
         .leader-section { margin-bottom: 12px; }
-        .leader-title { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: block; }
-        .leader-name { font-size: 15px; font-weight: bold; margin-top: 2px; display: block; }
+        .leader-title { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 3px; }
+        .countdown { font-weight: normal; opacity: 0.7; text-transform: none; font-size: 10px; margin-left: 5px; }
+        .leader-name { font-size: 15px; font-weight: bold; display: block; }
         .gold-txt { color: var(--gold); }
         .silver-txt { color: var(--silver); }
         
         .top-list-btn { width: 100%; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 8px; border-radius: 6px; font-size: 12px; cursor: pointer; margin-top: 5px; }
         #top-list-content { display: none; margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; }
+        .top-list-item { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #333; font-size: 13px; align-items: center; }
+        .user-title { font-size: 11px; color: var(--primary); opacity: 0.9; margin-left: 5px; }
 
+        /* OPPDATERT: Kompakt Featured Card */
         #global-featured-container, #featured-station-container { display: none; margin-bottom: 20px; }
-        .featured-card { border-radius: 12px; padding: 20px; color: white; position: relative; overflow: hidden; box-shadow: 0 8px 16px rgba(0,0,0,0.3); }
-        .featured-header { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; opacity: 0.9; font-weight: bold; display: flex; align-items: center; gap: 5px; }
-        .featured-title { font-size: 20px; font-weight: bold; margin: 0 0 15px 0; text-shadow: 1px 1px 3px rgba(0,0,0,0.5); }
-        .featured-prices { display: flex; gap: 10px; flex-wrap: wrap; }
-        .f-price-box { background: rgba(0,0,0,0.4); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); backdrop-filter: blur(4px); }
-        .f-lbl { font-size: 10px; display: block; margin-bottom: 2px; color: #eee; }
-        .f-val { font-size: 18px; font-weight: bold; display: flex; align-items: center; gap: 4px; }
-        .f-user { margin-top: 15px; font-size: 11px; opacity: 0.8; }
-        .f-icon-bg { position: absolute; right: -20px; bottom: -20px; font-size: 100px; opacity: 0.15; transform: rotate(-15deg); }
+        .featured-card { border-radius: 10px; padding: 12px 15px; color: white; position: relative; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .featured-header { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; opacity: 0.9; font-weight: bold; display: flex; align-items: center; z-index: 2; position: relative; }
+        .featured-title { font-size: 16px; font-weight: bold; margin: 0 0 10px 0; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); display: flex; justify-content: space-between; align-items: center; z-index: 2; position: relative; }
+        .featured-dist { font-size: 11px; font-weight: normal; opacity: 0.9; }
+        .featured-prices { display: flex; gap: 8px; flex-wrap: wrap; z-index: 2; position: relative; }
+        .f-price-box { background: rgba(0,0,0,0.4); padding: 6px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); display: flex; align-items: center; gap: 6px; backdrop-filter: blur(2px); }
+        .f-lbl { font-size: 9px; color: #eee; }
+        .f-val { font-size: 15px; font-weight: bold; display: flex; align-items: center; gap: 3px; }
+        .f-user { margin-top: 8px; font-size: 10px; opacity: 0.8; text-align: right; z-index: 2; position: relative; }
+        .f-icon-bg { position: absolute; right: -15px; bottom: -20px; font-size: 80px; opacity: 0.15; transform: rotate(-15deg); z-index: 1; pointer-events: none; line-height: 1; }
 
         .panel { background-color: var(--card-bg); padding: 15px; border-radius: 10px; margin-bottom: 20px; }
         input[type=text] { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: none; background-color: #3f3f4e; color: white; box-sizing: border-box; font-size: 16px; }
@@ -72,9 +77,8 @@
         .lbl-bensin98 { background-color: var(--bensin98-color); }
         .price-value { font-size: 16px; font-weight: bold; background-color: #3f3f4e; padding: 4px 8px; border-radius: 6px; min-width: 65px; text-align: right; display: flex; justify-content: flex-end; align-items: center; gap: 4px; }
         
-        /* NYTT: Pil opp/ned farger */
-        .trend-up { color: var(--success); font-size: 14px; } /* Grønn pil opp */
-        .trend-down { color: var(--danger); font-size: 14px; } /* Rød pil ned */
+        .trend-up { color: var(--danger); font-size: 14px; } 
+        .trend-down { color: var(--success); font-size: 14px; } 
         
         .verify-badge { color: var(--success); font-size: 14px; margin-left: -5px; }
 
@@ -88,7 +92,6 @@
         .history-item { display: flex; justify-content: space-between; border-bottom: 1px solid #333; padding: 4px 0; }
         .time-ago { font-size: 10px; color: #7a7a8c; margin-top: 10px; text-align: center; }
 
-        /* NYTT: Legg til stasjon knapp under listen */
         #add-station-container { display: none; text-align: center; margin-bottom: 30px; border-top: 1px solid #3f3f4e; padding-top: 20px; }
         .btn-add-station { background-color: transparent; border: 1px dashed var(--primary); color: var(--primary); padding: 12px; border-radius: 8px; font-size: 14px; display: inline-block; cursor: pointer; width: 100%; }
 
@@ -105,7 +108,7 @@
 
         #update-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); z-index: 1000; overflow-y: auto; }
         .modal-content { position: relative; margin: 40px auto; background-color: var(--card-bg); padding: 25px; border-radius: 15px; width: 90%; max-width: 350px; box-sizing: border-box; }
-        #modal-error { color: var(--danger); font-size: 12px; margin-bottom: 10px; display: none; }
+        #modal-error { color: var(--danger); font-size: 13px; margin-bottom: 12px; display: none; padding: 10px; background: rgba(255,0,0,0.1); border-radius: 8px; font-weight: bold; }
         .btn-add-98 { background: transparent; border: 1px dashed #555; color: #a0a0a0; padding: 10px; font-size: 12px; margin-bottom: 12px; border-radius: 8px; width: 100%; }
     </style>
 </head>
@@ -124,14 +127,20 @@
 
     <div class="leaderboard-card">
         <div class="leader-section">
-            <span class="leader-title">Dagens bidragsyter 🏆</span>
+            <span class="leader-title">Dagens bidragsyter 🏆 <span id="cd-day" class="countdown"></span></span>
             <span id="best-day" class="leader-name gold-txt">Laster...</span>
         </div>
         <div class="leader-section">
-            <span class="leader-title">Ukens bidragsyter 🥇</span>
+            <span class="leader-title">Ukens bidragsyter 🥇 <span id="cd-week" class="countdown"></span></span>
             <span id="best-week" class="leader-name gold-txt">Laster...</span>
         </div>
-        <button class="top-list-btn" onclick="toggleTopList()">Se Topp 10 bidragsytere</button>
+        
+        <div class="leader-section" style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 12px;">
+            <span class="leader-title">Dagens Prisjeger 🕵️‍♂️ (Kun verifiserte!)</span>
+            <span id="best-hunter" class="leader-name" style="color: var(--success); font-size: 14px;">Leter etter priser...</span>
+        </div>
+
+        <button class="top-list-btn" onclick="toggleTopList()">Se Topp 10 & Titler</button>
         <div id="top-list-content"><div id="top-list-items"></div></div>
     </div>
     
@@ -154,6 +163,8 @@
         <div class="footer-text">
             <strong>Personvern:</strong> Vi sporer deg ikke. Posisjonen din brukes kun lokalt for å finne stasjoner. 
             Vi lagrer kun kallenavnet ditt og en anonym ID for å sikre bidragene dine. Ingen reklame, ingen abonnement.
+            <br><br>
+            <span style="color: var(--danger);">⚠️ Viktig:</span> Siden det ikke er innlogging, kan du miste tilgang til kallenavnet ditt (og oppdateringene/titlene dine) hvis du sletter nettleserdataen på telefonen din.
         </div>
         <a href="mailto:thaldling@gmail.com?subject=Tilbakemelding%20Drivstoff%20Norge" class="feedback-btn">
             ✉️ Send tilbakemelding
@@ -257,6 +268,31 @@
         bannerText.innerHTML = `⚠️ <b>Du er i Facebook sin nettleser.</b><br>Appen fungerer best utenfor FB. For å installere appen:<br>Trykk på de tre prikkene ⋯ og velg <b>"Åpne i ekstern nettleser"</b>.`;
     } else if (!isStandalone) { installBanner.style.display = 'block'; }
 
+    // --- NEDTELLINGSLOGIKK ---
+    function oppdaterKlokker() {
+        let now = new Date();
+        
+        // Dagens midnatt
+        let tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+        let diffDay = tomorrow - now;
+        let hDay = Math.floor((diffDay / (1000 * 60 * 60)) % 24);
+        let mDay = Math.floor((diffDay / 1000 / 60) % 60);
+        
+        // Ukens (Neste mandag midnatt)
+        let dayOfWeek = now.getDay();
+        let daysUntilMonday = (7 - dayOfWeek + 1) % 7;
+        if (daysUntilMonday === 0) daysUntilMonday = 7;
+        let nextMonday = new Date(now.getFullYear(), now.getMonth(), now.getDate() + daysUntilMonday);
+        let diffWeek = nextMonday - now;
+        let dWeek = Math.floor(diffWeek / (1000 * 60 * 60 * 24));
+        let hWeek = Math.floor((diffWeek / (1000 * 60 * 60)) % 24);
+
+        document.getElementById('cd-day').innerText = `(Restarter om ${hDay}t ${mDay}m)`;
+        document.getElementById('cd-week').innerText = `(Restarter om ${dWeek}d ${hWeek}t)`;
+    }
+    setInterval(oppdaterKlokker, 60000); // Oppdaterer hvert minutt
+    oppdaterKlokker();
+
     const scrollBtn = document.getElementById('scroll-down-btn');
     function sjekkScroll() {
         const erLangNok = document.documentElement.scrollHeight > window.innerHeight;
@@ -269,7 +305,6 @@
     window.visInfoModal = () => document.getElementById('info-modal').style.display = 'block';
     window.lukkInfoModal = () => document.getElementById('info-modal').style.display = 'none';
     
-    // NYTT: Funksjoner for å legge til egen stasjon
     window.apneLeggTilStasjonModal = () => document.getElementById('add-station-modal').style.display = 'block';
     window.lukkLeggTilStasjonModal = () => document.getElementById('add-station-modal').style.display = 'none';
     
@@ -282,10 +317,7 @@
         navigator.geolocation.getCurrentPosition(async (p) => {
             const nyId = 'egen_' + Date.now();
             await set(ref(db, 'egne_stasjoner/' + nyId), {
-                navn: navn,
-                lat: p.coords.latitude,
-                lon: p.coords.longitude,
-                opprettetAv: myUid
+                navn: navn, lat: p.coords.latitude, lon: p.coords.longitude, opprettetAv: myUid
             });
             btn.innerText = "Lagre med GPS";
             document.getElementById('new-station-name').value = '';
@@ -298,14 +330,10 @@
         });
     }
 
-    let valgtStasjonId = null;
-    let valgtStasjonLat = null; let valgtStasjonLon = null; 
-    let gjeldendeStasjoner = [];
-    let sisteLat = null, sisteLon = null;
-    let skylagredePriser = {}; 
-    let egneStasjoner = {}; // NYTT: Lagrer egendefinerte stasjoner
+    let valgtStasjonId = null; let valgtStasjonLat = null; let valgtStasjonLon = null; 
+    let gjeldendeStasjoner = []; let sisteLat = null, sisteLon = null;
+    let skylagredePriser = {}; let egneStasjoner = {}; 
 
-    // Lytter på både priser og egne stasjoner
     onValue(ref(db, 'priser'), async (snapshot) => {
         skylagredePriser = snapshot.val() || {};
         const histSnap = await get(ref(db, 'alle_oppdateringer'));
@@ -317,28 +345,71 @@
 
     onValue(ref(db, 'egne_stasjoner'), (snapshot) => {
         egneStasjoner = snapshot.val() || {};
-        if (gjeldendeStasjoner.length > 0) hentStasjoner(sisteLat, sisteLon); // Oppdaterer visning om en ny legges til
+        if (gjeldendeStasjoner.length > 0) hentStasjoner(sisteLat, sisteLon); 
     });
 
-    // NYTT: Hjelpefunksjon for piler
     function getTrendHtml(curr, prev) {
         if(!curr || !prev || curr==="--" || prev==="--") return "";
         let c = parseFloat(curr.replace(',', '.'));
         let p = parseFloat(prev.replace(',', '.'));
-        if(c > p) return '<span class="trend-up">↑</span>'; // Grønn opp (per instruksjon)
-        if(c < p) return '<span class="trend-down">↓</span>'; // Rød ned (per instruksjon)
+        if(c > p) return '<span class="trend-up">↑</span>'; 
+        if(c < p) return '<span class="trend-down">↓</span>'; 
         return "";
     }
 
+    // NYTT: Funksjon for å regne ut Tittel basert på antall
+    function getTittel(antall) {
+        if (antall >= 1000) return "Drivstoff-Gud 👑";
+        if (antall >= 800) return "Pumpemester 🧙‍♂️";
+        if (antall >= 600) return "Prisprofet 👁️";
+        if (antall >= 400) return "Milsluker 🏎️";
+        if (antall >= 250) return "Oljebaron 🎩";
+        if (antall >= 150) return "Rabattjeger 🦅";
+        if (antall >= 100) return "Asfaltrytter 🏍️";
+        if (antall >= 50) return "Oktansniffer 👃";
+        if (antall >= 25) return "Pumpe-sjef ⛽";
+        if (antall >= 10) return "Sjåfør 🚗";
+        return "Fersking 🐣";
+    }
+
     function beregnTopplister(alleData) {
-        const dagTellere = {}; const ukeTellere = {}; const naa = Date.now();
-        const enDag = 24 * 60 * 60 * 1000; const enUke = 7 * enDag;
+        const dagTellere = {}; const ukeTellere = {}; const totalTellere = {};
+        
+        let now = new Date();
+        let startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+        let dayOfWeek = now.getDay();
+        let diffToMonday = now.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
+        let startOfWeek = new Date(now.getFullYear(), now.getMonth(), diffToMonday).getTime();
+
+        let lavestePris = 999;
+        let besteJegerStr = "Ingen verifiserte funn enda i dag";
 
         Object.values(alleData).forEach(p => {
             if (!p.user) return;
-            const alder = naa - p.timestamp;
-            if (alder < enDag) dagTellere[p.user] = (dagTellere[p.user] || 0) + 1;
-            if (alder < enUke) ukeTellere[p.user] = (ukeTellere[p.user] || 0) + 1;
+            
+            // Total-teller for titler
+            totalTellere[p.user] = (totalTellere[p.user] || 0) + 1;
+
+            // Teller siden midnatt i dag
+            if (p.timestamp >= startOfDay) {
+                dagTellere[p.user] = (dagTellere[p.user] || 0) + 1;
+                
+                // Prisjeger: Sjekker Dagens priser som er over 10kr, og som ER VERIFISERT
+                if (p.verified === true) {
+                    let dPris = parseFloat(p.diesel ? p.diesel.replace(',', '.') : 999);
+                    let bPris = parseFloat(p.bensin ? p.bensin.replace(',', '.') : 999);
+                    let b98Pris = parseFloat(p.bensin98 ? p.bensin98.replace(',', '.') : 999);
+                    
+                    if (dPris >= 10 && dPris < lavestePris) { lavestePris = dPris; besteJegerStr = `${p.user} (${lavestePris} kr for Diesel)`; }
+                    if (bPris >= 10 && bPris < lavestePris) { lavestePris = bPris; besteJegerStr = `${p.user} (${lavestePris} kr for Bensin)`; }
+                    if (b98Pris >= 10 && b98Pris < lavestePris) { lavestePris = b98Pris; besteJegerStr = `${p.user} (${lavestePris} kr for 98)`; }
+                }
+            }
+            
+            // Teller siden mandag midnatt
+            if (p.timestamp >= startOfWeek) {
+                ukeTellere[p.user] = (ukeTellere[p.user] || 0) + 1;
+            }
         });
 
         const dagSortert = Object.entries(dagTellere).sort((a,b) => b[1]-a[1]);
@@ -346,7 +417,16 @@
 
         document.getElementById('best-day').innerText = dagSortert.length ? `${dagSortert[0][0]} (${dagSortert[0][1]} stk)` : "Ingen enda i dag";
         document.getElementById('best-week').innerText = ukeSortert.length ? `${ukeSortert[0][0]} (${ukeSortert[0][1]} stk)` : "Ingen enda denne uken";
-        document.getElementById('top-list-items').innerHTML = ukeSortert.slice(0, 10).map((u, i) => `<div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #333; font-size:13px"><span>${i+1}. ${u[0]}</span><span>${u[1]} oppd.</span></div>`).join('');
+        document.getElementById('best-hunter').innerText = besteJegerStr;
+
+        // Viser Topp 10 med deres nyeste titler (basert på total)
+        document.getElementById('top-list-items').innerHTML = ukeSortert.slice(0, 10).map((u, i) => {
+            let tittel = getTittel(totalTellere[u[0]]);
+            return `<div class="top-list-item">
+                <div><span>${i+1}. ${u[0]}</span> <span class="user-title">${tittel}</span></div>
+                <span>${u[1]} oppd.</span>
+            </div>`;
+        }).join('');
     }
 
     function visGlobalSisteOppdatering() {
@@ -363,24 +443,24 @@
             let distStr = "";
             if (sisteLat && sisteLon && nyesteData.lat && nyesteData.lon) {
                 const dist = regnUtAvstand(sisteLat, sisteLon, nyesteData.lat, nyesteData.lon);
-                distStr = `<p style="margin: 5px 0 10px 0; font-size: 12px; opacity: 0.8;">📍 ${dist.toFixed(1)} km unna deg</p>`;
+                distStr = `<span class="featured-dist">📍 ${dist.toFixed(1)} km</span>`;
             }
 
             const style = getBrandStyle(nyesteData.navn);
             let textColor = style.color === '#ffcc00' ? '#000' : '#fff';
+            let borderColor = style.color === '#ffcc00' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.15)';
 
-            let b98Html = (nyesteData.bensin98 && nyesteData.bensin98 !== "--") ? `<div class="f-price-box"><span class="f-lbl">BENSIN 98</span><span class="f-val">${nyesteData.bensin98} ${getTrendHtml(nyesteData.bensin98, nyesteData.prev_bensin98)}</span></div>` : '';
+            let b98Html = (nyesteData.bensin98 && nyesteData.bensin98 !== "--") ? `<div class="f-price-box" style="border-color:${borderColor}"><span class="f-lbl">98</span><span class="f-val">${nyesteData.bensin98} ${getTrendHtml(nyesteData.bensin98, nyesteData.prev_bensin98)}</span></div>` : '';
 
             globalContainer.style.display = 'block';
             globalContainer.innerHTML = `
                 <div class="featured-card" style="background: ${style.bg}; color: ${textColor};">
                     <div class="f-icon-bg">${style.char}</div>
-                    <div class="featured-header">🌍 Akkurat nå i Norge</div>
-                    <h3 class="featured-title" style="margin-bottom: 5px;">${nyesteData.navn}</h3>
-                    ${distStr}
+                    <div class="featured-header">⚡ NYESTE OPPDATERING</div>
+                    <div class="featured-title">${nyesteData.navn} ${distStr}</div>
                     <div class="featured-prices">
-                        <div class="f-price-box"><span class="f-lbl">DIESEL</span><span class="f-val">${nyesteData.diesel} ${getTrendHtml(nyesteData.diesel, nyesteData.prev_diesel)}</span></div>
-                        <div class="f-price-box"><span class="f-lbl">BENSIN 95</span><span class="f-val">${nyesteData.bensin} ${getTrendHtml(nyesteData.bensin, nyesteData.prev_bensin)}</span></div>
+                        <div class="f-price-box" style="border-color:${borderColor}"><span class="f-lbl">D</span><span class="f-val">${nyesteData.diesel} ${getTrendHtml(nyesteData.diesel, nyesteData.prev_diesel)}</span></div>
+                        <div class="f-price-box" style="border-color:${borderColor}"><span class="f-lbl">95</span><span class="f-val">${nyesteData.bensin} ${getTrendHtml(nyesteData.bensin, nyesteData.prev_bensin)}</span></div>
                         ${b98Html}
                     </div>
                     <div class="f-user">${formaterTid(nyesteData.timestamp, nyesteData.user)}</div>
@@ -389,9 +469,14 @@
         } else { globalContainer.style.display = 'none'; }
     }
 
-    window.vis98Felt = function() {
-        document.getElementById('div-bensin98').style.display = 'block';
-        document.getElementById('btn-show-98').style.display = 'none';
+    window.vis98Felt = function() { document.getElementById('div-bensin98').style.display = 'block'; document.getElementById('btn-show-98').style.display = 'none'; }
+
+    // NY OPPDATERING: Sperrer for priser under 10 og over 35 kr
+    function validerPris(pris) {
+        if (!pris || pris === "--") return true; 
+        let val = parseFloat(pris.replace(',', '.'));
+        if (isNaN(val)) return false;
+        return (val >= 10 && val <= 35); 
     }
 
     window.lagrePris = async function() {
@@ -405,22 +490,22 @@
         if(!n) { modalError.innerText = "Du må fylle inn et kallenavn!"; modalError.style.display = "block"; return; }
         if (!d && !b && !b98) { modalError.innerText = "Du må fylle inn minst én pris!"; modalError.style.display = "block"; return; }
 
+        if (!validerPris(d) || !validerPris(b) || !validerPris(b98)) {
+            modalError.innerHTML = "⚠️ <b>Urealistisk pris!</b><br>Prisen må være mellom 10.00 og 35.00 kr.";
+            modalError.style.display = "block"; return;
+        }
+
         const nameRef = ref(db, 'users/' + n.toLowerCase());
         const nameSnap = await get(nameRef);
         if (nameSnap.exists() && nameSnap.val() !== myUid) {
             myUid = nameSnap.val(); localStorage.setItem('drivstoff_uid', myUid);
-        } else if (!nameSnap.exists()) {
-            await set(nameRef, myUid);
-        }
+        } else if (!nameSnap.exists()) { await set(nameRef, myUid); }
         localStorage.setItem('drivstoff_navn', n);
 
         const currentRef = ref(db, 'priser/' + valgtStasjonId);
         const oldData = skylagredePriser[valgtStasjonId] || {};
 
-        // NYTT: Lagrer forrige pris for trend-pilene
-        let prev_d = oldData.diesel || "--";
-        let prev_b = oldData.bensin || "--";
-        let prev_b98 = oldData.bensin98 || "--";
+        let prev_d = oldData.diesel || "--"; let prev_b = oldData.bensin || "--"; let prev_b98 = oldData.bensin98 || "--";
 
         if (!d) d = oldData.diesel || "--";
         else if (d !== oldData.diesel && oldData.diesel && oldData.diesel !== "--") prev_d = oldData.diesel;
@@ -440,17 +525,11 @@
         }
 
         const newData = { 
-            diesel: d, prev_diesel: prev_d, 
-            bensin: b, prev_bensin: prev_b, 
-            bensin98: b98, prev_bensin98: prev_b98, 
-            timestamp: Date.now(), user: n, uid: myUid, verified: verified,
-            navn: stasjonNavn, lat: valgtStasjonLat, lon: valgtStasjonLon 
+            diesel: d, prev_diesel: prev_d, bensin: b, prev_bensin: prev_b, bensin98: b98, prev_bensin98: prev_b98, 
+            timestamp: Date.now(), user: n, uid: myUid, verified: verified, navn: stasjonNavn, lat: valgtStasjonLat, lon: valgtStasjonLon 
         };
         
-        await set(currentRef, newData);
-        push(ref(db, 'historikk/' + valgtStasjonId), newData);
-        push(ref(db, 'alle_oppdateringer'), newData); 
-        
+        await set(currentRef, newData); push(ref(db, 'historikk/' + valgtStasjonId), newData); push(ref(db, 'alle_oppdateringer'), newData); 
         lukkModal();
     };
 
@@ -458,8 +537,7 @@
         const p = document.getElementById('hist-' + id);
         if (p.style.display === 'block') { p.style.display = 'none'; return; }
         p.style.display = 'block'; p.innerText = "Henter...";
-        const snap = await get(ref(db, 'historikk/' + id));
-        const data = snap.val();
+        const snap = await get(ref(db, 'historikk/' + id)); const data = snap.val();
         if (!data) { p.innerText = "Ingen historikk."; return; }
         const h = Object.values(data).reverse().slice(1, 4);
         p.innerHTML = h.length ? h.map(i => `<div class="history-item"><span>D: ${i.diesel} | 95: ${i.bensin} ${i.bensin98 && i.bensin98 !== '--' ? '| 98: '+i.bensin98 : ''}</span><span>${new Date(i.timestamp).toLocaleDateString()}</span></div>`).join('') : "Ingen tidligere data.";
@@ -484,9 +562,7 @@
 
         const sorted = [...stasjoner].sort((a,b) => (parseFloat(skylagredePriser[a.id]?.diesel)||99) - (parseFloat(skylagredePriser[b.id]?.diesel)||99));
         
-        if (sorted.length === 0) { 
-            list.innerHTML = "<p style='text-align:center; color:var(--text-muted); margin-top:20px;'>Ingen stasjoner funnet i dette området.</p>"; 
-        }
+        if (sorted.length === 0) { list.innerHTML = "<p style='text-align:center; color:var(--text-muted); margin-top:20px;'>Ingen stasjoner funnet i dette området.</p>"; }
 
         let nyesteTid = 0; let nyesteStasjon = null; let nyesteData = null;
 
@@ -499,7 +575,6 @@
 
             if (p.timestamp > nyesteTid) { nyesteTid = p.timestamp; nyesteStasjon = { id, navn, escapedName, dist, style }; nyesteData = p; }
             
-            // Piler for trender
             const trendD = getTrendHtml(p.diesel, p.prev_diesel);
             const trendB = getTrendHtml(p.bensin, p.prev_bensin);
             const trendB98 = getTrendHtml(p.bensin98, p.prev_bensin98);
@@ -513,17 +588,18 @@
 
         if (nyesteStasjon && nyesteTid > (Date.now() - (3 * 24 * 60 * 60 * 1000))) {
             let textColor = nyesteStasjon.style.color === '#ffcc00' ? '#000' : '#fff';
-            let b98Html = (nyesteData.bensin98 && nyesteData.bensin98 !== "--") ? `<div class="f-price-box"><span class="f-lbl">BENSIN 98</span><span class="f-val">${nyesteData.bensin98} ${getTrendHtml(nyesteData.bensin98, nyesteData.prev_bensin98)}</span></div>` : '';
+            let borderColor = nyesteStasjon.style.color === '#ffcc00' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.15)';
+            let b98Html = (nyesteData.bensin98 && nyesteData.bensin98 !== "--") ? `<div class="f-price-box" style="border-color:${borderColor}"><span class="f-lbl">98</span><span class="f-val">${nyesteData.bensin98} ${getTrendHtml(nyesteData.bensin98, nyesteData.prev_bensin98)}</span></div>` : '';
             
             featuredContainer.style.display = 'block';
             featuredContainer.innerHTML = `
                 <div class="featured-card" style="background: ${nyesteStasjon.style.bg}; color: ${textColor};">
                     <div class="f-icon-bg">${nyesteStasjon.style.char}</div>
-                    <div class="featured-header">⚡ Sist oppdatert i ditt søk</div>
-                    <h3 class="featured-title">${nyesteStasjon.navn}</h3>
+                    <div class="featured-header">⚡ NYESTE OPPDATERING</div>
+                    <div class="featured-title">${nyesteStasjon.navn} <span class="featured-dist">📍 ${nyesteStasjon.dist.toFixed(1)} km</span></div>
                     <div class="featured-prices">
-                        <div class="f-price-box"><span class="f-lbl">DIESEL</span><span class="f-val">${nyesteData.diesel} ${getTrendHtml(nyesteData.diesel, nyesteData.prev_diesel)}</span></div>
-                        <div class="f-price-box"><span class="f-lbl">BENSIN 95</span><span class="f-val">${nyesteData.bensin} ${getTrendHtml(nyesteData.bensin, nyesteData.prev_bensin)}</span></div>
+                        <div class="f-price-box" style="border-color:${borderColor}"><span class="f-lbl">D</span><span class="f-val">${nyesteData.diesel} ${getTrendHtml(nyesteData.diesel, nyesteData.prev_diesel)}</span></div>
+                        <div class="f-price-box" style="border-color:${borderColor}"><span class="f-lbl">95</span><span class="f-val">${nyesteData.bensin} ${getTrendHtml(nyesteData.bensin, nyesteData.prev_bensin)}</span></div>
                         ${b98Html}
                     </div>
                     <div class="f-user">${formaterTid(nyesteData.timestamp, nyesteData.user)}</div>
@@ -531,7 +607,7 @@
             `;
         }
         
-        document.getElementById('add-station-container').style.display = 'block'; // Vis knappen for å legge til
+        document.getElementById('add-station-container').style.display = 'block'; 
         setTimeout(sjekkScroll, 200);
     }
 
@@ -548,13 +624,8 @@
         document.getElementById('input-bensin').value = p.bensin === "--" ? "" : p.bensin;
         document.getElementById('input-bensin98').value = p.bensin98 === "--" || !p.bensin98 ? "" : p.bensin98;
         
-        if (p.bensin98 && p.bensin98 !== "--") {
-            document.getElementById('div-bensin98').style.display = 'block';
-            document.getElementById('btn-show-98').style.display = 'none';
-        } else {
-            document.getElementById('div-bensin98').style.display = 'none';
-            document.getElementById('btn-show-98').style.display = 'block';
-        }
+        if (p.bensin98 && p.bensin98 !== "--") { document.getElementById('div-bensin98').style.display = 'block'; document.getElementById('btn-show-98').style.display = 'none';
+        } else { document.getElementById('div-bensin98').style.display = 'none'; document.getElementById('btn-show-98').style.display = 'block'; }
         document.getElementById('update-modal').style.display = 'block'; 
     };
 
@@ -588,20 +659,13 @@
             const data = await res.json(); 
             gjeldendeStasjoner = data.elements; 
             
-            // NYTT: Slår sammen stasjoner fra kartet med dine egne stasjoner!
             for (const key in egneStasjoner) {
                 const cs = egneStasjoner[key];
                 const dist = regnUtAvstand(lat, lon, cs.lat, cs.lon);
                 if (dist <= r/1000) {
-                    gjeldendeStasjoner.push({
-                        id: key,
-                        lat: cs.lat,
-                        lon: cs.lon,
-                        tags: { name: cs.navn, brand: cs.navn }
-                    });
+                    gjeldendeStasjoner.push({ id: key, lat: cs.lat, lon: cs.lon, tags: { name: cs.navn, brand: cs.navn } });
                 }
             }
-            
             visStasjoner(gjeldendeStasjoner, lat, lon);
         } catch (e) { document.getElementById('station-list').innerHTML = "<p style='text-align:center; color:var(--danger);'>Kartfeil. Prøv igjen.</p>"; }
     }
