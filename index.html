@@ -18,6 +18,7 @@
             --text-muted: #a0a0a0;
             --diesel-color: #ff9800;
             --bensin-color: #4caf50;
+            --bensin98-color: #2196f3; /* Blåfarge for 98 oktan */
             --danger: #ff4444;
             --gold: #ffd700;
             --silver: #c0c0c0;
@@ -45,7 +46,7 @@
         .featured-card { border-radius: 12px; padding: 20px; color: white; position: relative; overflow: hidden; box-shadow: 0 8px 16px rgba(0,0,0,0.3); }
         .featured-header { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; opacity: 0.9; font-weight: bold; display: flex; align-items: center; gap: 5px; }
         .featured-title { font-size: 20px; font-weight: bold; margin: 0 0 15px 0; text-shadow: 1px 1px 3px rgba(0,0,0,0.5); }
-        .featured-prices { display: flex; gap: 15px; }
+        .featured-prices { display: flex; gap: 10px; flex-wrap: wrap; }
         .f-price-box { background: rgba(0,0,0,0.4); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); backdrop-filter: blur(4px); }
         .f-lbl { font-size: 10px; display: block; margin-bottom: 2px; color: #eee; }
         .f-val { font-size: 18px; font-weight: bold; }
@@ -65,9 +66,10 @@
         .brand-icon { width: 40px; height: 40px; flex-shrink: 0; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 12px; background: #4a4a5a; }
         .prices-container { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
         .price-row { display: flex; align-items: center; gap: 8px; position: relative; }
-        .price-label { font-size: 10px; font-weight: bold; border-radius: 4px; padding: 2px 5px; width: 40px; text-align: center; color: white; }
+        .price-label { font-size: 10px; font-weight: bold; border-radius: 4px; padding: 2px 5px; width: 45px; text-align: center; color: white; }
         .lbl-diesel { background-color: var(--diesel-color); }
         .lbl-bensin { background-color: var(--bensin-color); }
+        .lbl-bensin98 { background-color: var(--bensin98-color); }
         .price-value { font-size: 16px; font-weight: bold; background-color: #3f3f4e; padding: 4px 8px; border-radius: 6px; min-width: 55px; text-align: right; }
         .verify-badge { color: var(--success); font-size: 14px; margin-left: -5px; }
 
@@ -85,9 +87,10 @@
         .footer-text { font-size: 12px; color: var(--text-muted); line-height: 1.6; margin-bottom: 15px; }
         .feedback-btn { background: transparent; border: 1px solid var(--share-color); color: var(--share-color); padding: 10px 20px; border-radius: 8px; font-size: 13px; display: inline-block; text-decoration: none; }
 
-        #update-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); z-index: 1000; }
-        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: var(--card-bg); padding: 25px; border-radius: 15px; width: 90%; max-width: 350px; box-sizing: border-box; }
+        #update-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); z-index: 1000; overflow-y: auto; }
+        .modal-content { position: relative; margin: 40px auto; background-color: var(--card-bg); padding: 25px; border-radius: 15px; width: 90%; max-width: 350px; box-sizing: border-box; }
         #modal-error { color: var(--danger); font-size: 12px; margin-bottom: 10px; display: none; }
+        .btn-add-98 { background: transparent; border: 1px dashed #555; color: #a0a0a0; padding: 10px; font-size: 12px; margin-bottom: 12px; border-radius: 8px; width: 100%; }
     </style>
 </head>
 <body>
@@ -101,7 +104,6 @@
     <h2>Drivstoff Norge ⛽</h2>
 
     <div id="global-featured-container"></div>
-    
     <div id="featured-station-container"></div>
 
     <div class="leaderboard-card">
@@ -154,6 +156,14 @@
             <label style="color: var(--bensin-color); font-size:12px">Bensin 95</label>
             <input type="text" inputmode="decimal" id="input-bensin" oninput="this.value = this.value.replace(',', '.')">
         </div>
+        
+        <button type="button" id="btn-show-98" class="btn-add-98" onclick="vis98Felt()">+ Legg til Bensin 98</button>
+        
+        <div id="div-bensin98" style="display:none; margin-bottom:12px">
+            <label style="color: var(--bensin98-color); font-size:12px">Bensin 98</label>
+            <input type="text" inputmode="decimal" id="input-bensin98" oninput="this.value = this.value.replace(',', '.')">
+        </div>
+
         <div style="display:flex; gap:10px">
             <button style="background-color:#555" onclick="lukkModal()">Avbryt</button>
             <button onclick="lagrePris()">Lagre</button>
@@ -183,14 +193,11 @@
 
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
     const installBanner = document.getElementById('install-banner');
-
-    if (!isStandalone) {
-        installBanner.style.display = 'block';
-    }
+    if (!isStandalone) installBanner.style.display = 'block';
 
     let valgtStasjonId = null;
-    let valgtStasjonLat = null; // Lagt til for å huske lat for lagring
-    let valgtStasjonLon = null; // Lagt til for å huske lon for lagring
+    let valgtStasjonLat = null; 
+    let valgtStasjonLon = null; 
     let gjeldendeStasjoner = [];
     let sisteLat = null, sisteLon = null;
     let skylagredePriser = {}; 
@@ -199,19 +206,13 @@
         skylagredePriser = snapshot.val() || {};
         const histSnap = await get(ref(db, 'alle_oppdateringer'));
         beregnTopplister(histSnap.val() || {});
-        
-        // Kjør funksjonen som sjekker om vi kan vise et globalt kort
         visGlobalSisteOppdatering();
-
         if (gjeldendeStasjoner.length > 0) visStasjoner(gjeldendeStasjoner, sisteLat, sisteLon);
     });
 
     function beregnTopplister(alleData) {
-        const dagTellere = {};
-        const ukeTellere = {};
-        const naa = Date.now();
-        const enDag = 24 * 60 * 60 * 1000;
-        const enUke = 7 * enDag;
+        const dagTellere = {}; const ukeTellere = {}; const naa = Date.now();
+        const enDag = 24 * 60 * 60 * 1000; const enUke = 7 * enDag;
 
         Object.values(alleData).forEach(p => {
             if (!p.user) return;
@@ -225,36 +226,21 @@
 
         document.getElementById('best-day').innerText = dagSortert.length ? `${dagSortert[0][0]} (${dagSortert[0][1]} stk)` : "Ingen enda i dag";
         document.getElementById('best-week').innerText = ukeSortert.length ? `${ukeSortert[0][0]} (${ukeSortert[0][1]} stk)` : "Ingen enda denne uken";
-
-        document.getElementById('top-list-items').innerHTML = ukeSortert.slice(0, 10).map((u, i) => `
-            <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #333; font-size:13px">
-                <span>${i+1}. ${u[0]}</span>
-                <span>${u[1]} oppd.</span>
-            </div>
-        `).join('');
+        document.getElementById('top-list-items').innerHTML = ukeSortert.slice(0, 10).map((u, i) => `<div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #333; font-size:13px"><span>${i+1}. ${u[0]}</span><span>${u[1]} oppd.</span></div>`).join('');
     }
 
-    // NY FUNKSJON: Finner absolutt nyeste i hele databasen
     function visGlobalSisteOppdatering() {
-        // Skjul hvis vi allerede ser på lokale stasjoner
         if (gjeldendeStasjoner.length > 0) return;
-
-        let nyesteTid = 0;
-        let nyesteData = null;
+        let nyesteTid = 0; let nyesteData = null;
 
         for (const id in skylagredePriser) {
             const p = skylagredePriser[id];
-            // Sjekker om den har navn (det betyr at den er lagret med nyeste versjon av appen)
-            if (p.timestamp > nyesteTid && p.navn) { 
-                nyesteTid = p.timestamp;
-                nyesteData = p;
-            }
+            if (p.timestamp > nyesteTid && p.navn) { nyesteTid = p.timestamp; nyesteData = p; }
         }
 
         const globalContainer = document.getElementById('global-featured-container');
         if (nyesteData && nyesteTid > (Date.now() - (3 * 24 * 60 * 60 * 1000))) {
             let distStr = "";
-            // Regn ut avstand hvis vi har GPS-en til brukeren fra tidligere
             if (sisteLat && sisteLon && nyesteData.lat && nyesteData.lon) {
                 const dist = regnUtAvstand(sisteLat, sisteLon, nyesteData.lat, nyesteData.lon);
                 distStr = `<p style="margin: 5px 0 10px 0; font-size: 12px; opacity: 0.8;">📍 ${dist.toFixed(1)} km unna deg</p>`;
@@ -262,6 +248,9 @@
 
             const style = getBrandStyle(nyesteData.navn);
             let textColor = style.color === '#ffcc00' ? '#000' : '#fff';
+
+            // HTML for 98 oktan hvis den finnes
+            let b98Html = (nyesteData.bensin98 && nyesteData.bensin98 !== "--") ? `<div class="f-price-box"><span class="f-lbl">BENSIN 98</span><span class="f-val">${nyesteData.bensin98}</span></div>` : '';
 
             globalContainer.style.display = 'block';
             globalContainer.innerHTML = `
@@ -271,40 +260,43 @@
                     <h3 class="featured-title" style="margin-bottom: 5px;">${nyesteData.navn}</h3>
                     ${distStr}
                     <div class="featured-prices">
-                        <div class="f-price-box">
-                            <span class="f-lbl">DIESEL</span>
-                            <span class="f-val">${nyesteData.diesel}</span>
-                        </div>
-                        <div class="f-price-box">
-                            <span class="f-lbl">BENSIN 95</span>
-                            <span class="f-val">${nyesteData.bensin}</span>
-                        </div>
+                        <div class="f-price-box"><span class="f-lbl">DIESEL</span><span class="f-val">${nyesteData.diesel}</span></div>
+                        <div class="f-price-box"><span class="f-lbl">BENSIN 95</span><span class="f-val">${nyesteData.bensin}</span></div>
+                        ${b98Html}
                     </div>
                     <div class="f-user">${formaterTid(nyesteData.timestamp, nyesteData.user)}</div>
                 </div>
             `;
-        } else {
-            globalContainer.style.display = 'none';
-        }
+        } else { globalContainer.style.display = 'none'; }
+    }
+
+    window.vis98Felt = function() {
+        document.getElementById('div-bensin98').style.display = 'block';
+        document.getElementById('btn-show-98').style.display = 'none';
     }
 
     window.lagrePris = async function() {
         let d = document.getElementById('input-diesel').value.trim();
         let b = document.getElementById('input-bensin').value.trim();
+        let b98 = document.getElementById('input-bensin98').value.trim();
         const n = document.getElementById('input-nickname').value.trim();
         const modalError = document.getElementById('modal-error');
-        const stasjonNavn = document.getElementById('modal-station-name').innerText; // Henter navnet!
+        const stasjonNavn = document.getElementById('modal-station-name').innerText;
 
         if(!n) { modalError.innerText = "Du må fylle inn et kallenavn!"; modalError.style.display = "block"; return; }
-        if (!d && !b) { modalError.innerText = "Du må fylle inn minst én pris!"; modalError.style.display = "block"; return; }
+        if (!d && !b && !b98) { modalError.innerText = "Du må fylle inn minst én pris!"; modalError.style.display = "block"; return; }
 
         const nameRef = ref(db, 'users/' + n.toLowerCase());
         const nameSnap = await get(nameRef);
+        
+        // OPPDATERT: Hvis navnet eksisterer, men eies av en annen ID, adopterer vi den gamle IDen (Løser FB-browser problemet)
         if (nameSnap.exists() && nameSnap.val() !== myUid) {
-            modalError.innerText = "Kallenavnet er tatt av en annen!"; modalError.style.display = "block"; return;
+            myUid = nameSnap.val();
+            localStorage.setItem('drivstoff_uid', myUid);
+        } else if (!nameSnap.exists()) {
+            await set(nameRef, myUid);
         }
 
-        await set(nameRef, myUid);
         localStorage.setItem('drivstoff_navn', n);
 
         const currentRef = ref(db, 'priser/' + valgtStasjonId);
@@ -312,15 +304,15 @@
 
         if (!d) d = oldData.diesel || "--";
         if (!b) b = oldData.bensin || "--";
+        if (!b98) b98 = oldData.bensin98 || "--";
 
         let verified = false;
         if (oldData && oldData.uid !== myUid && oldData.diesel === d && oldData.bensin === b) {
             if (Date.now() - oldData.timestamp < 86400000) verified = true;
         }
 
-        // OPPDATERT: Sender nå også inn navn og koordinater til Firebase
         const newData = { 
-            diesel: d, bensin: b, timestamp: Date.now(), user: n, uid: myUid, verified: verified,
+            diesel: d, bensin: b, bensin98: b98, timestamp: Date.now(), user: n, uid: myUid, verified: verified,
             navn: stasjonNavn, lat: valgtStasjonLat, lon: valgtStasjonLon 
         };
         
@@ -339,58 +331,52 @@
         const data = snap.val();
         if (!data) { p.innerText = "Ingen historikk."; return; }
         const h = Object.values(data).reverse().slice(1, 4);
-        p.innerHTML = h.length ? h.map(i => `<div class="history-item"><span>D: ${i.diesel} | 95: ${i.bensin}</span><span>${new Date(i.timestamp).toLocaleDateString()}</span></div>`).join('') : "Ingen tidligere data.";
+        p.innerHTML = h.length ? h.map(i => `<div class="history-item"><span>D: ${i.diesel} | 95: ${i.bensin} ${i.bensin98 && i.bensin98 !== '--' ? '| 98: '+i.bensin98 : ''}</span><span>${new Date(i.timestamp).toLocaleDateString()}</span></div>`).join('') : "Ingen tidligere data.";
     }
 
     function getBrandStyle(name) {
         const n = name.toLowerCase();
         if (n.includes("circle k")) return { char: 'C', color: '#ed1c24', bg: 'linear-gradient(135deg, #ed1c24 0%, #a60f16 100%)' }; 
         if (n.includes("shell")) return { char: 'S', color: '#ffcc00', text: '#ed1c24', bg: 'linear-gradient(135deg, #ffcc00 0%, #e65c00 100%)' }; 
-        if (n.includes("uno-x")) return { char: 'U', color: '#ffcc00', text: '#000', bg: 'linear-gradient(135deg, #ffcc00 0%, #b38f00 100%)' }; 
+        if (n.includes("uno-x") || n.includes("unox")) return { char: 'U', color: '#ffcc00', text: '#000', bg: 'linear-gradient(135deg, #ffcc00 0%, #b38f00 100%)' }; 
         if (n.includes("yx")) return { char: 'Y', color: '#0055b8', bg: 'linear-gradient(135deg, #0055b8 0%, #00336b 100%)' }; 
         if (n.includes("esso")) return { char: 'E', color: '#ed1c24', bg: 'linear-gradient(135deg, #ed1c24 0%, #a60f16 100%)' }; 
+        if (n.includes("best")) return { char: 'B', color: '#ffcc00', text: '#000', bg: 'linear-gradient(135deg, #ffcc00 0%, #b38f00 100%)' };
         return { char: '⛽', color: '#4a4a5a', bg: 'linear-gradient(135deg, #4a4a5a 0%, #2b2b36 100%)' }; 
     }
 
     function visStasjoner(stasjoner, lat, lon) {
         const list = document.getElementById('station-list'); list.innerHTML = "";
         const featuredContainer = document.getElementById('featured-station-container');
-        featuredContainer.innerHTML = "";
-        featuredContainer.style.display = 'none';
-
-        // Skjul globalt kort når man ser lokale
+        featuredContainer.innerHTML = ""; featuredContainer.style.display = 'none';
         document.getElementById('global-featured-container').style.display = 'none';
 
         const sorted = [...stasjoner].sort((a,b) => (parseFloat(skylagredePriser[a.id]?.diesel)||99) - (parseFloat(skylagredePriser[b.id]?.diesel)||99));
         
-        if (sorted.length === 0) {
-            list.innerHTML = "<p style='text-align:center; color:var(--text-muted); margin-top:20px;'>Ingen stasjoner funnet i dette området.</p>";
-            return;
-        }
+        if (sorted.length === 0) { list.innerHTML = "<p style='text-align:center; color:var(--text-muted); margin-top:20px;'>Ingen stasjoner funnet i dette området.</p>"; return; }
 
         let nyesteTid = 0; let nyesteStasjon = null; let nyesteData = null;
 
         sorted.forEach(s => {
-            const id = s.id; const p = skylagredePriser[id] || { diesel: "--", bensin: "--", timestamp: 0 };
+            const id = s.id; const p = skylagredePriser[id] || { diesel: "--", bensin: "--", bensin98: "--", timestamp: 0 };
             const dist = regnUtAvstand(lat, lon, s.lat, s.lon);
             const navn = s.tags.name || s.tags.brand || "Stasjon";
             const escapedName = navn.replace(/'/g, "\\'");
             const style = getBrandStyle(navn);
 
-            if (p.timestamp > nyesteTid) {
-                nyesteTid = p.timestamp;
-                nyesteStasjon = { id, navn, escapedName, dist, style };
-                nyesteData = p;
-            }
+            if (p.timestamp > nyesteTid) { nyesteTid = p.timestamp; nyesteStasjon = { id, navn, escapedName, dist, style }; nyesteData = p; }
             
-            // Lagrer s.lat og s.lon i apneModal-funksjonen
+            let b98Html = (p.bensin98 && p.bensin98 !== "--") ? `<div class="price-row"><span class="price-label lbl-bensin98">BENSIN 98</span><div class="price-value">${p.bensin98}</div></div>` : '';
+
             const card = document.createElement('div'); card.className = `station-card`;
-            card.innerHTML = `<div class="main-info"><div class="station-info"><div class="brand-icon" style="background-color: ${style.color}; color: ${style.text || '#fff'}">${style.char}</div><div class="station-details"><h3>${navn}</h3><p>${dist.toFixed(1)} km unna</p></div></div><div class="prices-container"><div class="price-row"><span class="price-label lbl-diesel">DIESEL</span><div class="price-value">${p.diesel}</div> ${p.verified?'<span class="verify-badge">✅</span>':''}</div><div class="price-row"><span class="price-label lbl-bensin">BENSIN 95</span><div class="price-value">${p.bensin}</div> ${p.verified?'<span class="verify-badge">✅</span>':''}</div></div></div><div class="action-buttons"><div class="update-btn" onclick="apneModal(${id},'${escapedName}', ${s.lat}, ${s.lon})">OPPDATER</div><a class="nav-btn" href="https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lon}" target="_blank">KJØR HIT</a><div class="hist-btn" onclick="visHistorikk(${id})">⌛ HISTORIKK</div></div><div id="hist-${id}" class="history-panel"></div><div class="time-ago">${formaterTid(p.timestamp, p.user)}</div>`;
+            card.innerHTML = `<div class="main-info"><div class="station-info"><div class="brand-icon" style="background-color: ${style.color}; color: ${style.text || '#fff'}">${style.char}</div><div class="station-details"><h3>${navn}</h3><p>${dist.toFixed(1)} km unna</p></div></div><div class="prices-container"><div class="price-row"><span class="price-label lbl-diesel">DIESEL</span><div class="price-value">${p.diesel}</div> ${p.verified?'<span class="verify-badge">✅</span>':''}</div><div class="price-row"><span class="price-label lbl-bensin">BENSIN 95</span><div class="price-value">${p.bensin}</div> ${p.verified?'<span class="verify-badge">✅</span>':''}</div>${b98Html}</div></div><div class="action-buttons"><div class="update-btn" onclick="apneModal(${id},'${escapedName}', ${s.lat}, ${s.lon})">OPPDATER</div><a class="nav-btn" href="https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lon}" target="_blank">KJØR HIT</a><div class="hist-btn" onclick="visHistorikk(${id})">⌛ HISTORIKK</div></div><div id="hist-${id}" class="history-panel"></div><div class="time-ago">${formaterTid(p.timestamp, p.user)}</div>`;
             list.appendChild(card);
         });
 
         if (nyesteStasjon && nyesteTid > (Date.now() - (3 * 24 * 60 * 60 * 1000))) {
             let textColor = nyesteStasjon.style.color === '#ffcc00' ? '#000' : '#fff';
+            let b98Html = (nyesteData.bensin98 && nyesteData.bensin98 !== "--") ? `<div class="f-price-box"><span class="f-lbl">BENSIN 98</span><span class="f-val">${nyesteData.bensin98}</span></div>` : '';
+            
             featuredContainer.style.display = 'block';
             featuredContainer.innerHTML = `
                 <div class="featured-card" style="background: ${nyesteStasjon.style.bg}; color: ${textColor};">
@@ -398,14 +384,9 @@
                     <div class="featured-header">⚡ Sist oppdatert i ditt søk</div>
                     <h3 class="featured-title">${nyesteStasjon.navn}</h3>
                     <div class="featured-prices">
-                        <div class="f-price-box">
-                            <span class="f-lbl">DIESEL</span>
-                            <span class="f-val">${nyesteData.diesel}</span>
-                        </div>
-                        <div class="f-price-box">
-                            <span class="f-lbl">BENSIN 95</span>
-                            <span class="f-val">${nyesteData.bensin}</span>
-                        </div>
+                        <div class="f-price-box"><span class="f-lbl">DIESEL</span><span class="f-val">${nyesteData.diesel}</span></div>
+                        <div class="f-price-box"><span class="f-lbl">BENSIN 95</span><span class="f-val">${nyesteData.bensin}</span></div>
+                        ${b98Html}
                     </div>
                     <div class="f-user">${formaterTid(nyesteData.timestamp, nyesteData.user)}</div>
                 </div>
@@ -417,16 +398,24 @@
     window.lukkModal = () => { document.getElementById('update-modal').style.display='none'; document.getElementById('modal-error').style.display='none'; };
     window.oppdaterRadiusText = () => document.getElementById('radius-val').innerText = document.getElementById('radius').value;
     
-    // Oppdatert for å ta imot og huske lat/lon
     window.apneModal = (id, n, lat, lon) => { 
-        valgtStasjonId = id; 
-        valgtStasjonLat = lat;
-        valgtStasjonLon = lon;
+        valgtStasjonId = id; valgtStasjonLat = lat; valgtStasjonLon = lon;
         document.getElementById('modal-station-name').innerText = n; 
         document.getElementById('input-nickname').value = localStorage.getItem('drivstoff_navn') || ""; 
-        const p = skylagredePriser[id] || { diesel: "", bensin: "" };
+        const p = skylagredePriser[id] || { diesel: "", bensin: "", bensin98: "" };
         document.getElementById('input-diesel').value = p.diesel === "--" ? "" : p.diesel;
         document.getElementById('input-bensin').value = p.bensin === "--" ? "" : p.bensin;
+        document.getElementById('input-bensin98').value = p.bensin98 === "--" || !p.bensin98 ? "" : p.bensin98;
+        
+        // Viser 98-feltet kun hvis det allerede ligger en pris inne
+        if (p.bensin98 && p.bensin98 !== "--") {
+            document.getElementById('div-bensin98').style.display = 'block';
+            document.getElementById('btn-show-98').style.display = 'none';
+        } else {
+            document.getElementById('div-bensin98').style.display = 'none';
+            document.getElementById('btn-show-98').style.display = 'block';
+        }
+        
         document.getElementById('update-modal').style.display = 'block'; 
     };
 
@@ -434,8 +423,7 @@
         const s = document.getElementById('stedsnavn').value; 
         if(!s) return;
         document.getElementById('station-list').innerHTML = "<p class='loading-msg'>🔍 Henter stasjoner for " + s + "...</p>";
-        document.getElementById('featured-station-container').style.display = 'none'; 
-        document.getElementById('global-featured-container').style.display = 'none';
+        document.getElementById('featured-station-container').style.display = 'none'; document.getElementById('global-featured-container').style.display = 'none';
         try {
             const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(s)},Norge&format=json&limit=1`); 
             const d = await res.json(); 
@@ -446,15 +434,9 @@
 
     window.startGpsSok = () => {
         document.getElementById('station-list').innerHTML = "<p class='loading-msg'>📍 Finner din posisjon...</p>";
-        document.getElementById('featured-station-container').style.display = 'none';
-        document.getElementById('global-featured-container').style.display = 'none';
+        document.getElementById('featured-station-container').style.display = 'none'; document.getElementById('global-featured-container').style.display = 'none';
         navigator.geolocation.getCurrentPosition(
-            p => {
-                // Husker GPS-posisjonen slik at det globale kortet kan regne ut avstand senere!
-                sisteLat = p.coords.latitude;
-                sisteLon = p.coords.longitude;
-                hentStasjoner(p.coords.latitude, p.coords.longitude);
-            },
+            p => { sisteLat = p.coords.latitude; sisteLon = p.coords.longitude; hentStasjoner(p.coords.latitude, p.coords.longitude); },
             e => { document.getElementById('station-list').innerHTML = "<p style='text-align:center; color:var(--danger);'>GPS-feil.</p>"; }
         );
     };
@@ -465,8 +447,7 @@
         try {
             const res = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(`[out:json];node["amenity"="fuel"](around:${r},${lat},${lon});out;`)}`); 
             const data = await res.json(); 
-            gjeldendeStasjoner = data.elements; 
-            visStasjoner(gjeldendeStasjoner, lat, lon);
+            gjeldendeStasjoner = data.elements; visStasjoner(gjeldendeStasjoner, lat, lon);
         } catch (e) { document.getElementById('station-list').innerHTML = "<p style='text-align:center; color:var(--danger);'>Kartfeil. Prøv igjen.</p>"; }
     }
 
