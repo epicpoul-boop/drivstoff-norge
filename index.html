@@ -215,8 +215,8 @@
         <h3 id="modal-station-name" style="margin-top:0">Oppdater pris</h3>
         <p id="modal-error"></p>
         <div style="margin-bottom:12px">
-            <label style="font-size:12px; color:var(--text-muted)">Kallenavn</label>
-            <input type="text" id="input-nickname" placeholder="Ditt navn">
+            <label style="font-size:12px; color:var(--text-muted)">Kallenavn (Valgfritt)</label>
+            <input type="text" id="input-nickname" placeholder="La stå tom for å være Anonym">
         </div>
         <div style="margin-bottom:12px">
             <label style="color: var(--diesel-color); font-size:12px">Diesel</label>
@@ -405,7 +405,8 @@
         let startOfWeek = new Date(now.getFullYear(), now.getMonth(), diffToMonday).getTime();
 
         Object.values(alleData).forEach(p => {
-            if (!p.user) return;
+            // Ignorer de som er "Anonym" fra Topplisten!
+            if (!p.user || p.user === "Anonym") return; 
             
             totalTellere[p.user] = (totalTellere[p.user] || 0) + 1;
 
@@ -444,7 +445,7 @@
         }).join('');
 
         let myName = localStorage.getItem('drivstoff_navn'); let myRankHtml = "";
-        if (myName) {
+        if (myName && myName !== "Anonym") {
             let myIndex = ukeSortert.findIndex(u => u[0].toLowerCase() === myName.toLowerCase());
             if (myIndex >= 10) {
                 let myData = ukeSortert[myIndex]; let tittel = getTittel(totalTellere[myData[0]]); let streak = userStreaks[myData[0]] || 0;
@@ -496,7 +497,6 @@
         } else { globalContainer.style.display = 'none'; }
     }
 
-    // OPPDATERT: Snittpris (D + 95) og kun i Norge
     function visDagensEkstremer() {
         let naa = Date.now();
         let grense = naa - (24 * 60 * 60 * 1000); 
@@ -509,13 +509,11 @@
         for (const id in skylagredePriser) {
             const p = skylagredePriser[id];
             if (p.timestamp > grense && p.navn) {
-                // Sjekker at landet er Norge (eller tomt, som betyr gammel data fra Norge)
                 if (p.land && p.land !== 'no') continue;
 
                 let d = parseFloat(p.diesel ? p.diesel.replace(',', '.') : NaN);
                 let b = parseFloat(p.bensin ? p.bensin.replace(',', '.') : NaN);
 
-                // Krever at både diesel og bensin er oppdatert for å lage et rettferdig snitt
                 if (!isNaN(d) && !isNaN(b) && d >= 10 && b >= 10) {
                     let avg = (d + b) / 2;
                     
@@ -532,7 +530,7 @@
         }
 
         const container = document.getElementById('extremes-container');
-        container.style.display = 'block'; // Seksjonen vises alltid nå
+        container.style.display = 'block'; 
 
         const renderPlaceholder = (title, icon, color) => `
             <div class="featured-card" style="background: transparent; border: 1px dashed ${color}; margin-bottom: 10px; color: var(--text-muted);">
@@ -589,11 +587,10 @@
         let d = document.getElementById('input-diesel').value.trim();
         let b = document.getElementById('input-bensin').value.trim();
         let b98 = document.getElementById('input-bensin98').value.trim();
-        const n = document.getElementById('input-nickname').value.trim();
+        let n = document.getElementById('input-nickname').value.trim();
         const modalError = document.getElementById('modal-error');
         const stasjonNavn = document.getElementById('modal-station-name').innerText;
 
-        if(!n) { modalError.innerText = "Du må fylle inn et kallenavn!"; modalError.style.display = "block"; return; }
         if (!d && !b && !b98) { modalError.innerText = "Du må fylle inn minst én pris!"; modalError.style.display = "block"; return; }
 
         if (!validerPris(d) || !validerPris(b) || !validerPris(b98)) {
@@ -601,16 +598,26 @@
             modalError.style.display = "block"; return;
         }
 
-        const nameRef = ref(db, 'users/' + n.toLowerCase());
-        const nameSnap = await get(nameRef);
-        
-        if (nameSnap.exists() && nameSnap.val() !== myUid) {
-            const bekreft = confirm(`Kallenavnet '${n}' er allerede i bruk av noen andre (eller din gamle profil).\n\nEr dette deg? Trykk OK for å hente tilbake profilen din.\nTrykk Avbryt for å velge et annet navn.`);
-            if (!bekreft) return; 
-            myUid = nameSnap.val(); localStorage.setItem('drivstoff_uid', myUid);
-        } else if (!nameSnap.exists()) { await set(nameRef, myUid); }
-        
-        localStorage.setItem('drivstoff_navn', n);
+        // Håndterer anonymitet
+        let isAnonym = false;
+        if (!n) {
+            n = "Anonym";
+            isAnonym = true;
+        }
+
+        if (!isAnonym) {
+            const nameRef = ref(db, 'users/' + n.toLowerCase());
+            const nameSnap = await get(nameRef);
+            
+            if (nameSnap.exists() && nameSnap.val() !== myUid) {
+                const bekreft = confirm(`Kallenavnet '${n}' er allerede i bruk av noen andre (eller din gamle profil).\n\nEr dette deg? Trykk OK for å hente tilbake profilen din.\nTrykk Avbryt for å velge et annet navn.`);
+                if (!bekreft) return; 
+                myUid = nameSnap.val(); localStorage.setItem('drivstoff_uid', myUid);
+            } else if (!nameSnap.exists()) { 
+                await set(nameRef, myUid); 
+            }
+            localStorage.setItem('drivstoff_navn', n);
+        }
 
         const currentRef = ref(db, 'priser/' + valgtStasjonId);
         const oldData = skylagredePriser[valgtStasjonId] || {};
@@ -694,7 +701,6 @@
             
             const flag = getFlag(sisteLand);
 
-            // OPPDATERT: Fremhever navnet til den som oppdaterte den billigste stasjonen i søket!
             let timeAgoHtml = `<div class="time-ago">${formaterTid(p.timestamp, p.user)}</div>`;
             if (index === 0 && p.user && p.diesel !== "--") {
                 let rawTimeText = formaterTid(p.timestamp, p.user).replace("Sist: ", "");
@@ -755,7 +761,7 @@
         if(!s) return;
         document.getElementById('station-list').innerHTML = "<p class='loading-msg'>🔍 Henter stasjoner for " + s + "...</p>";
         document.getElementById('featured-station-container').style.display = 'none'; document.getElementById('global-featured-container').style.display = 'none'; document.getElementById('add-station-container').style.display = 'none';
-        document.getElementById('extremes-container').style.display = 'none'; // Skjuler ekstremene midlertidig
+        document.getElementById('extremes-container').style.display = 'none'; 
         try {
             const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(s)}&countrycodes=no,se,dk&format=json&addressdetails=1&limit=1`); 
             const d = await res.json(); 
@@ -770,7 +776,7 @@
     window.startGpsSok = () => {
         document.getElementById('station-list').innerHTML = "<p class='loading-msg'>📍 Finner din posisjon...</p>";
         document.getElementById('featured-station-container').style.display = 'none'; document.getElementById('global-featured-container').style.display = 'none'; document.getElementById('add-station-container').style.display = 'none';
-        document.getElementById('extremes-container').style.display = 'none'; // Skjuler ekstremene midlertidig
+        document.getElementById('extremes-container').style.display = 'none'; 
         navigator.geolocation.getCurrentPosition(
             async p => { 
                 sisteLat = p.coords.latitude; sisteLon = p.coords.longitude; 
@@ -801,7 +807,7 @@
                 }
             }
             visStasjoner(gjeldendeStasjoner, lat, lon);
-            visDagensEkstremer(); // Viser ekstremene igjen etter søk
+            visDagensEkstremer(); 
         } catch (e) { document.getElementById('station-list').innerHTML = "<p style='text-align:center; color:var(--danger);'>Kartfeil. Prøv igjen.</p>"; }
     }
 
