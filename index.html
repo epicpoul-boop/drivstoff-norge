@@ -27,7 +27,7 @@
         }
         body { font-family: -apple-system, sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 15px; padding-bottom: 50px; }
         .container { max-width: 500px; margin: 0 auto; }
-        h2 { text-align: center; margin-bottom: 10px; }
+        h2 { text-align: center; margin-bottom: 10px; font-size: 22px; }
 
         .install-banner { display: none; background-color: var(--primary); color: white; padding: 12px; border-radius: 8px; margin-bottom: 20px; position: relative; font-size: 13px; text-align: center; line-height: 1.4; }
         .install-arrow { position: absolute; top: -15px; right: 15px; font-size: 18px; }
@@ -45,10 +45,8 @@
         .top-list-item { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #333; font-size: 13px; align-items: center; }
         .user-title { font-size: 11px; color: var(--primary); opacity: 0.9; margin-left: 5px; font-weight: normal; }
         
-        /* NYTT: Stil for din egen rangering under Topp 10 */
         .my-rank-item { border-top: 2px dashed #4a4a5a; margin-top: 5px; padding-top: 10px; background: rgba(255, 122, 0, 0.05); border-radius: 6px; padding: 8px; font-weight: bold; }
         
-        /* NYTT: Deleknapp */
         .share-app-btn { width: 100%; background: rgba(74, 144, 226, 0.15); border: 1px solid var(--share-color); color: var(--share-color); padding: 12px; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; margin-top: 15px; display: flex; align-items: center; justify-content: center; gap: 8px; }
 
         #global-featured-container, #featured-station-container { display: none; margin-bottom: 20px; }
@@ -275,23 +273,16 @@
         bannerText.innerHTML = `⚠️ <b>Du er i Facebook sin nettleser.</b><br>Appen fungerer best utenfor FB. For å installere appen:<br>Trykk på de tre prikkene ⋯ og velg <b>"Åpne i ekstern nettleser"</b>.`;
     } else if (!isStandalone) { installBanner.style.display = 'block'; }
 
-    // --- NYTT: Ekte Delefunksjon ---
     window.delAppen = async () => {
         const shareData = {
             title: 'Drivstoff Norge ⛽',
             text: 'Jeg bruker Drivstoff Norge! En gratis og reklamefri dugnads-app for å finne og dele de billigste drivstoffprisene. Sjekk den ut:',
-            url: 'https://is.gd/drivstoffnorge' // Bruker kortlenken din her utad til venner
+            url: 'https://is.gd/drivstoffnorge' 
         };
         try {
-            if (navigator.share) {
-                await navigator.share(shareData);
-            } else {
-                navigator.clipboard.writeText(shareData.url);
-                alert('Lenken er kopiert til utklippstavlen! Lim den inn og send til en venn. 🚗💨');
-            }
-        } catch (err) {
-            console.log('Deling avbrutt', err);
-        }
+            if (navigator.share) { await navigator.share(shareData); } 
+            else { navigator.clipboard.writeText(shareData.url); alert('Lenken er kopiert til utklippstavlen! Lim den inn og send til en venn. 🚗💨'); }
+        } catch (err) { console.log('Deling avbrutt', err); }
     };
 
     function oppdaterKlokker() {
@@ -312,8 +303,7 @@
         document.getElementById('cd-day').innerText = `(Restarter om ${hDay}t ${mDay}m)`;
         document.getElementById('cd-week').innerText = `(Restarter om ${dWeek}d ${hWeek}t)`;
     }
-    setInterval(oppdaterKlokker, 60000);
-    oppdaterKlokker();
+    setInterval(oppdaterKlokker, 60000); oppdaterKlokker();
 
     const scrollBtn = document.getElementById('scroll-down-btn');
     function sjekkScroll() {
@@ -355,6 +345,8 @@
     let valgtStasjonId = null; let valgtStasjonLat = null; let valgtStasjonLon = null; 
     let gjeldendeStasjoner = []; let sisteLat = null, sisteLon = null;
     let skylagredePriser = {}; let egneStasjoner = {}; 
+    
+    let sisteLand = 'no'; 
 
     onValue(ref(db, 'priser'), async (snapshot) => {
         skylagredePriser = snapshot.val() || {};
@@ -377,6 +369,12 @@
         if(c > p) return '<span class="trend-up">↑</span>'; 
         if(c < p) return '<span class="trend-down">↓</span>'; 
         return "";
+    }
+
+    function getFlag(code) {
+        if(code === 'se') return '🇸🇪';
+        if(code === 'dk') return '🇩🇰';
+        return ''; // Fjernet det norske flagget som standard
     }
 
     function getTittel(antall) {
@@ -411,8 +409,7 @@
             
             totalTellere[p.user] = (totalTellere[p.user] || 0) + 1;
 
-            const d = new Date(p.timestamp);
-            d.setHours(0,0,0,0);
+            const d = new Date(p.timestamp); d.setHours(0,0,0,0);
             if (!userDays[p.user]) userDays[p.user] = new Set();
             userDays[p.user].add(d.getTime());
 
@@ -424,30 +421,24 @@
                     let bPris = parseFloat(p.bensin ? p.bensin.replace(',', '.') : 999);
                     let b98Pris = parseFloat(p.bensin98 ? p.bensin98.replace(',', '.') : 999);
                     let sNavn = p.navn || "Stasjon";
+                    let flag = getFlag(p.land || 'no'); 
                     
-                    if (dPris >= 10 && dPris < lavestePris) { lavestePris = dPris; besteJegerStr = `${p.user} (${lavestePris} kr for Diesel på ${sNavn})`; }
-                    if (bPris >= 10 && bPris < lavestePris) { lavestePris = bPris; besteJegerStr = `${p.user} (${lavestePris} kr for Bensin på ${sNavn})`; }
-                    if (b98Pris >= 10 && b98Pris < lavestePris) { lavestePris = b98Pris; besteJegerStr = `${p.user} (${lavestePris} kr for 98 på ${sNavn})`; }
+                    if (dPris >= 10 && dPris < lavestePris) { lavestePris = dPris; besteJegerStr = `${p.user} (${lavestePris} kr for Diesel på ${sNavn} ${flag})`; }
+                    if (bPris >= 10 && bPris < lavestePris) { lavestePris = bPris; besteJegerStr = `${p.user} (${lavestePris} kr for Bensin på ${sNavn} ${flag})`; }
+                    if (b98Pris >= 10 && b98Pris < lavestePris) { lavestePris = b98Pris; besteJegerStr = `${p.user} (${lavestePris} kr for 98 på ${sNavn} ${flag})`; }
                 }
             }
-            
-            if (p.timestamp >= startOfWeek) {
-                ukeTellere[p.user] = (ukeTellere[p.user] || 0) + 1;
-            }
+            if (p.timestamp >= startOfWeek) { ukeTellere[p.user] = (ukeTellere[p.user] || 0) + 1; }
         });
 
-        const userStreaks = {};
-        const todayTime = startOfDay;
-        const yesterdayTime = todayTime - 86400000;
-
+        const userStreaks = {}; const todayTime = startOfDay; const yesterdayTime = todayTime - 86400000;
         for (const user in userDays) {
             const days = Array.from(userDays[user]).sort((a,b) => b-a);
             let streak = 0;
             if (days[0] === todayTime || days[0] === yesterdayTime) {
                 let currentExpected = days[0];
                 for (let i = 0; i < days.length; i++) {
-                    if (days[i] === currentExpected) { streak++; currentExpected -= 86400000; } 
-                    else { break; }
+                    if (days[i] === currentExpected) { streak++; currentExpected -= 86400000; } else { break; }
                 }
             }
             userStreaks[user] = streak;
@@ -455,47 +446,27 @@
 
         const dagSortert = Object.entries(dagTellere).sort((a,b) => b[1]-a[1]);
         const ukeSortert = Object.entries(ukeTellere).sort((a,b) => b[1]-a[1]);
-
-        const formatName = (user) => {
-            let streak = userStreaks[user] || 0;
-            return streak > 1 ? `${user} 🔥${streak}` : user;
-        };
+        const formatName = (user) => { let streak = userStreaks[user] || 0; return streak > 1 ? `${user} 🔥${streak}` : user; };
 
         document.getElementById('best-day').innerText = dagSortert.length ? `${formatName(dagSortert[0][0])} (${dagSortert[0][1]})` : "Ingen enda i dag";
         document.getElementById('best-week').innerText = ukeSortert.length ? `${formatName(ukeSortert[0][0])} (${ukeSortert[0][1]})` : "Ingen enda denne uken";
         document.getElementById('best-hunter').innerText = besteJegerStr;
 
-        // Bygger HTML for Topp 10
         let top10Html = ukeSortert.slice(0, 10).map((u, i) => {
-            let tittel = getTittel(totalTellere[u[0]]);
-            let streak = userStreaks[u[0]] || 0;
+            let tittel = getTittel(totalTellere[u[0]]); let streak = userStreaks[u[0]] || 0;
             let streakHtml = streak > 1 ? `<span style="color:var(--primary); font-size:12px; margin-left:5px;">🔥${streak}</span>` : '';
-            return `<div class="top-list-item">
-                <div><span>${i+1}. ${u[0]}</span>${streakHtml} <span class="user-title">${tittel}</span></div>
-                <span>${u[1]}</span>
-            </div>`;
+            return `<div class="top-list-item"><div><span>${i+1}. ${u[0]}</span>${streakHtml} <span class="user-title">${tittel}</span></div><span>${u[1]}</span></div>`;
         }).join('');
 
-        // NYTT: Finn din egen plassering hvis du ikke er i Topp 10
-        let myName = localStorage.getItem('drivstoff_navn');
-        let myRankHtml = "";
-
+        let myName = localStorage.getItem('drivstoff_navn'); let myRankHtml = "";
         if (myName) {
             let myIndex = ukeSortert.findIndex(u => u[0].toLowerCase() === myName.toLowerCase());
-            
             if (myIndex >= 10) {
-                let myData = ukeSortert[myIndex];
-                let tittel = getTittel(totalTellere[myData[0]]);
-                let streak = userStreaks[myData[0]] || 0;
+                let myData = ukeSortert[myIndex]; let tittel = getTittel(totalTellere[myData[0]]); let streak = userStreaks[myData[0]] || 0;
                 let streakHtml = streak > 1 ? `<span style="color:var(--primary); font-size:12px; margin-left:5px;">🔥${streak}</span>` : '';
-                
-                myRankHtml = `<div class="top-list-item my-rank-item">
-                    <div><span>${myIndex + 1}. ${myData[0]} (Deg)</span>${streakHtml} <span class="user-title">${tittel}</span></div>
-                    <span>${myData[1]}</span>
-                </div>`;
+                myRankHtml = `<div class="top-list-item my-rank-item"><div><span>${myIndex + 1}. ${myData[0]} (Deg)</span>${streakHtml} <span class="user-title">${tittel}</span></div><span>${myData[1]}</span></div>`;
             }
         }
-
         document.getElementById('top-list-items').innerHTML = top10Html + myRankHtml;
     }
 
@@ -519,6 +490,7 @@
             const style = getBrandStyle(nyesteData.navn);
             let textColor = style.color === '#ffcc00' ? '#000' : '#fff';
             let borderColor = style.color === '#ffcc00' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.15)';
+            let flag = getFlag(nyesteData.land || 'no'); 
 
             let b98Html = (nyesteData.bensin98 && nyesteData.bensin98 !== "--") ? `<div class="f-price-box" style="border-color:${borderColor}"><span class="f-lbl">98</span><span class="f-val">${nyesteData.bensin98} ${getTrendHtml(nyesteData.bensin98, nyesteData.prev_bensin98)}</span></div>` : '';
 
@@ -526,8 +498,8 @@
             globalContainer.innerHTML = `
                 <div class="featured-card" style="background: ${style.bg}; color: ${textColor};">
                     <div class="f-icon-bg">${style.char}</div>
-                    <div class="featured-header">⚡ NYESTE OPPDATERING I NORGE</div>
-                    <div class="featured-title">${nyesteData.navn} ${distStr}</div>
+                    <div class="featured-header">⚡ NYESTE OPPDATERING</div>
+                    <div class="featured-title">${nyesteData.navn} ${flag} <span style="margin-left:auto;">${distStr}</span></div>
                     <div class="featured-prices">
                         <div class="f-price-box" style="border-color:${borderColor}"><span class="f-lbl">D</span><span class="f-val">${nyesteData.diesel} ${getTrendHtml(nyesteData.diesel, nyesteData.prev_diesel)}</span></div>
                         <div class="f-price-box" style="border-color:${borderColor}"><span class="f-lbl">95</span><span class="f-val">${nyesteData.bensin} ${getTrendHtml(nyesteData.bensin, nyesteData.prev_bensin)}</span></div>
@@ -569,15 +541,9 @@
         
         if (nameSnap.exists() && nameSnap.val() !== myUid) {
             const bekreft = confirm(`Kallenavnet '${n}' er allerede i bruk av noen andre (eller din gamle profil).\n\nEr dette deg? Trykk OK for å hente tilbake profilen din.\nTrykk Avbryt for å velge et annet navn.`);
-            
-            if (!bekreft) {
-                return; 
-            }
-            
+            if (!bekreft) return; 
             myUid = nameSnap.val(); localStorage.setItem('drivstoff_uid', myUid);
-        } else if (!nameSnap.exists()) { 
-            await set(nameRef, myUid); 
-        }
+        } else if (!nameSnap.exists()) { await set(nameRef, myUid); }
         
         localStorage.setItem('drivstoff_navn', n);
 
@@ -605,7 +571,8 @@
 
         const newData = { 
             diesel: d, prev_diesel: prev_d, bensin: b, prev_bensin: prev_b, bensin98: b98, prev_bensin98: prev_b98, 
-            timestamp: Date.now(), user: n, uid: myUid, verified: verified, navn: stasjonNavn, lat: valgtStasjonLat, lon: valgtStasjonLon 
+            timestamp: Date.now(), user: n, uid: myUid, verified: verified, navn: stasjonNavn, lat: valgtStasjonLat, lon: valgtStasjonLon,
+            land: sisteLand 
         };
         
         await set(currentRef, newData); push(ref(db, 'historikk/' + valgtStasjonId), newData); push(ref(db, 'alle_oppdateringer'), newData); 
@@ -659,9 +626,11 @@
             const trendB98 = getTrendHtml(p.bensin98, p.prev_bensin98);
 
             let b98Html = (p.bensin98 && p.bensin98 !== "--") ? `<div class="price-row"><span class="price-label lbl-bensin98">BENSIN 98</span><div class="price-value">${p.bensin98} ${trendB98}</div></div>` : '';
+            
+            const flag = getFlag(sisteLand);
 
             const card = document.createElement('div'); card.className = `station-card`;
-            card.innerHTML = `<div class="main-info"><div class="station-info"><div class="brand-icon" style="background-color: ${style.color}; color: ${style.text || '#fff'}">${style.char}</div><div class="station-details"><h3>${navn}</h3><p>${dist.toFixed(1)} km unna</p></div></div><div class="prices-container"><div class="price-row"><span class="price-label lbl-diesel">DIESEL</span><div class="price-value">${p.diesel} ${trendD}</div> ${p.verified?'<span class="verify-badge">✅</span>':''}</div><div class="price-row"><span class="price-label lbl-bensin">BENSIN 95</span><div class="price-value">${p.bensin} ${trendB}</div> ${p.verified?'<span class="verify-badge">✅</span>':''}</div>${b98Html}</div></div><div class="action-buttons"><div class="update-btn" onclick="apneModal('${id}','${escapedName}', ${s.lat}, ${s.lon})">OPPDATER</div><a class="nav-btn" href="https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lon}" target="_blank">KJØR HIT</a><div class="hist-btn" onclick="visHistorikk('${id}')">⌛ HISTORIKK</div></div><div id="hist-${id}" class="history-panel"></div><div class="time-ago">${formaterTid(p.timestamp, p.user)}</div>`;
+            card.innerHTML = `<div class="main-info"><div class="station-info"><div class="brand-icon" style="background-color: ${style.color}; color: ${style.text || '#fff'}">${style.char}</div><div class="station-details"><h3>${navn} ${flag}</h3><p>${dist.toFixed(1)} km unna</p></div></div><div class="prices-container"><div class="price-row"><span class="price-label lbl-diesel">DIESEL</span><div class="price-value">${p.diesel} ${trendD}</div> ${p.verified?'<span class="verify-badge">✅</span>':''}</div><div class="price-row"><span class="price-label lbl-bensin">BENSIN 95</span><div class="price-value">${p.bensin} ${trendB}</div> ${p.verified?'<span class="verify-badge">✅</span>':''}</div>${b98Html}</div></div><div class="action-buttons"><div class="update-btn" onclick="apneModal('${id}','${escapedName}', ${s.lat}, ${s.lon})">OPPDATER</div><a class="nav-btn" href="https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lon}" target="_blank">KJØR HIT</a><div class="hist-btn" onclick="visHistorikk('${id}')">⌛ HISTORIKK</div></div><div id="hist-${id}" class="history-panel"></div><div class="time-ago">${formaterTid(p.timestamp, p.user)}</div>`;
             list.appendChild(card);
         });
 
@@ -669,13 +638,14 @@
             let textColor = nyesteStasjon.style.color === '#ffcc00' ? '#000' : '#fff';
             let borderColor = nyesteStasjon.style.color === '#ffcc00' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.15)';
             let b98Html = (nyesteData.bensin98 && nyesteData.bensin98 !== "--") ? `<div class="f-price-box" style="border-color:${borderColor}"><span class="f-lbl">98</span><span class="f-val">${nyesteData.bensin98} ${getTrendHtml(nyesteData.bensin98, nyesteData.prev_bensin98)}</span></div>` : '';
-            
+            let flag = getFlag(sisteLand);
+
             featuredContainer.style.display = 'block';
             featuredContainer.innerHTML = `
                 <div class="featured-card" style="background: ${nyesteStasjon.style.bg}; color: ${textColor};">
                     <div class="f-icon-bg">${nyesteStasjon.style.char}</div>
                     <div class="featured-header">⚡ NYESTE OPPDATERING I DITT SØK</div>
-                    <div class="featured-title">${nyesteStasjon.navn} <span class="featured-dist">📍 ${nyesteStasjon.dist.toFixed(1)} km</span></div>
+                    <div class="featured-title">${nyesteStasjon.navn} ${flag} <span style="margin-left:auto;" class="featured-dist">📍 ${nyesteStasjon.dist.toFixed(1)} km</span></div>
                     <div class="featured-prices">
                         <div class="f-price-box" style="border-color:${borderColor}"><span class="f-lbl">D</span><span class="f-val">${nyesteData.diesel} ${getTrendHtml(nyesteData.diesel, nyesteData.prev_diesel)}</span></div>
                         <div class="f-price-box" style="border-color:${borderColor}"><span class="f-lbl">95</span><span class="f-val">${nyesteData.bensin} ${getTrendHtml(nyesteData.bensin, nyesteData.prev_bensin)}</span></div>
@@ -714,9 +684,12 @@
         document.getElementById('station-list').innerHTML = "<p class='loading-msg'>🔍 Henter stasjoner for " + s + "...</p>";
         document.getElementById('featured-station-container').style.display = 'none'; document.getElementById('global-featured-container').style.display = 'none'; document.getElementById('add-station-container').style.display = 'none';
         try {
-            const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(s)},Norge&format=json&limit=1`); 
+            const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(s)}&countrycodes=no,se,dk&format=json&addressdetails=1&limit=1`); 
             const d = await res.json(); 
-            if(d.length>0) { hentStasjoner(parseFloat(d[0].lat), parseFloat(d[0].lon)); }
+            if(d.length>0) { 
+                sisteLand = d[0].address?.country_code || 'no'; 
+                hentStasjoner(parseFloat(d[0].lat), parseFloat(d[0].lon)); 
+            }
             else { document.getElementById('station-list').innerHTML = "<p style='text-align:center; color:var(--danger);'>Kunne ikke finne stedet.</p>"; }
         } catch (e) { document.getElementById('station-list').innerHTML = "<p style='text-align:center; color:var(--danger);'>Nettverksfeil.</p>"; }
     };
@@ -725,7 +698,15 @@
         document.getElementById('station-list').innerHTML = "<p class='loading-msg'>📍 Finner din posisjon...</p>";
         document.getElementById('featured-station-container').style.display = 'none'; document.getElementById('global-featured-container').style.display = 'none'; document.getElementById('add-station-container').style.display = 'none';
         navigator.geolocation.getCurrentPosition(
-            p => { sisteLat = p.coords.latitude; sisteLon = p.coords.longitude; hentStasjoner(p.coords.latitude, p.coords.longitude); },
+            async p => { 
+                sisteLat = p.coords.latitude; sisteLon = p.coords.longitude; 
+                try {
+                    const revRes = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${sisteLat}&lon=${sisteLon}&format=json`);
+                    const revData = await revRes.json();
+                    sisteLand = revData.address?.country_code || 'no';
+                } catch(e) { sisteLand = 'no'; }
+                hentStasjoner(sisteLat, sisteLon); 
+            },
             e => { document.getElementById('station-list').innerHTML = "<p style='text-align:center; color:var(--danger);'>GPS-feil.</p>"; }
         );
     };
