@@ -68,17 +68,22 @@
         .gps-btn { background-color: #3f3f4e; margin-top: 10px; }
         .loading-msg { text-align: center; color: var(--primary); font-weight: bold; margin-top: 20px; font-size: 14px; }
 
+        /* OPPDATERT: CSS for Stasjonskort for å hindre at lange navn dytter prisen ut! */
         .station-card { background-color: var(--card-bg); border-radius: 10px; padding: 15px; margin-bottom: 15px; display: flex; flex-direction: column; border: 2px solid transparent; }
-        .main-info { display: flex; justify-content: space-between; align-items: center; width: 100%; }
-        .station-info { flex: 1; display: flex; align-items: flex-start; }
+        .main-info { display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 10px; }
+        .station-info { flex: 1; display: flex; align-items: center; min-width: 0; } /* min-width:0 er magien som fikser feilen */
+        .station-details { flex: 1; min-width: 0; }
+        .station-details h3 { margin: 0 0 5px 0; font-size: 15px; word-wrap: break-word; line-height: 1.3; } /* Lar navnet gå over to linjer */
+        .station-details p { margin: 0; font-size: 12px; color: var(--text-muted); }
         .brand-icon { width: 40px; height: 40px; flex-shrink: 0; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 12px; background: #4a4a5a; }
-        .prices-container { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
+        .prices-container { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; flex-shrink: 0; } /* flex-shrink:0 holder boksen intakt */
+        
         .price-row { display: flex; align-items: center; gap: 8px; position: relative; }
-        .price-label { font-size: 10px; font-weight: bold; border-radius: 4px; padding: 2px 5px; width: 45px; text-align: center; color: white; }
+        .price-label { font-size: 10px; font-weight: bold; border-radius: 4px; padding: 2px 5px; width: 45px; text-align: center; color: white; flex-shrink: 0; }
         .lbl-diesel { background-color: var(--diesel-color); }
         .lbl-bensin { background-color: var(--bensin-color); }
         .lbl-bensin98 { background-color: var(--bensin98-color); }
-        .price-value { font-size: 16px; font-weight: bold; background-color: #3f3f4e; padding: 4px 8px; border-radius: 6px; min-width: 65px; text-align: right; display: flex; justify-content: flex-end; align-items: center; gap: 4px; }
+        .price-value { font-size: 16px; font-weight: bold; background-color: #3f3f4e; padding: 4px 8px; border-radius: 6px; min-width: 60px; text-align: right; display: flex; justify-content: flex-end; align-items: center; gap: 4px; }
         
         .trend-up { color: var(--danger); font-size: 14px; } 
         .trend-down { color: var(--success); font-size: 14px; } 
@@ -374,7 +379,7 @@
     function getFlag(code) {
         if(code === 'se') return '🇸🇪';
         if(code === 'dk') return '🇩🇰';
-        return ''; // Fjernet det norske flagget som standard
+        return ''; 
     }
 
     function getTittel(antall) {
@@ -498,7 +503,7 @@
             globalContainer.innerHTML = `
                 <div class="featured-card" style="background: ${style.bg}; color: ${textColor};">
                     <div class="f-icon-bg">${style.char}</div>
-                    <div class="featured-header">⚡ NYESTE OPPDATERING</div>
+                    <div class="featured-header">⚡ NYESTE OPPDATERING I NORGE</div>
                     <div class="featured-title">${nyesteData.navn} ${flag} <span style="margin-left:auto;">${distStr}</span></div>
                     <div class="featured-prices">
                         <div class="f-price-box" style="border-color:${borderColor}"><span class="f-lbl">D</span><span class="f-val">${nyesteData.diesel} ${getTrendHtml(nyesteData.diesel, nyesteData.prev_diesel)}</span></div>
