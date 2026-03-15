@@ -47,7 +47,7 @@
         
         .my-rank-item { border-top: 2px dashed #4a4a5a; margin-top: 5px; padding-top: 10px; background: rgba(255, 122, 0, 0.05); border-radius: 6px; padding: 8px; font-weight: bold; }
         
-        .share-app-btn { width: 100%; background: rgba(74, 144, 226, 0.15); border: 1px solid var(--share-color); color: var(--share-color); padding: 12px; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .share-app-btn { width: 100%; background: rgba(74, 144, 226, 0.15); border: 1px solid var(--share-color); color: var(--share-color); padding: 12px; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 20px; }
 
         #global-featured-container, #featured-station-container { display: none; margin-bottom: 20px; }
         .featured-card { border-radius: 10px; padding: 12px 15px; color: white; position: relative; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
@@ -104,8 +104,8 @@
 
         .footer { margin-top: 10px; text-align: center; padding: 20px; border-top: 1px solid #2b2b36; }
         .footer-text { font-size: 12px; color: var(--text-muted); line-height: 1.6; margin-bottom: 15px; }
-        .feedback-btn { background: transparent; border: 1px solid var(--share-color); color: var(--share-color); padding: 10px 20px; border-radius: 8px; font-size: 13px; display: inline-block; text-decoration: none; margin-top: 15px; }
-        .appstore-link { display: inline-block; margin-top: 20px; color: var(--primary); text-decoration: underline; cursor: pointer; font-weight: bold; font-size: 13px; }
+        .feedback-btn { background: transparent; border: 1px solid var(--share-color); color: var(--share-color); padding: 10px 20px; border-radius: 8px; font-size: 13px; display: inline-block; text-decoration: none; margin-top: 5px; margin-bottom: 15px;}
+        .appstore-link { display: inline-block; color: var(--primary); text-decoration: underline; cursor: pointer; font-weight: bold; font-size: 13px; }
 
         #info-modal, #add-station-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); z-index: 2000; overflow-y: auto; }
         .info-content { position: relative; margin: 40px auto; background-color: var(--card-bg); padding: 25px; border-radius: 15px; width: 90%; max-width: 350px; box-sizing: border-box; line-height: 1.5; font-size: 14px; }
@@ -137,16 +137,11 @@
             <span class="leader-title">Dagens bidragsyter 🏆 <span id="cd-day" class="countdown"></span></span>
             <span id="best-day" class="leader-name gold-txt">Laster...</span>
         </div>
-        <div class="leader-section">
+        <div class="leader-section" style="margin-bottom: 0;">
             <span class="leader-title">Ukens bidragsyter 🥇 <span id="cd-week" class="countdown"></span></span>
             <span id="best-week" class="leader-name gold-txt">Laster...</span>
         </div>
         
-        <div class="leader-section" style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 12px;">
-            <span class="leader-title">Dagens Prisjeger 🕵️‍♂️</span>
-            <span id="best-hunter" class="leader-name" style="color: var(--success); font-size: 14px;">Leter etter priser...</span>
-        </div>
-
         <button class="top-list-btn" onclick="toggleTopList()">Se Topp 10</button>
         <div id="top-list-content"><div id="top-list-items"></div></div>
     </div>
@@ -161,7 +156,7 @@
 
     <div id="station-list"></div>
 
-    <div id="extremes-container" style="display: none; margin-bottom: 20px;"></div>
+    <div id="extremes-container" style="display: none; margin-bottom: 30px;"></div>
 
     <div id="add-station-container">
         <p style="font-size: 13px; color: var(--text-muted); margin-top: 0;">Finner du ikke stasjonen du leter etter?</p>
@@ -169,18 +164,19 @@
     </div>
 
     <div class="footer">
-        <button class="share-app-btn" onclick="delAppen()" style="margin-bottom: 20px;">📢 Hjelp dugnaden – Inviter en venn</button>
+        <button class="share-app-btn" onclick="delAppen()">📢 Hjelp dugnaden – Inviter en venn</button>
         
+        <a href="mailto:thaldling@gmail.com?subject=Tilbakemelding%20Drivstoff%20Norge" class="feedback-btn">
+            ✉️ Send tilbakemelding
+        </a>
+
         <div class="footer-text">
             <strong>Personvern:</strong> Vi sporer deg ikke. Posisjonen din brukes kun lokalt for å finne stasjoner. 
             Vi lagrer kun kallenavnet ditt og en anonym ID for å sikre bidragene dine. Ingen reklame, ingen abonnement.
             <br><br>
             <span style="color: var(--primary);">⚠️ Viktig om kallenavn:</span> Appen har ingen passord for å holde ting lynraskt og enkelt. Hvis du sletter nettleserdataen din, får du tilbake poengene og titlene dine ved å bare skrive inn nøyaktig samme kallenavn neste gang du oppdaterer en pris! Vi stoler på dugnadsånden, så vi håper ingen utnytter dette til å stjele andres kallenavn. 🤞
         </div>
-        <a href="mailto:thaldling@gmail.com?subject=Tilbakemelding%20Drivstoff%20Norge" class="feedback-btn">
-            ✉️ Send tilbakemelding
-        </a>
-        <br>
+        
         <a class="appstore-link" onclick="visInfoModal()">Hvorfor er ikke appen i App Store?</a>
     </div>
 </div>
@@ -359,7 +355,7 @@
         const histSnap = await get(ref(db, 'alle_oppdateringer'));
         beregnTopplister(histSnap.val() || {});
         visGlobalSisteOppdatering();
-        visDagensEkstremer(); // NYTT: Skanner etter billigst og dyrest!
+        visDagensEkstremer(); 
         if (gjeldendeStasjoner.length > 0) visStasjoner(gjeldendeStasjoner, sisteLat, sisteLon);
         setTimeout(sjekkScroll, 500); 
     });
@@ -408,9 +404,6 @@
         let diffToMonday = now.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
         let startOfWeek = new Date(now.getFullYear(), now.getMonth(), diffToMonday).getTime();
 
-        let lavestePris = 999;
-        let besteJegerStr = "Ingen verifiserte funn enda i dag";
-
         Object.values(alleData).forEach(p => {
             if (!p.user) return;
             
@@ -420,21 +413,7 @@
             if (!userDays[p.user]) userDays[p.user] = new Set();
             userDays[p.user].add(d.getTime());
 
-            if (p.timestamp >= startOfDay) {
-                dagTellere[p.user] = (dagTellere[p.user] || 0) + 1;
-                
-                if (p.verified === true) {
-                    let dPris = parseFloat(p.diesel ? p.diesel.replace(',', '.') : 999);
-                    let bPris = parseFloat(p.bensin ? p.bensin.replace(',', '.') : 999);
-                    let b98Pris = parseFloat(p.bensin98 ? p.bensin98.replace(',', '.') : 999);
-                    let sNavn = p.navn || "Stasjon";
-                    let flag = getFlag(p.land || 'no'); 
-                    
-                    if (dPris >= 10 && dPris < lavestePris) { lavestePris = dPris; besteJegerStr = `${p.user} (${lavestePris} kr for Diesel på ${sNavn} ${flag})`; }
-                    if (bPris >= 10 && bPris < lavestePris) { lavestePris = bPris; besteJegerStr = `${p.user} (${lavestePris} kr for Bensin på ${sNavn} ${flag})`; }
-                    if (b98Pris >= 10 && b98Pris < lavestePris) { lavestePris = b98Pris; besteJegerStr = `${p.user} (${lavestePris} kr for 98 på ${sNavn} ${flag})`; }
-                }
-            }
+            if (p.timestamp >= startOfDay) { dagTellere[p.user] = (dagTellere[p.user] || 0) + 1; }
             if (p.timestamp >= startOfWeek) { ukeTellere[p.user] = (ukeTellere[p.user] || 0) + 1; }
         });
 
@@ -457,7 +436,6 @@
 
         document.getElementById('best-day').innerText = dagSortert.length ? `${formatName(dagSortert[0][0])} (${dagSortert[0][1]})` : "Ingen enda i dag";
         document.getElementById('best-week').innerText = ukeSortert.length ? `${formatName(ukeSortert[0][0])} (${ukeSortert[0][1]})` : "Ingen enda denne uken";
-        document.getElementById('best-hunter').innerText = besteJegerStr;
 
         let top10Html = ukeSortert.slice(0, 10).map((u, i) => {
             let tittel = getTittel(totalTellere[u[0]]); let streak = userStreaks[u[0]] || 0;
@@ -518,38 +496,35 @@
         } else { globalContainer.style.display = 'none'; }
     }
 
-    // NY FUNKSJON: Finner dagens dyreste og billigste stasjon uansett land
+    // OPPDATERT: Snittpris (D + 95) og kun i Norge
     function visDagensEkstremer() {
         let naa = Date.now();
-        let grense = naa - (24 * 60 * 60 * 1000); // Kun de siste 24 timene
+        let grense = naa - (24 * 60 * 60 * 1000); 
         
-        let billigstePris = Infinity;
-        let dyrestePris = 0;
+        let billigsteAvg = Infinity;
+        let dyresteAvg = 0;
         let billigsteData = null;
         let dyresteData = null;
 
         for (const id in skylagredePriser) {
             const p = skylagredePriser[id];
             if (p.timestamp > grense && p.navn) {
-                let d = parseFloat(p.diesel ? p.diesel.replace(',', '.') : 999);
-                let b = parseFloat(p.bensin ? p.bensin.replace(',', '.') : 999);
-                let b98 = parseFloat(p.bensin98 ? p.bensin98.replace(',', '.') : 999);
+                // Sjekker at landet er Norge (eller tomt, som betyr gammel data fra Norge)
+                if (p.land && p.land !== 'no') continue;
 
-                let stasjonMin = Math.min(d, b, b98);
-                if (stasjonMin >= 10 && stasjonMin < billigstePris) {
-                    billigstePris = stasjonMin;
-                    billigsteData = p;
-                }
+                let d = parseFloat(p.diesel ? p.diesel.replace(',', '.') : NaN);
+                let b = parseFloat(p.bensin ? p.bensin.replace(',', '.') : NaN);
 
-                let maxArr = [];
-                if (d < 999) maxArr.push(d);
-                if (b < 999) maxArr.push(b);
-                if (b98 < 999) maxArr.push(b98);
-                
-                if (maxArr.length > 0) {
-                    let stasjonMax = Math.max(...maxArr);
-                    if (stasjonMax <= 35 && stasjonMax > dyrestePris) {
-                        dyrestePris = stasjonMax;
+                // Krever at både diesel og bensin er oppdatert for å lage et rettferdig snitt
+                if (!isNaN(d) && !isNaN(b) && d >= 10 && b >= 10) {
+                    let avg = (d + b) / 2;
+                    
+                    if (avg < billigsteAvg) {
+                        billigsteAvg = avg;
+                        billigsteData = p;
+                    }
+                    if (avg > dyresteAvg && avg <= 35) {
+                        dyresteAvg = avg;
                         dyresteData = p;
                     }
                 }
@@ -557,46 +532,48 @@
         }
 
         const container = document.getElementById('extremes-container');
-        
-        if (billigsteData && dyresteData && (billigsteData.navn !== dyresteData.navn || billigstePris !== dyrestePris)) {
-            container.style.display = 'block';
+        container.style.display = 'block'; // Seksjonen vises alltid nå
+
+        const renderPlaceholder = (title, icon, color) => `
+            <div class="featured-card" style="background: transparent; border: 1px dashed ${color}; margin-bottom: 10px; color: var(--text-muted);">
+                <div class="featured-header">${icon} ${title}</div>
+                <div style="text-align:center; padding: 20px; font-size: 13px;">Venter på dagens oppdateringer...</div>
+            </div>
+        `;
+
+        const renderCard = (data, title, icon, borderColorBase) => {
+            const style = getBrandStyle(data.navn);
+            let textColor = style.color === '#ffcc00' ? '#000' : '#fff';
+            let borderColor = style.color === '#ffcc00' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.15)';
             
-            const renderCard = (data, title, icon, borderColorBase) => {
-                const style = getBrandStyle(data.navn);
-                let textColor = style.color === '#ffcc00' ? '#000' : '#fff';
-                let borderColor = style.color === '#ffcc00' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.15)';
-                let flag = getFlag(data.land || 'no'); 
-                
-                let distStr = "";
-                if (sisteLat && sisteLon && data.lat && data.lon) {
-                    const dist = regnUtAvstand(sisteLat, sisteLon, data.lat, data.lon);
-                    distStr = `<span class="featured-dist">📍 ${dist.toFixed(1)} km</span>`;
-                }
+            let b98Html = (data.bensin98 && data.bensin98 !== "--") ? `<div class="f-price-box" style="border-color:${borderColor}"><span class="f-lbl">98</span><span class="f-val">${data.bensin98} ${getTrendHtml(data.bensin98, data.prev_bensin98)}</span></div>` : '';
 
-                let b98Html = (data.bensin98 && data.bensin98 !== "--") ? `<div class="f-price-box" style="border-color:${borderColor}"><span class="f-lbl">98</span><span class="f-val">${data.bensin98} ${getTrendHtml(data.bensin98, data.prev_bensin98)}</span></div>` : '';
+            return `
+            <div class="featured-card" style="background: ${style.bg}; color: ${textColor}; margin-bottom: 10px; border: 1px solid ${borderColorBase};">
+                <div class="f-icon-bg">${style.char}</div>
+                <div class="featured-header">${icon} ${title}</div>
+                <div class="featured-title">${data.navn}</div>
+                <div class="featured-prices">
+                    <div class="f-price-box" style="border-color:${borderColor}"><span class="f-lbl">D</span><span class="f-val">${data.diesel} ${getTrendHtml(data.diesel, data.prev_diesel)}</span></div>
+                    <div class="f-price-box" style="border-color:${borderColor}"><span class="f-lbl">95</span><span class="f-val">${data.bensin} ${getTrendHtml(data.bensin, data.prev_bensin)}</span></div>
+                    ${b98Html}
+                </div>
+                <div class="f-user">${formaterTid(data.timestamp, data.user)}</div>
+            </div>`;
+        };
 
-                return `
-                <div class="featured-card" style="background: ${style.bg}; color: ${textColor}; margin-bottom: 10px; border: 1px solid ${borderColorBase};">
-                    <div class="f-icon-bg">${style.char}</div>
-                    <div class="featured-header">${icon} ${title}</div>
-                    <div class="featured-title">${data.navn} ${flag} <span style="margin-left:auto;">${distStr}</span></div>
-                    <div class="featured-prices">
-                        <div class="f-price-box" style="border-color:${borderColor}"><span class="f-lbl">D</span><span class="f-val">${data.diesel} ${getTrendHtml(data.diesel, data.prev_diesel)}</span></div>
-                        <div class="f-price-box" style="border-color:${borderColor}"><span class="f-lbl">95</span><span class="f-val">${data.bensin} ${getTrendHtml(data.bensin, data.prev_bensin)}</span></div>
-                        ${b98Html}
-                    </div>
-                    <div class="f-user">${formaterTid(data.timestamp, data.user)}</div>
-                </div>`;
-            };
+        let html = '<h3 style="font-size: 13px; text-transform: uppercase; color: var(--text-muted); margin-top: 25px; margin-bottom: 10px; text-align: center;">🇳🇴 Norges Ytterpunkter (Siste 24t)</h3>';
+        
+        if (billigsteData) html += renderCard(billigsteData, 'DAGENS BILLIGSTE (Snitt D/95)', '🟢', 'rgba(76, 175, 80, 0.4)');
+        else html += renderPlaceholder('DAGENS BILLIGSTE', '🟢', 'rgba(76, 175, 80, 0.4)');
 
-            container.innerHTML = `
-                <h3 style="font-size: 13px; text-transform: uppercase; color: var(--text-muted); margin-top: 10px; margin-bottom: 10px; text-align: center;">Norges Ytterpunkter (Siste 24t)</h3>
-                ${renderCard(billigsteData, 'DAGENS BILLIGSTE', '🟢', 'rgba(76, 175, 80, 0.4)')}
-                ${renderCard(dyresteData, 'DAGENS DYRESTE', '🔴', 'rgba(255, 68, 68, 0.4)')}
-            `;
-        } else {
-            container.style.display = 'none';
+        if (dyresteData && (dyresteData.navn !== billigsteData?.navn || dyresteAvg !== billigsteAvg)) {
+            html += renderCard(dyresteData, 'DAGENS DYRESTE (Snitt D/95)', '🔴', 'rgba(255, 68, 68, 0.4)');
+        } else if (!dyresteData) {
+            html += renderPlaceholder('DAGENS DYRESTE', '🔴', 'rgba(255, 68, 68, 0.4)');
         }
+
+        container.innerHTML = html;
     }
 
     window.vis98Felt = function() { document.getElementById('div-bensin98').style.display = 'block'; document.getElementById('btn-show-98').style.display = 'none'; }
@@ -700,7 +677,7 @@
 
         let nyesteTid = 0; let nyesteStasjon = null; let nyesteData = null;
 
-        sorted.forEach(s => {
+        sorted.forEach((s, index) => {
             const id = s.id; const p = skylagredePriser[id] || { diesel: "--", bensin: "--", bensin98: "--", timestamp: 0 };
             const dist = regnUtAvstand(lat, lon, s.lat, s.lon);
             const navn = s.tags.name || s.tags.brand || "Stasjon";
@@ -717,8 +694,15 @@
             
             const flag = getFlag(sisteLand);
 
+            // OPPDATERT: Fremhever navnet til den som oppdaterte den billigste stasjonen i søket!
+            let timeAgoHtml = `<div class="time-ago">${formaterTid(p.timestamp, p.user)}</div>`;
+            if (index === 0 && p.user && p.diesel !== "--") {
+                let rawTimeText = formaterTid(p.timestamp, p.user).replace("Sist: ", "");
+                timeAgoHtml = `<div class="time-ago" style="color: var(--gold); font-weight: bold; font-size: 11px;">🏆 LOKALT KUPP! • Sist oppdatert ${rawTimeText}</div>`;
+            }
+
             const card = document.createElement('div'); card.className = `station-card`;
-            card.innerHTML = `<div class="main-info"><div class="station-info"><div class="brand-icon" style="background-color: ${style.color}; color: ${style.text || '#fff'}">${style.char}</div><div class="station-details"><h3>${navn} ${flag}</h3><p>${dist.toFixed(1)} km unna</p></div></div><div class="prices-container"><div class="price-row"><span class="price-label lbl-diesel">DIESEL</span><div class="price-value">${p.diesel} ${trendD}</div> ${p.verified?'<span class="verify-badge">✅</span>':''}</div><div class="price-row"><span class="price-label lbl-bensin">BENSIN 95</span><div class="price-value">${p.bensin} ${trendB}</div> ${p.verified?'<span class="verify-badge">✅</span>':''}</div>${b98Html}</div></div><div class="action-buttons"><div class="update-btn" onclick="apneModal('${id}','${escapedName}', ${s.lat}, ${s.lon})">OPPDATER</div><a class="nav-btn" href="https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lon}" target="_blank">KJØR HIT</a><div class="hist-btn" onclick="visHistorikk('${id}')">⌛ HISTORIKK</div></div><div id="hist-${id}" class="history-panel"></div><div class="time-ago">${formaterTid(p.timestamp, p.user)}</div>`;
+            card.innerHTML = `<div class="main-info"><div class="station-info"><div class="brand-icon" style="background-color: ${style.color}; color: ${style.text || '#fff'}">${style.char}</div><div class="station-details"><h3>${navn} ${flag}</h3><p>${dist.toFixed(1)} km unna</p></div></div><div class="prices-container"><div class="price-row"><span class="price-label lbl-diesel">DIESEL</span><div class="price-value">${p.diesel} ${trendD}</div> ${p.verified?'<span class="verify-badge">✅</span>':''}</div><div class="price-row"><span class="price-label lbl-bensin">BENSIN 95</span><div class="price-value">${p.bensin} ${trendB}</div> ${p.verified?'<span class="verify-badge">✅</span>':''}</div>${b98Html}</div></div><div class="action-buttons"><div class="update-btn" onclick="apneModal('${id}','${escapedName}', ${s.lat}, ${s.lon})">OPPDATER</div><a class="nav-btn" href="https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lon}" target="_blank">KJØR HIT</a><div class="hist-btn" onclick="visHistorikk('${id}')">⌛ HISTORIKK</div></div><div id="hist-${id}" class="history-panel"></div>${timeAgoHtml}`;
             list.appendChild(card);
         });
 
@@ -771,6 +755,7 @@
         if(!s) return;
         document.getElementById('station-list').innerHTML = "<p class='loading-msg'>🔍 Henter stasjoner for " + s + "...</p>";
         document.getElementById('featured-station-container').style.display = 'none'; document.getElementById('global-featured-container').style.display = 'none'; document.getElementById('add-station-container').style.display = 'none';
+        document.getElementById('extremes-container').style.display = 'none'; // Skjuler ekstremene midlertidig
         try {
             const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(s)}&countrycodes=no,se,dk&format=json&addressdetails=1&limit=1`); 
             const d = await res.json(); 
@@ -785,6 +770,7 @@
     window.startGpsSok = () => {
         document.getElementById('station-list').innerHTML = "<p class='loading-msg'>📍 Finner din posisjon...</p>";
         document.getElementById('featured-station-container').style.display = 'none'; document.getElementById('global-featured-container').style.display = 'none'; document.getElementById('add-station-container').style.display = 'none';
+        document.getElementById('extremes-container').style.display = 'none'; // Skjuler ekstremene midlertidig
         navigator.geolocation.getCurrentPosition(
             async p => { 
                 sisteLat = p.coords.latitude; sisteLon = p.coords.longitude; 
@@ -815,6 +801,7 @@
                 }
             }
             visStasjoner(gjeldendeStasjoner, lat, lon);
+            visDagensEkstremer(); // Viser ekstremene igjen etter søk
         } catch (e) { document.getElementById('station-list').innerHTML = "<p style='text-align:center; color:var(--danger);'>Kartfeil. Prøv igjen.</p>"; }
     }
 
