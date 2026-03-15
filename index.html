@@ -47,7 +47,7 @@
         
         .my-rank-item { border-top: 2px dashed #4a4a5a; margin-top: 5px; padding-top: 10px; background: rgba(255, 122, 0, 0.05); border-radius: 6px; padding: 8px; font-weight: bold; }
         
-        .share-app-btn { width: 100%; background: rgba(74, 144, 226, 0.15); border: 1px solid var(--share-color); color: var(--share-color); padding: 12px; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; margin-top: 15px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .share-app-btn { width: 100%; background: rgba(74, 144, 226, 0.15); border: 1px solid var(--share-color); color: var(--share-color); padding: 12px; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
 
         #global-featured-container, #featured-station-container { display: none; margin-bottom: 20px; }
         .featured-card { border-radius: 10px; padding: 12px 15px; color: white; position: relative; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
@@ -68,15 +68,14 @@
         .gps-btn { background-color: #3f3f4e; margin-top: 10px; }
         .loading-msg { text-align: center; color: var(--primary); font-weight: bold; margin-top: 20px; font-size: 14px; }
 
-        /* OPPDATERT: CSS for Stasjonskort for å hindre at lange navn dytter prisen ut! */
         .station-card { background-color: var(--card-bg); border-radius: 10px; padding: 15px; margin-bottom: 15px; display: flex; flex-direction: column; border: 2px solid transparent; }
         .main-info { display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 10px; }
-        .station-info { flex: 1; display: flex; align-items: center; min-width: 0; } /* min-width:0 er magien som fikser feilen */
+        .station-info { flex: 1; display: flex; align-items: center; min-width: 0; } 
         .station-details { flex: 1; min-width: 0; }
-        .station-details h3 { margin: 0 0 5px 0; font-size: 15px; word-wrap: break-word; line-height: 1.3; } /* Lar navnet gå over to linjer */
+        .station-details h3 { margin: 0 0 5px 0; font-size: 15px; word-wrap: break-word; line-height: 1.3; } 
         .station-details p { margin: 0; font-size: 12px; color: var(--text-muted); }
         .brand-icon { width: 40px; height: 40px; flex-shrink: 0; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 12px; background: #4a4a5a; }
-        .prices-container { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; flex-shrink: 0; } /* flex-shrink:0 holder boksen intakt */
+        .prices-container { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; flex-shrink: 0; } 
         
         .price-row { display: flex; align-items: center; gap: 8px; position: relative; }
         .price-label { font-size: 10px; font-weight: bold; border-radius: 4px; padding: 2px 5px; width: 45px; text-align: center; color: white; flex-shrink: 0; }
@@ -105,7 +104,7 @@
 
         .footer { margin-top: 10px; text-align: center; padding: 20px; border-top: 1px solid #2b2b36; }
         .footer-text { font-size: 12px; color: var(--text-muted); line-height: 1.6; margin-bottom: 15px; }
-        .feedback-btn { background: transparent; border: 1px solid var(--share-color); color: var(--share-color); padding: 10px 20px; border-radius: 8px; font-size: 13px; display: inline-block; text-decoration: none; }
+        .feedback-btn { background: transparent; border: 1px solid var(--share-color); color: var(--share-color); padding: 10px 20px; border-radius: 8px; font-size: 13px; display: inline-block; text-decoration: none; margin-top: 15px; }
         .appstore-link { display: inline-block; margin-top: 20px; color: var(--primary); text-decoration: underline; cursor: pointer; font-weight: bold; font-size: 13px; }
 
         #info-modal, #add-station-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); z-index: 2000; overflow-y: auto; }
@@ -144,14 +143,12 @@
         </div>
         
         <div class="leader-section" style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 12px;">
-            <span class="leader-title">Dagens Prisjeger 🕵️‍♂️ (Kun verifiserte!)</span>
+            <span class="leader-title">Dagens Prisjeger 🕵️‍♂️</span>
             <span id="best-hunter" class="leader-name" style="color: var(--success); font-size: 14px;">Leter etter priser...</span>
         </div>
 
         <button class="top-list-btn" onclick="toggleTopList()">Se Topp 10</button>
         <div id="top-list-content"><div id="top-list-items"></div></div>
-        
-        <button class="share-app-btn" onclick="delAppen()">📢 Hjelp dugnaden – Inviter en venn</button>
     </div>
     
     <div class="panel">
@@ -164,12 +161,16 @@
 
     <div id="station-list"></div>
 
+    <div id="extremes-container" style="display: none; margin-bottom: 20px;"></div>
+
     <div id="add-station-container">
         <p style="font-size: 13px; color: var(--text-muted); margin-top: 0;">Finner du ikke stasjonen du leter etter?</p>
         <button class="btn-add-station" onclick="apneLeggTilStasjonModal()">+ Legg til manglende stasjon</button>
     </div>
 
     <div class="footer">
+        <button class="share-app-btn" onclick="delAppen()" style="margin-bottom: 20px;">📢 Hjelp dugnaden – Inviter en venn</button>
+        
         <div class="footer-text">
             <strong>Personvern:</strong> Vi sporer deg ikke. Posisjonen din brukes kun lokalt for å finne stasjoner. 
             Vi lagrer kun kallenavnet ditt og en anonym ID for å sikre bidragene dine. Ingen reklame, ingen abonnement.
@@ -358,6 +359,7 @@
         const histSnap = await get(ref(db, 'alle_oppdateringer'));
         beregnTopplister(histSnap.val() || {});
         visGlobalSisteOppdatering();
+        visDagensEkstremer(); // NYTT: Skanner etter billigst og dyrest!
         if (gjeldendeStasjoner.length > 0) visStasjoner(gjeldendeStasjoner, sisteLat, sisteLon);
         setTimeout(sjekkScroll, 500); 
     });
@@ -514,6 +516,87 @@
                 </div>
             `;
         } else { globalContainer.style.display = 'none'; }
+    }
+
+    // NY FUNKSJON: Finner dagens dyreste og billigste stasjon uansett land
+    function visDagensEkstremer() {
+        let naa = Date.now();
+        let grense = naa - (24 * 60 * 60 * 1000); // Kun de siste 24 timene
+        
+        let billigstePris = Infinity;
+        let dyrestePris = 0;
+        let billigsteData = null;
+        let dyresteData = null;
+
+        for (const id in skylagredePriser) {
+            const p = skylagredePriser[id];
+            if (p.timestamp > grense && p.navn) {
+                let d = parseFloat(p.diesel ? p.diesel.replace(',', '.') : 999);
+                let b = parseFloat(p.bensin ? p.bensin.replace(',', '.') : 999);
+                let b98 = parseFloat(p.bensin98 ? p.bensin98.replace(',', '.') : 999);
+
+                let stasjonMin = Math.min(d, b, b98);
+                if (stasjonMin >= 10 && stasjonMin < billigstePris) {
+                    billigstePris = stasjonMin;
+                    billigsteData = p;
+                }
+
+                let maxArr = [];
+                if (d < 999) maxArr.push(d);
+                if (b < 999) maxArr.push(b);
+                if (b98 < 999) maxArr.push(b98);
+                
+                if (maxArr.length > 0) {
+                    let stasjonMax = Math.max(...maxArr);
+                    if (stasjonMax <= 35 && stasjonMax > dyrestePris) {
+                        dyrestePris = stasjonMax;
+                        dyresteData = p;
+                    }
+                }
+            }
+        }
+
+        const container = document.getElementById('extremes-container');
+        
+        if (billigsteData && dyresteData && (billigsteData.navn !== dyresteData.navn || billigstePris !== dyrestePris)) {
+            container.style.display = 'block';
+            
+            const renderCard = (data, title, icon, borderColorBase) => {
+                const style = getBrandStyle(data.navn);
+                let textColor = style.color === '#ffcc00' ? '#000' : '#fff';
+                let borderColor = style.color === '#ffcc00' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.15)';
+                let flag = getFlag(data.land || 'no'); 
+                
+                let distStr = "";
+                if (sisteLat && sisteLon && data.lat && data.lon) {
+                    const dist = regnUtAvstand(sisteLat, sisteLon, data.lat, data.lon);
+                    distStr = `<span class="featured-dist">📍 ${dist.toFixed(1)} km</span>`;
+                }
+
+                let b98Html = (data.bensin98 && data.bensin98 !== "--") ? `<div class="f-price-box" style="border-color:${borderColor}"><span class="f-lbl">98</span><span class="f-val">${data.bensin98} ${getTrendHtml(data.bensin98, data.prev_bensin98)}</span></div>` : '';
+
+                return `
+                <div class="featured-card" style="background: ${style.bg}; color: ${textColor}; margin-bottom: 10px; border: 1px solid ${borderColorBase};">
+                    <div class="f-icon-bg">${style.char}</div>
+                    <div class="featured-header">${icon} ${title}</div>
+                    <div class="featured-title">${data.navn} ${flag} <span style="margin-left:auto;">${distStr}</span></div>
+                    <div class="featured-prices">
+                        <div class="f-price-box" style="border-color:${borderColor}"><span class="f-lbl">D</span><span class="f-val">${data.diesel} ${getTrendHtml(data.diesel, data.prev_diesel)}</span></div>
+                        <div class="f-price-box" style="border-color:${borderColor}"><span class="f-lbl">95</span><span class="f-val">${data.bensin} ${getTrendHtml(data.bensin, data.prev_bensin)}</span></div>
+                        ${b98Html}
+                    </div>
+                    <div class="f-user">${formaterTid(data.timestamp, data.user)}</div>
+                </div>`;
+            };
+
+            container.innerHTML = `
+                <h3 style="font-size: 13px; text-transform: uppercase; color: var(--text-muted); margin-top: 10px; margin-bottom: 10px; text-align: center;">Norges Ytterpunkter (Siste 24t)</h3>
+                ${renderCard(billigsteData, 'DAGENS BILLIGSTE', '🟢', 'rgba(76, 175, 80, 0.4)')}
+                ${renderCard(dyresteData, 'DAGENS DYRESTE', '🔴', 'rgba(255, 68, 68, 0.4)')}
+            `;
+        } else {
+            container.style.display = 'none';
+        }
     }
 
     window.vis98Felt = function() { document.getElementById('div-bensin98').style.display = 'block'; document.getElementById('btn-show-98').style.display = 'none'; }
