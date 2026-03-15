@@ -275,6 +275,14 @@
         bannerText.innerHTML = `⚠️ <b>Du er i Facebook sin nettleser.</b><br>Appen fungerer best utenfor FB. For å installere appen:<br>Trykk på de tre prikkene ⋯ og velg <b>"Åpne i ekstern nettleser"</b>.`;
     } else if (!isStandalone) { installBanner.style.display = 'block'; }
 
+    // NYTT: Vaskemaskin-funksjon (Sanitizer) som fjerner farlig kode fra tekst!
+    function sanitize(str) {
+        if (!str) return "";
+        const temp = document.createElement('div');
+        temp.textContent = str;
+        return temp.innerHTML;
+    }
+
     window.delAppen = async () => {
         const shareData = {
             title: 'Drivstoff Norge ⛽',
@@ -324,7 +332,8 @@
     
     window.lagreNyStasjon = () => {
         const btn = document.getElementById('btn-save-station');
-        const navn = document.getElementById('new-station-name').value.trim();
+        // Kjører vaskemaskinen på nytt stasjonsnavn
+        const navn = sanitize(document.getElementById('new-station-name').value.trim());
         if(!navn) { alert("Du må skrive inn et stasjonsnavn!"); return; }
         
         btn.innerText = "Henter posisjon...";
@@ -405,17 +414,19 @@
         let startOfWeek = new Date(now.getFullYear(), now.getMonth(), diffToMonday).getTime();
 
         Object.values(alleData).forEach(p => {
-            // Ignorer de som er "Anonym" fra Topplisten!
             if (!p.user || p.user === "Anonym") return; 
             
-            totalTellere[p.user] = (totalTellere[p.user] || 0) + 1;
+            // Vi vasker navnet her også bare for sikkerhets skyld
+            let safeUser = sanitize(p.user);
+
+            totalTellere[safeUser] = (totalTellere[safeUser] || 0) + 1;
 
             const d = new Date(p.timestamp); d.setHours(0,0,0,0);
-            if (!userDays[p.user]) userDays[p.user] = new Set();
-            userDays[p.user].add(d.getTime());
+            if (!userDays[safeUser]) userDays[safeUser] = new Set();
+            userDays[safeUser].add(d.getTime());
 
-            if (p.timestamp >= startOfDay) { dagTellere[p.user] = (dagTellere[p.user] || 0) + 1; }
-            if (p.timestamp >= startOfWeek) { ukeTellere[p.user] = (ukeTellere[p.user] || 0) + 1; }
+            if (p.timestamp >= startOfDay) { dagTellere[safeUser] = (dagTellere[safeUser] || 0) + 1; }
+            if (p.timestamp >= startOfWeek) { ukeTellere[safeUser] = (ukeTellere[safeUser] || 0) + 1; }
         });
 
         const userStreaks = {}; const todayTime = startOfDay; const yesterdayTime = todayTime - 86400000;
@@ -446,7 +457,8 @@
 
         let myName = localStorage.getItem('drivstoff_navn'); let myRankHtml = "";
         if (myName && myName !== "Anonym") {
-            let myIndex = ukeSortert.findIndex(u => u[0].toLowerCase() === myName.toLowerCase());
+            let safeMyName = sanitize(myName);
+            let myIndex = ukeSortert.findIndex(u => u[0].toLowerCase() === safeMyName.toLowerCase());
             if (myIndex >= 10) {
                 let myData = ukeSortert[myIndex]; let tittel = getTittel(totalTellere[myData[0]]); let streak = userStreaks[myData[0]] || 0;
                 let streakHtml = streak > 1 ? `<span style="color:var(--primary); font-size:12px; margin-left:5px;">🔥${streak}</span>` : '';
@@ -477,6 +489,10 @@
             let textColor = style.color === '#ffcc00' ? '#000' : '#fff';
             let borderColor = style.color === '#ffcc00' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.15)';
             let flag = getFlag(nyesteData.land || 'no'); 
+            
+            // Vasker tekstene
+            let safeNavn = sanitize(nyesteData.navn);
+            let safeUser = sanitize(nyesteData.user);
 
             let b98Html = (nyesteData.bensin98 && nyesteData.bensin98 !== "--") ? `<div class="f-price-box" style="border-color:${borderColor}"><span class="f-lbl">98</span><span class="f-val">${nyesteData.bensin98} ${getTrendHtml(nyesteData.bensin98, nyesteData.prev_bensin98)}</span></div>` : '';
 
@@ -485,13 +501,13 @@
                 <div class="featured-card" style="background: ${style.bg}; color: ${textColor};">
                     <div class="f-icon-bg">${style.char}</div>
                     <div class="featured-header">⚡ NYESTE OPPDATERING I NORGE</div>
-                    <div class="featured-title">${nyesteData.navn} ${flag} <span style="margin-left:auto;">${distStr}</span></div>
+                    <div class="featured-title">${safeNavn} ${flag} <span style="margin-left:auto;">${distStr}</span></div>
                     <div class="featured-prices">
                         <div class="f-price-box" style="border-color:${borderColor}"><span class="f-lbl">D</span><span class="f-val">${nyesteData.diesel} ${getTrendHtml(nyesteData.diesel, nyesteData.prev_diesel)}</span></div>
                         <div class="f-price-box" style="border-color:${borderColor}"><span class="f-lbl">95</span><span class="f-val">${nyesteData.bensin} ${getTrendHtml(nyesteData.bensin, nyesteData.prev_bensin)}</span></div>
                         ${b98Html}
                     </div>
-                    <div class="f-user">${formaterTid(nyesteData.timestamp, nyesteData.user)}</div>
+                    <div class="f-user">${formaterTid(nyesteData.timestamp, safeUser)}</div>
                 </div>
             `;
         } else { globalContainer.style.display = 'none'; }
@@ -544,19 +560,23 @@
             let textColor = style.color === '#ffcc00' ? '#000' : '#fff';
             let borderColor = style.color === '#ffcc00' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.15)';
             
+            // Vasker tekstene for sikkerhets skyld!
+            let safeNavn = sanitize(data.navn);
+            let safeUser = sanitize(data.user);
+
             let b98Html = (data.bensin98 && data.bensin98 !== "--") ? `<div class="f-price-box" style="border-color:${borderColor}"><span class="f-lbl">98</span><span class="f-val">${data.bensin98} ${getTrendHtml(data.bensin98, data.prev_bensin98)}</span></div>` : '';
 
             return `
             <div class="featured-card" style="background: ${style.bg}; color: ${textColor}; margin-bottom: 10px; border: 1px solid ${borderColorBase};">
                 <div class="f-icon-bg">${style.char}</div>
                 <div class="featured-header">${icon} ${title}</div>
-                <div class="featured-title">${data.navn}</div>
+                <div class="featured-title">${safeNavn}</div>
                 <div class="featured-prices">
                     <div class="f-price-box" style="border-color:${borderColor}"><span class="f-lbl">D</span><span class="f-val">${data.diesel} ${getTrendHtml(data.diesel, data.prev_diesel)}</span></div>
                     <div class="f-price-box" style="border-color:${borderColor}"><span class="f-lbl">95</span><span class="f-val">${data.bensin} ${getTrendHtml(data.bensin, data.prev_bensin)}</span></div>
                     ${b98Html}
                 </div>
-                <div class="f-user">${formaterTid(data.timestamp, data.user)}</div>
+                <div class="f-user">${formaterTid(data.timestamp, safeUser)}</div>
             </div>`;
         };
 
@@ -587,9 +607,10 @@
         let d = document.getElementById('input-diesel').value.trim();
         let b = document.getElementById('input-bensin').value.trim();
         let b98 = document.getElementById('input-bensin98').value.trim();
-        let n = document.getElementById('input-nickname').value.trim();
+        // Vasker kallenavnet med en gang noen skriver det inn!
+        let n = sanitize(document.getElementById('input-nickname').value.trim());
         const modalError = document.getElementById('modal-error');
-        const stasjonNavn = document.getElementById('modal-station-name').innerText;
+        const stasjonNavn = document.getElementById('modal-station-name').innerText; // Har allerede blitt vasket ved opprettelse
 
         if (!d && !b && !b98) { modalError.innerText = "Du må fylle inn minst én pris!"; modalError.style.display = "block"; return; }
 
@@ -598,7 +619,6 @@
             modalError.style.display = "block"; return;
         }
 
-        // Håndterer anonymitet
         let isAnonym = false;
         if (!n) {
             n = "Anonym";
@@ -687,7 +707,9 @@
         sorted.forEach((s, index) => {
             const id = s.id; const p = skylagredePriser[id] || { diesel: "--", bensin: "--", bensin98: "--", timestamp: 0 };
             const dist = regnUtAvstand(lat, lon, s.lat, s.lon);
-            const navn = s.tags.name || s.tags.brand || "Stasjon";
+            
+            // Vi vasker stasjonsnavnet i tilfelle noen har lagt til en custom-stasjon med script!
+            const navn = sanitize(s.tags.name || s.tags.brand || "Stasjon");
             const escapedName = navn.replace(/'/g, "\\'");
             const style = getBrandStyle(navn);
 
@@ -701,9 +723,11 @@
             
             const flag = getFlag(sisteLand);
 
-            let timeAgoHtml = `<div class="time-ago">${formaterTid(p.timestamp, p.user)}</div>`;
-            if (index === 0 && p.user && p.diesel !== "--") {
-                let rawTimeText = formaterTid(p.timestamp, p.user).replace("Sist: ", "");
+            // Vasker også navnet til brukeren som la inn
+            let safeUser = sanitize(p.user);
+            let timeAgoHtml = `<div class="time-ago">${formaterTid(p.timestamp, safeUser)}</div>`;
+            if (index === 0 && safeUser && p.diesel !== "--") {
+                let rawTimeText = formaterTid(p.timestamp, safeUser).replace("Sist: ", "");
                 timeAgoHtml = `<div class="time-ago" style="color: var(--gold); font-weight: bold; font-size: 11px;">🏆 LOKALT KUPP! • Sist oppdatert ${rawTimeText}</div>`;
             }
 
@@ -717,6 +741,8 @@
             let borderColor = nyesteStasjon.style.color === '#ffcc00' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.15)';
             let b98Html = (nyesteData.bensin98 && nyesteData.bensin98 !== "--") ? `<div class="f-price-box" style="border-color:${borderColor}"><span class="f-lbl">98</span><span class="f-val">${nyesteData.bensin98} ${getTrendHtml(nyesteData.bensin98, nyesteData.prev_bensin98)}</span></div>` : '';
             let flag = getFlag(sisteLand);
+            
+            let safeUser = sanitize(nyesteData.user);
 
             featuredContainer.style.display = 'block';
             featuredContainer.innerHTML = `
@@ -729,7 +755,7 @@
                         <div class="f-price-box" style="border-color:${borderColor}"><span class="f-lbl">95</span><span class="f-val">${nyesteData.bensin} ${getTrendHtml(nyesteData.bensin, nyesteData.prev_bensin)}</span></div>
                         ${b98Html}
                     </div>
-                    <div class="f-user">${formaterTid(nyesteData.timestamp, nyesteData.user)}</div>
+                    <div class="f-user">${formaterTid(nyesteData.timestamp, safeUser)}</div>
                 </div>
             `;
         }
