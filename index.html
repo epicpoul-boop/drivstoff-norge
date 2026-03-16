@@ -67,6 +67,7 @@
         button { width: 100%; padding: 15px; background-color: var(--primary); color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; }
         .gps-btn { background-color: #3f3f4e; margin-top: 10px; }
         .loading-msg { text-align: center; color: var(--primary); font-weight: bold; margin-top: 20px; font-size: 14px; }
+        .error-msg { text-align: center; color: var(--danger); font-weight: bold; margin-top: 20px; font-size: 14px; line-height: 1.5; }
 
         .station-card { background-color: var(--card-bg); border-radius: 10px; padding: 15px; margin-bottom: 15px; display: flex; flex-direction: column; border: 2px solid transparent; }
         .main-info { display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 10px; }
@@ -355,9 +356,38 @@
     let gjeldendeStasjoner = []; let sisteLat = null, sisteLon = null;
     let skylagredePriser = {}; let egneStasjoner = {}; 
     let sisteLand = 'no'; 
+    let globalAvgD = "--";
+    let globalAvgB = "--";
 
     onValue(ref(db, 'priser'), async (snapshot) => {
         skylagredePriser = snapshot.val() || {};
+        
+        let startOfDay = new Date(new Date().setHours(0,0,0,0)).getTime();
+        let startOfYesterday = startOfDay - 86400000;
+        
+        let sumDToday = 0, countDToday = 0; let sumBToday = 0, countBToday = 0;
+        let sumDYes = 0, countDYes = 0; let sumBYes = 0, countBYes = 0;
+
+        Object.values(skylagredePriser).forEach(p => {
+            if (p.land && p.land !== 'no') return; 
+            let d = parseFloat(p.diesel ? String(p.diesel).replace(',', '.') : NaN);
+            let b = parseFloat(p.bensin ? String(p.bensin).replace(',', '.') : NaN);
+
+            if (p.timestamp >= startOfDay) {
+                if (!isNaN(d) && d >= 10 && d <= 35) { sumDToday += d; countDToday++; }
+                if (!isNaN(b) && b >= 10 && b <= 35) { sumBToday += b; countBToday++; }
+            } else if (p.timestamp >= startOfYesterday) {
+                if (!isNaN(d) && d >= 10 && d <= 35) { sumDYes += d; countDYes++; }
+                if (!isNaN(b) && b >= 10 && b <= 35) { sumBYes += b; countBYes++; }
+            }
+        });
+
+        let avgDNum = countDToday > 0 ? (sumDToday/countDToday) : (countDYes > 0 ? (sumDYes/countDYes) : NaN);
+        let avgBNum = countBToday > 0 ? (sumBToday/countBToday) : (countBYes > 0 ? (sumBYes/countBYes) : NaN);
+
+        globalAvgD = !isNaN(avgDNum) ? avgDNum.toFixed(2).replace('.', ',') : "--";
+        globalAvgB = !isNaN(avgBNum) ? avgBNum.toFixed(2).replace('.', ',') : "--";
+
         const histSnap = await get(ref(db, 'alle_oppdateringer'));
         beregnTopplister(histSnap.val() || {});
         visGlobalSisteOppdatering();
@@ -373,8 +403,8 @@
 
     function getTrendHtml(curr, prev) {
         if(!curr || !prev || curr==="--" || prev==="--") return "";
-        let c = parseFloat(curr.replace(',', '.'));
-        let p = parseFloat(prev.replace(',', '.'));
+        let c = parseFloat(String(curr).replace(',', '.'));
+        let p = parseFloat(String(prev).replace(',', '.'));
         if(c > p) return '<span class="trend-up">↑</span>'; 
         if(c < p) return '<span class="trend-down">↓</span>'; 
         return "";
@@ -520,8 +550,8 @@
             if (p.timestamp > grense && p.navn) {
                 if (p.land && p.land !== 'no') continue;
 
-                let d = parseFloat(p.diesel ? p.diesel.replace(',', '.') : NaN);
-                let b = parseFloat(p.bensin ? p.bensin.replace(',', '.') : NaN);
+                let d = parseFloat(p.diesel ? String(p.diesel).replace(',', '.') : NaN);
+                let b = parseFloat(p.bensin ? String(p.bensin).replace(',', '.') : NaN);
 
                 if (!isNaN(d) && !isNaN(b) && d >= 10 && b >= 10) {
                     let avg = (d + b) / 2;
@@ -590,7 +620,7 @@
 
     function validerPris(pris) {
         if (!pris || pris === "--") return true; 
-        let val = parseFloat(pris.replace(',', '.'));
+        let val = parseFloat(String(pris).replace(',', '.'));
         if (isNaN(val)) return false;
         return (val >= 10 && val <= 35); 
     }
@@ -683,7 +713,6 @@
         return { char: '⛽', color: '#4a4a5a', bg: 'linear-gradient(135deg, #4a4a5a 0%, #2b2b36 100%)' }; 
     }
 
-    // OPPDATERT: Regner ut lokalsnitt FØR vi lister ut stasjonene
     function visStasjoner(stasjoner, lat, lon) {
         const list = document.getElementById('station-list'); list.innerHTML = "";
         const featuredContainer = document.getElementById('featured-station-container');
@@ -700,8 +729,8 @@
 
         Object.values(skylagredePriser).forEach(p => {
             if (p.land && p.land !== 'no') return; 
-            let d = parseFloat(p.diesel ? p.diesel.replace(',', '.') : NaN);
-            let b = parseFloat(p.bensin ? p.bensin.replace(',', '.') : NaN);
+            let d = parseFloat(p.diesel ? String(p.diesel).replace(',', '.') : NaN);
+            let b = parseFloat(p.bensin ? String(p.bensin).replace(',', '.') : NaN);
             
             let validD = !isNaN(d) && d >= 10 && d <= 35;
             let validB = !isNaN(b) && b >= 10 && b <= 35;
@@ -733,7 +762,7 @@
             const id = s.id;
             const p = skylagredePriser[id] || { diesel: "--", bensin: "--", bensin98: "--", timestamp: 0 };
             const dist = regnUtAvstand(lat, lon, s.lat, s.lon);
-            const navn = sanitize(s.tags.name || s.tags.brand || "Stasjon");
+            const navn = sanitize((s.tags && (s.tags.name || s.tags.brand)) || "Stasjon");
             const escapedName = navn.replace(/'/g, "\\'");
             const style = getBrandStyle(navn);
             const flag = getFlag(sisteLand);
@@ -845,13 +874,17 @@
         document.getElementById('extremes-container').style.display = 'none'; 
         try {
             const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(s)}&countrycodes=no,se,dk&format=json&addressdetails=1&limit=1`); 
+            if (!res.ok) throw new Error("Nominatim overbelastet");
             const d = await res.json(); 
             if(d.length>0) { 
                 sisteLand = d[0].address?.country_code || 'no'; 
                 hentStasjoner(parseFloat(d[0].lat), parseFloat(d[0].lon)); 
             }
             else { document.getElementById('station-list').innerHTML = "<p style='text-align:center; color:var(--danger);'>Kunne ikke finne stedet.</p>"; }
-        } catch (e) { document.getElementById('station-list').innerHTML = "<p style='text-align:center; color:var(--danger);'>Nettverksfeil.</p>"; }
+        } catch (e) { 
+            console.error(e);
+            document.getElementById('station-list').innerHTML = "<p style='text-align:center; color:var(--danger);'>Kart-tjenesten er overbelastet. Prøv igjen om litt. ⏱️</p>"; 
+        }
     };
 
     window.startGpsSok = () => {
@@ -863,12 +896,14 @@
                 sisteLat = p.coords.latitude; sisteLon = p.coords.longitude; 
                 try {
                     const revRes = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${sisteLat}&lon=${sisteLon}&format=json`);
-                    const revData = await revRes.json();
-                    sisteLand = revData.address?.country_code || 'no';
+                    if (revRes.ok) {
+                        const revData = await revRes.json();
+                        sisteLand = revData.address?.country_code || 'no';
+                    }
                 } catch(e) { sisteLand = 'no'; }
                 hentStasjoner(sisteLat, sisteLon); 
             },
-            e => { document.getElementById('station-list').innerHTML = "<p style='text-align:center; color:var(--danger);'>GPS-feil.</p>"; }
+            e => { document.getElementById('station-list').innerHTML = "<p style='text-align:center; color:var(--danger);'>Fikk ikke tilgang til GPS.</p>"; }
         );
     };
 
@@ -877,19 +912,29 @@
         document.getElementById('station-list').innerHTML = "<p class='loading-msg'>📡 Henter data (" + r/1000 + " km)...</p>";
         try {
             const res = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(`[out:json];node["amenity"="fuel"](around:${r},${lat},${lon});out;`)}`); 
+            if (!res.ok) throw new Error("Overpass API feil: " + res.status);
             const data = await res.json(); 
-            gjeldendeStasjoner = data.elements; 
+            gjeldendeStasjoner = data.elements || []; 
             
             for (const key in egneStasjoner) {
                 const cs = egneStasjoner[key];
-                const dist = regnUtAvstand(lat, lon, cs.lat, cs.lon);
-                if (dist <= r/1000) {
-                    gjeldendeStasjoner.push({ id: key, lat: cs.lat, lon: cs.lon, tags: { name: cs.navn, brand: cs.navn } });
+                if (cs.lat && cs.lon) {
+                    const dist = regnUtAvstand(lat, lon, cs.lat, cs.lon);
+                    if (dist <= r/1000) {
+                        gjeldendeStasjoner.push({ id: key, lat: cs.lat, lon: cs.lon, tags: { name: cs.navn, brand: cs.navn } });
+                    }
                 }
             }
             visStasjoner(gjeldendeStasjoner, lat, lon);
             visDagensEkstremer(); 
-        } catch (e) { document.getElementById('station-list').innerHTML = "<p style='text-align:center; color:var(--danger);'>Kartfeil. Prøv igjen.</p>"; }
+        } catch (e) { 
+            console.error("Kartfeil:", e);
+            if (e.message.includes("Overpass")) {
+                document.getElementById('station-list').innerHTML = "<p class='error-msg'>Kart-serveren er midlertidig overbelastet<br>(for mange søk på rad).<br><br>Vent litt og prøv igjen! ⏱️</p>";
+            } else {
+                document.getElementById('station-list').innerHTML = "<p class='error-msg'>En feil oppstod ved lesing av kartdata. Prøv igjen.</p>"; 
+            }
+        }
     }
 
     function formaterTid(ts, u) { if(!ts) return "Aldri"; const d = Math.floor((Date.now()-ts)/1000); let txt = d<60?"nå":d<3600?Math.floor(d/60)+"m":d<86400?Math.floor(d/3600)+"t":Math.floor(d/86400)+"d"; return `Sist: ${txt} siden ${u?'av '+u:''}`; }
