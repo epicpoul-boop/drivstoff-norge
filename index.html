@@ -14,7 +14,7 @@
             --bg-color: #1e1e24;
             --card-bg: #2b2b36;
             --primary: #ff7a00;
-            --text-main: #ffffff;
+            --text-main: #f0f0f0;
             --text-muted: #a0a0a0;
             --diesel-color: #ff9800;
             --bensin-color: #4caf50;
@@ -25,107 +25,118 @@
             --silver: #c0c0c0;
             --share-color: #4a90e2;
             --success: #4caf50;
+            --price-box-bg: #3f3f4e; /* Standard bakgrunn for prisbokser */
+            --radius-md: 12px;
+            --shadow-md: 0 4px 15px rgba(0,0,0,0.3);
+            --transition: all 0.2s ease;
         }
-        body { font-family: -apple-system, sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 15px; padding-bottom: 50px; }
+        body { font-family: -apple-system, sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 15px; padding-bottom: 50px; font-size: 13px; line-height: 1.4; }
         .container { max-width: 500px; margin: 0 auto; }
-        h2 { text-align: center; margin-bottom: 10px; font-size: 22px; }
+        h2 { text-align: center; margin-bottom: 10px; font-size: 22px; font-weight: 700; }
 
-        .install-banner { display: none; background-color: var(--primary); color: white; padding: 12px; border-radius: 8px; margin-bottom: 20px; position: relative; font-size: 13px; text-align: center; line-height: 1.4; }
+        .install-banner { display: none; background-color: var(--primary); color: white; padding: 12px; border-radius: var(--radius-md); margin-bottom: 20px; position: relative; text-align: center; }
         .install-arrow { position: absolute; top: -15px; right: 15px; font-size: 18px; }
 
-        .leaderboard-card { background: linear-gradient(135deg, #3a3a4d 0%, #2b2b36 100%); border-radius: 12px; padding: 15px; margin-bottom: 20px; border: 1px solid rgba(255, 255, 255, 0.1); }
+        .leaderboard-card { background: linear-gradient(135deg, #3a3a4d 0%, #2b2b36 100%); border-radius: var(--radius-md); padding: 15px; margin-bottom: 20px; border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: var(--shadow-md); }
         .leader-section { margin-bottom: 12px; }
-        .leader-title { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 3px; }
+        .leader-title { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 3px; font-weight: 600; }
         .countdown { font-weight: normal; opacity: 0.7; text-transform: none; font-size: 10px; margin-left: 5px; }
-        .leader-name { font-size: 15px; font-weight: bold; display: block; }
+        .leader-name { font-size: 15px; font-weight: 700; display: block; }
         .gold-txt { color: var(--gold); }
         .silver-txt { color: var(--silver); }
         
-        .top-list-btn { width: 100%; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 8px; border-radius: 6px; font-size: 12px; cursor: pointer; margin-top: 5px; }
+        .top-list-btn { width: 100%; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 10px; border-radius: 8px; font-size: 12px; cursor: pointer; margin-top: 5px; font-weight: 600; transition: var(--transition); }
+        .top-list-btn:active { background: rgba(255,255,255,0.15); }
         #top-list-content { display: none; margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; }
-        .top-list-item { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #333; font-size: 13px; align-items: center; }
+        .top-list-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #333; align-items: center; }
         .user-title { font-size: 11px; color: var(--primary); opacity: 0.9; margin-left: 5px; font-weight: normal; }
         
         .my-rank-item { border-top: 2px dashed #4a4a5a; margin-top: 5px; padding-top: 10px; background: rgba(255, 122, 0, 0.05); border-radius: 6px; padding: 8px; font-weight: bold; }
         
-        .share-app-btn { width: 100%; background: rgba(74, 144, 226, 0.15); border: 1px solid var(--share-color); color: var(--share-color); padding: 12px; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 20px; }
+        .share-app-btn { width: 100%; background: rgba(74, 144, 226, 0.15); border: 1px solid var(--share-color); color: var(--share-color); padding: 15px; border-radius: var(--radius-md); font-size: 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 20px; transition: var(--transition); }
+        .share-app-btn:active { background: rgba(74, 144, 226, 0.25); }
 
         #global-featured-container, #featured-station-container { display: none; margin-bottom: 20px; }
-        .featured-card { border-radius: 10px; padding: 12px 15px; color: white; position: relative; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        .featured-header { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; opacity: 0.9; font-weight: bold; display: flex; align-items: center; z-index: 2; position: relative; }
-        .featured-title { font-size: 16px; font-weight: bold; margin: 0 0 10px 0; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); display: flex; justify-content: space-between; align-items: center; z-index: 2; position: relative; }
-        .featured-dist { font-size: 11px; font-weight: normal; opacity: 0.9; }
-        .featured-prices { display: flex; gap: 8px; flex-wrap: wrap; z-index: 2; position: relative; }
-        .f-price-box { background: rgba(0,0,0,0.4); padding: 6px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); display: flex; align-items: center; gap: 6px; backdrop-filter: blur(2px); }
-        .f-lbl { font-size: 9px; color: #fff; }
-        .f-val { font-size: 15px; font-weight: bold; display: flex; align-items: center; gap: 3px; color: #fff; }
-        .f-user { margin-top: 8px; font-size: 10px; opacity: 0.8; text-align: right; z-index: 2; position: relative; }
+        .featured-card { border-radius: var(--radius-md); padding: 15px; color: white; position: relative; overflow: hidden; box-shadow: 0 6px 20px rgba(0,0,0,0.4); transition: var(--transition); }
+        .featured-header { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; opacity: 0.9; font-weight: 700; display: flex; align-items: center; z-index: 2; position: relative; }
+        .featured-title { font-size: 16px; font-weight: 700; margin: 0 0 12px 0; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); display: flex; justify-content: space-between; align-items: center; z-index: 2; position: relative; }
+        .featured-dist { font-size: 11px; font-weight: 400; opacity: 0.9; }
+        .featured-prices { display: flex; gap: 10px; flex-wrap: wrap; z-index: 2; position: relative; }
+        .f-price-box { background: rgba(0,0,0,0.3); padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 6px; backdrop-filter: blur(2px); }
+        .f-lbl { font-size: 10px; color: rgba(255,255,255,0.9); font-weight: 600; }
+        .f-val { font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 3px; color: #ffffff; }
+        .f-user { margin-top: 10px; font-size: 11px; opacity: 0.85; text-align: right; z-index: 2; position: relative; font-weight: 400; }
         .f-icon-bg { position: absolute; right: -15px; bottom: -20px; font-size: 80px; opacity: 0.15; transform: rotate(-15deg); z-index: 1; pointer-events: none; line-height: 1; }
 
-        .panel { background-color: var(--card-bg); padding: 15px; border-radius: 10px; margin-bottom: 20px; }
-        input[type=text] { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: none; background-color: #3f3f4e; color: white; box-sizing: border-box; font-size: 16px; }
-        input[type=range] { width: 100%; accent-color: var(--primary); margin-bottom: 10px; }
-        button { width: 100%; padding: 15px; background-color: var(--primary); color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; }
+        .panel { background-color: var(--card-bg); padding: 15px; border-radius: var(--radius-md); margin-bottom: 20px; box-shadow: var(--shadow-md); }
+        input[type=text] { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: none; background-color: #3f3f4e; color: white; box-sizing: border-box; font-size: 15px; }
+        input[type=range] { width: 100%; accent-color: var(--primary); margin-bottom: 10px; border-radius: 8px;}
+        button { width: 100%; padding: 15px; background-color: var(--primary); color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 15px; transition: var(--transition); }
+        button:active { opacity: 0.9; }
         .gps-btn { background-color: #3f3f4e; margin-top: 10px; }
-        .loading-msg { text-align: center; color: var(--primary); font-weight: bold; margin-top: 20px; font-size: 14px; }
-        .error-msg { text-align: center; color: var(--danger); font-weight: bold; margin-top: 20px; font-size: 14px; line-height: 1.5; }
+        .loading-msg { text-align: center; color: var(--primary); font-weight: 700; margin-top: 20px; font-size: 14px; }
+        .error-msg { text-align: center; color: var(--danger); font-weight: 700; margin-top: 20px; font-size: 14px; line-height: 1.5; }
 
-        .station-card { background-color: var(--card-bg); border-radius: 10px; padding: 15px; margin-bottom: 15px; display: flex; flex-direction: column; border: 2px solid transparent; }
+        .station-card { background-color: var(--card-bg); border-radius: var(--radius-md); padding: 15px; margin-bottom: 15px; display: flex; flex-direction: column; border: 1px solid transparent; box-shadow: var(--shadow-md); transition: var(--transition); }
         .main-info { display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 10px; }
         .station-info { flex: 1; display: flex; align-items: center; min-width: 0; } 
         .station-details { flex: 1; min-width: 0; }
-        .station-details h3 { margin: 0 0 5px 0; font-size: 15px; word-wrap: break-word; line-height: 1.3; } 
-        .station-details p { margin: 0; font-size: 12px; }
-        .brand-icon { width: 40px; height: 40px; flex-shrink: 0; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 12px; background: #4a4a5a; }
+        .station-details h3 { margin: 0 0 5px 0; font-size: 16px; word-wrap: break-word; line-height: 1.3; font-weight: 600;} 
+        .station-details p { margin: 0; font-size: 12px; font-weight: 400;}
+        .brand-icon { width: 42px; height: 42px; flex-shrink: 0; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; margin-right: 12px; font-size: 18px; }
         .prices-container { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; flex-shrink: 0; } 
         
         .price-row { display: flex; align-items: center; gap: 8px; position: relative; }
-        .price-label { font-size: 10px; font-weight: bold; border-radius: 4px; padding: 2px 5px; width: 45px; text-align: center; color: white; flex-shrink: 0; }
+        .price-label { font-size: 10px; font-weight: 700; border-radius: 4px; padding: 3px 6px; width: 45px; text-align: center; color: white; flex-shrink: 0; letter-spacing: 0.3px;}
         .lbl-diesel { background-color: var(--diesel-color); }
         .lbl-bensin { background-color: var(--bensin-color); }
         .lbl-bensin98 { background-color: var(--bensin98-color); }
         .lbl-fd { background-color: var(--fd-color); }
-        .price-value { font-size: 16px; font-weight: bold; background-color: #3f3f4e; padding: 4px 8px; border-radius: 6px; min-width: 60px; text-align: right; display: flex; justify-content: flex-end; align-items: center; gap: 4px; color: white; }
+        /* Standardisert prisboks: Alltid mørkegrå, alltid hvit skrift */
+        .price-value { font-size: 17px; font-weight: 700; background-color: var(--price-box-bg); padding: 5px 10px; border-radius: 6px; min-width: 60px; text-align: right; display: flex; justify-content: flex-end; align-items: center; gap: 4px; color: #ffffff; box-shadow: inset 0 1px 3px rgba(0,0,0,0.2); }
         
         .trend-up { color: var(--danger); font-size: 14px; } 
         .trend-down { color: var(--success); font-size: 14px; } 
         
         .verify-badge { color: var(--success); font-size: 14px; margin-left: -5px; }
 
-        .action-buttons { display: flex; gap: 5px; margin-top: 15px; border-top: 1px solid rgba(0,0,0,0.1); padding-top: 10px; }
-        .update-btn, .nav-btn, .hist-btn { padding: 8px 4px; font-size: 11px; border-radius: 6px; flex: 1; font-weight: bold; text-align: center; text-decoration: none; cursor:pointer; display: flex; align-items: center; justify-content: center; height: 35px; border: 1px solid transparent; background: transparent; }
+        .action-buttons { display: flex; gap: 8px; margin-top: 15px; border-top: 1px solid rgba(0,0,0,0.1); padding-top: 12px; }
+        .update-btn, .nav-btn, .hist-btn { padding: 8px 4px; font-size: 11px; border-radius: 6px; flex: 1; font-weight: 700; text-align: center; text-decoration: none; cursor:pointer; display: flex; align-items: center; justify-content: center; height: 35px; border: 1px solid transparent; background: transparent; transition: var(--transition); }
+        /* Knappene arver farge fra kortet og får en tynn ramme */
+        .update-btn:active, .nav-btn:active, .hist-btn:active { background: rgba(255,255,255,0.1); }
 
-        .history-panel { display: none; background: rgba(0,0,0,0.5); border-radius: 8px; margin-top: 10px; padding: 10px; font-size: 11px; color: white; }
-        .history-item { display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.1); padding: 4px 0; }
-        .time-ago { font-size: 10px; margin-top: 10px; text-align: center; }
+        .history-panel { display: none; background: rgba(0,0,0,0.3); border-radius: 8px; margin-top: 10px; padding: 12px; font-size: 11px; color: inherit; box-shadow: inset 0 2px 5px rgba(0,0,0,0.2); }
+        .history-item { display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.1); padding: 6px 0; }
+        .time-ago { font-size: 11px; margin-top: 10px; text-align: center; font-weight: 400;}
 
         #add-station-container { display: none; text-align: center; margin-bottom: 30px; margin-top: 20px; border-top: 1px solid #3f3f4e; padding-top: 20px; }
-        .btn-add-station { background-color: transparent; border: 1px dashed var(--primary); color: var(--primary); padding: 12px; border-radius: 8px; font-size: 14px; display: inline-block; cursor: pointer; width: 100%; }
+        .btn-add-station { background-color: transparent; border: 1px dashed var(--primary); color: var(--primary); padding: 15px; border-radius: var(--radius-md); font-size: 14px; display: inline-block; cursor: pointer; width: 100%; font-weight: 600;}
 
-        .footer { margin-top: 10px; text-align: center; padding: 20px; border-top: 1px solid #2b2b36; }
-        .footer-text { font-size: 12px; color: var(--text-muted); line-height: 1.6; margin-bottom: 15px; }
-        .feedback-btn { background: transparent; border: 1px solid var(--share-color); color: var(--share-color); padding: 10px 20px; border-radius: 8px; font-size: 13px; display: inline-block; text-decoration: none; margin-top: 5px; margin-bottom: 15px;}
-        .appstore-link { display: inline-block; color: var(--primary); text-decoration: underline; cursor: pointer; font-weight: bold; font-size: 13px; }
+        .footer { margin-top: 10px; text-align: center; padding: 25px 20px; border-top: 1px solid #2b2b36; }
+        .footer-text { font-size: 12px; color: var(--text-muted); line-height: 1.6; margin-bottom: 15px; font-weight: 400;}
+        .feedback-btn { background: transparent; border: 1px solid var(--share-color); color: var(--share-color); padding: 12px 20px; border-radius: 8px; font-size: 13px; display: inline-block; text-decoration: none; margin-top: 5px; margin-bottom: 15px; font-weight: 600;}
+        .appstore-link { display: inline-block; color: var(--primary); text-decoration: underline; cursor: pointer; font-weight: 700; font-size: 13px; }
 
         #info-modal, #add-station-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); z-index: 2000; overflow-y: auto; }
-        .info-content { position: relative; margin: 40px auto; background-color: var(--card-bg); padding: 25px; border-radius: 15px; width: 90%; max-width: 350px; box-sizing: border-box; line-height: 1.5; font-size: 14px; }
-        .info-content h3 { margin-top: 0; color: var(--primary); font-size: 18px; }
+        .info-content { position: relative; margin: 40px auto; background-color: var(--card-bg); padding: 25px; border-radius: var(--radius-md); width: 90%; max-width: 350px; box-sizing: border-box; line-height: 1.5; font-size: 14px; box-shadow: var(--shadow-md); }
+        .info-content h3 { margin-top: 0; color: var(--primary); font-size: 18px; font-weight: 700; }
 
-        #scroll-down-btn { display: none; position: fixed; bottom: 25px; right: 20px; background-color: var(--primary); color: white; border: none; border-radius: 50%; width: 50px; height: 50px; font-size: 22px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); cursor: pointer; z-index: 999; align-items: center; justify-content: center; opacity: 0.9; }
+        #scroll-down-btn { display: none; position: fixed; bottom: 25px; right: 20px; background-color: var(--primary); color: white; border: none; border-radius: 50%; width: 52px; height: 52px; font-size: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); cursor: pointer; z-index: 999; align-items: center; justify-content: center; opacity: 0.9; transition: var(--transition); }
+        #scroll-down-btn:active { opacity: 1; transform: translateY(2px); }
 
         #update-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); z-index: 1000; overflow-y: auto; }
-        .modal-content { position: relative; margin: 40px auto; background-color: var(--card-bg); padding: 25px; border-radius: 15px; width: 90%; max-width: 350px; box-sizing: border-box; }
+        .modal-content { position: relative; margin: 40px auto; background-color: var(--card-bg); padding: 25px; border-radius: var(--radius-md); width: 90%; max-width: 350px; box-sizing: border-box; box-shadow: var(--shadow-md); }
         #modal-error { color: var(--danger); font-size: 13px; margin-bottom: 12px; display: none; padding: 10px; background: rgba(255,0,0,0.1); border-radius: 8px; font-weight: bold; }
         
-        .btn-add-98 { background: transparent; border: 1px dashed #555; color: #a0a0a0; padding: 8px; font-size: 11px; border-radius: 8px; width: 100%; }
+        .btn-add-98 { background: transparent; border: 1px dashed #555; color: #a0a0a0; padding: 10px; font-size: 12px; border-radius: 8px; width: 100%; font-weight: 600;}
         
-        .admin-section { margin-top: 20px; border-top: 1px dashed #3f3f4e; padding-top: 15px; }
-        .admin-title { font-size: 10px; color: var(--text-muted); text-align: center; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 10px 0; }
+        .admin-section { margin-top: 22px; border-top: 1px dashed #3f3f4e; padding-top: 18px; }
+        .admin-title { font-size: 10px; color: var(--text-muted); text-align: center; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 12px 0; font-weight: 600; }
         .admin-row { display: flex; gap: 8px; justify-content: space-between; }
-        .admin-btn { flex: 1; background: transparent; border: 1px solid #555; color: #ccc; padding: 8px 4px; font-size: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; text-align: center; }
+        .admin-btn { flex: 1; background: transparent; border: 1px solid #555; color: #ccc; padding: 10px 4px; font-size: 11px; border-radius: 6px; cursor: pointer; font-weight: 600; text-align: center; }
         .admin-btn:hover { background: #3f3f4e; }
-        .danger-btn { border-color: rgba(255, 68, 68, 0.4); color: #ff4444; }
-        .danger-btn:hover { background: rgba(255, 68, 68, 0.1); }
+        .danger-btn { border-color: rgba(255, 68, 68, 0.5); color: #ff6666; }
+        .danger-btn:hover { background: rgba(255, 68, 68, 0.15); }
     </style>
 </head>
 <body>
@@ -518,29 +529,74 @@
         document.getElementById('top-list-items').innerHTML = top10Html + myRankHtml;
     }
 
-    // NY OPPDATERT THEME-FUNKSJON MED DINE FARGEVALG!
+    // OPPDATERT THEME-MOTOR: Bruker gradienter, mindre kontrast, standard fonter.
     function getBrandStyle(name) {
         const n = name.toLowerCase();
-        let bg = 'var(--card-bg)';
-        let text = '#ffffff';
-        let border = 'transparent';
-        let char = '⛽';
+        let styles = {
+            bg: 'linear-gradient(135deg, #3a3a4d 0%, #2b2b36 100%)', // Default pro mørk
+            text: '#f0f0f0', // Soft hvit standard
+            border: 'rgba(255,255,255,0.08)', // Nesten usynlig ramme
+            char: '⛽'
+        };
 
-        if (n.includes("yx")) { bg = '#ed1c24'; text = '#ffffff'; border = '#0055b8'; char = 'Y'; }
-        else if (n.includes("circle k")) { bg = '#ed1c24'; text = '#ffffff'; border = '#ff9800'; char = 'C'; }
-        else if (n.includes("uno-x") || n.includes("unox")) { bg = '#e5a904'; text = '#000000'; border = '#ed1c24'; char = 'U'; }
-        else if (n.includes("esso")) { bg = '#ffffff'; text = '#ed1c24'; border = '#0055b8'; char = 'E'; }
-        else if (n.includes("tanken")) { bg = '#ed1c24'; text = '#ffffff'; border = '#ffffff'; char = 'T'; }
-        else if (n.includes("driv")) { bg = '#ed1c24'; text = '#ffffff'; border = '#ed1c24'; char = 'D'; }
-        else if (n.includes("st1")) { bg = '#ffe100'; text = '#ed1c24'; border = '#ffffff'; char = 'S'; }
-        else if (n.includes("oljeleverandøren")) { bg = '#333333'; text = '#ff9800'; border = '#ffffff'; char = 'O'; }
-        else if (n.includes("best")) { bg = '#0055b8'; text = '#ffffff'; border = '#ff9800'; char = 'B'; }
-        else if (n.includes("bunker oil") || n.includes("bunkeroil")) { bg = '#ffffff'; text = '#0055b8'; border = '#ed1c24'; char = 'B'; }
-        else if (n.includes("haltbakk")) { bg = '#111111'; text = '#4caf50'; border = '#4caf50'; char = 'H'; }
-        else if (n.includes("lpg")) { bg = '#ffffff'; text = '#4caf50'; border = '#4caf50'; char = 'L'; }
-        else if (n.includes("shell")) { bg = '#ffcc00'; text = '#ed1c24'; border = '#ed1c24'; char = 'S'; }
+        if (n.includes("yx")) { 
+            styles.bg = 'linear-gradient(135deg, #ff3a40 0%, #ed1c24 100%)'; 
+            styles.text = '#ffffff'; styles.border = 'rgba(0, 85, 184, 0.4)'; styles.char = 'Y'; 
+        }
+        else if (n.includes("circle k")) { 
+            styles.bg = 'linear-gradient(135deg, #ff4d52 0%, #ed1c24 100%)'; 
+            styles.text = '#ffffff'; styles.border = 'rgba(255, 152, 0, 0.4)'; styles.char = 'C'; 
+        }
+        else if (n.includes("uno-x") || n.includes("unox")) { 
+            // Tonet ned sennep/sort kontrast
+            styles.bg = 'linear-gradient(135deg, #ffcc33 0%, #e5a904 100%)'; 
+            styles.text = '#222222'; styles.border = 'rgba(237, 28, 36, 0.4)'; styles.char = 'U'; 
+        }
+        else if (n.includes("esso")) { 
+            // Myk hvit/grå gradient
+            styles.bg = 'linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%)'; 
+            styles.text = '#df1820'; styles.border = 'rgba(0, 85, 184, 0.3)'; styles.char = 'E'; 
+        }
+        else if (n.includes("tanken")) { 
+            styles.bg = 'linear-gradient(135deg, #ff2026 0%, #ed1c24 100%)'; 
+            styles.text = '#ffffff'; styles.border = 'rgba(255, 255, 255, 0.5)'; styles.char = 'T'; 
+        }
+        else if (n.includes("driv")) { 
+            styles.bg = 'linear-gradient(135deg, #ff3a40 0%, #ed1c24 100%)'; 
+            styles.text = '#ffffff'; styles.border = 'rgba(237, 28, 36, 0.3)'; styles.char = 'D'; 
+        }
+        else if (n.includes("st1")) { 
+            styles.bg = 'linear-gradient(135deg, #ffff33 0%, #ffe100 100%)'; 
+            styles.text = '#ed1c24'; styles.border = 'rgba(255, 255, 255, 0.5)'; styles.char = 'S'; 
+        }
+        else if (n.includes("oljeleverandøren")) { 
+            styles.bg = 'linear-gradient(135deg, #4d4d4d 0%, #333333 100%)'; 
+            styles.text = '#ff9800'; styles.border = 'rgba(255, 255, 255, 0.4)'; styles.char = 'O'; 
+        }
+        else if (n.includes("best")) { 
+            // Dyp blå gradient
+            styles.bg = 'linear-gradient(135deg, #1a75ff 0%, #0055b8 100%)'; 
+            styles.text = '#ffffff'; styles.border = 'rgba(255, 152, 0, 0.4)'; styles.char = 'B'; 
+        }
+        else if (n.includes("bunker oil") || n.includes("bunkeroil")) { 
+            styles.bg = 'linear-gradient(135deg, #ffffff 0%, #f9f9f9 100%)'; 
+            styles.text = '#0055b8'; styles.border = 'rgba(237, 28, 36, 0.3)'; styles.char = 'B'; 
+        }
+        else if (n.includes("haltbakk")) { 
+            // Nesten sort, veldig dyp grønn kant
+            styles.bg = 'linear-gradient(135deg, #222222 0%, #111111 100%)'; 
+            styles.text = '#4caf50'; styles.border = 'rgba(76, 175, 80, 0.4)'; styles.char = 'H'; 
+        }
+        else if (n.includes("lpg")) { 
+            styles.bg = 'linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%)'; 
+            styles.text = '#4caf50'; styles.border = 'rgba(76, 175, 80, 0.3)'; styles.char = 'L'; 
+        }
+        else if (n.includes("shell")) { 
+            styles.bg = 'linear-gradient(135deg, #ffe066 0%, #ffcc00 100%)'; 
+            styles.text = '#ed1c24'; styles.border = 'rgba(237, 28, 36, 0.3)'; styles.char = 'S'; 
+        }
 
-        return { bg, text, border, char };
+        return styles;
     }
 
     function visGlobalSisteOppdatering() {
@@ -571,12 +627,13 @@
             let safeNavn = sanitize(bruktNavn);
             let safeUser = sanitize(nyesteData.user);
 
+            // Featured cards bruker fortsatt gjennomsiktig boks for "fancy" look
             let b98Html = (nyesteData.bensin98 && nyesteData.bensin98 !== "--") ? `<div class="f-price-box" style="border-color:${style.border}"><span class="f-lbl">98</span><span class="f-val">${nyesteData.bensin98} ${getTrendHtml(nyesteData.bensin98, nyesteData.prev_bensin98)}</span></div>` : '';
             let fdHtml = (nyesteData.fd && nyesteData.fd !== "--") ? `<div class="f-price-box" style="border-color:${style.border}"><span class="f-lbl">FD</span><span class="f-val">${nyesteData.fd} ${getTrendHtml(nyesteData.fd, nyesteData.prev_fd)}</span></div>` : '';
 
             globalContainer.style.display = 'block';
             globalContainer.innerHTML = `
-                <div class="featured-card" style="background: ${style.bg}; color: ${style.text}; border: 2px solid ${style.border};">
+                <div class="featured-card" style="background: ${style.bg}; color: ${style.text}; border: 1px solid ${style.border};">
                     <div class="f-icon-bg">${style.char}</div>
                     <div class="featured-header">⚡ NYESTE OPPDATERING I NORGE</div>
                     <div class="featured-title">${safeNavn} ${flag} <span style="margin-left:auto;">${distStr}</span></div>
@@ -630,9 +687,9 @@
         container.style.display = 'block'; 
 
         const renderPlaceholder = (title, icon, color) => `
-            <div class="featured-card" style="background: transparent; border: 1px dashed ${color}; margin-bottom: 10px; color: var(--text-muted);">
+            <div class="featured-card" style="background: transparent; border: 1px dashed ${color}; margin-bottom: 10px; color: var(--text-muted); box-shadow: none;">
                 <div class="featured-header">${icon} ${title}</div>
-                <div style="text-align:center; padding: 20px; font-size: 13px;">Venter på dagens oppdateringer...</div>
+                <div style="text-align:center; padding: 25px; font-size: 13px; font-weight: 400;">Venter på dagens oppdateringer...</div>
             </div>
         `;
 
@@ -645,8 +702,11 @@
             let b98Html = (data.bensin98 && data.bensin98 !== "--") ? `<div class="f-price-box" style="border-color:${style.border}"><span class="f-lbl">98</span><span class="f-val">${data.bensin98} ${getTrendHtml(data.bensin98, data.prev_bensin98)}</span></div>` : '';
             let fdHtml = (data.fd && data.fd !== "--") ? `<div class="f-price-box" style="border-color:${style.border}"><span class="f-lbl">FD</span><span class="f-val">${data.fd} ${getTrendHtml(data.fd, data.prev_fd)}</span></div>` : '';
 
+            // Bruker fallback ramme hvis merkevaren ikke har definert ramme (gjennomsiktig)
+            let finalBorder = style.border === 'rgba(255,255,255,0.08)' ? fallbackBorderColor : style.border;
+
             return `
-            <div class="featured-card" style="background: ${style.bg}; color: ${style.text}; margin-bottom: 10px; border: 2px solid ${style.border !== 'transparent' ? style.border : fallbackBorderColor};">
+            <div class="featured-card" style="background: ${style.bg}; color: ${style.text}; margin-bottom: 15px; border: 1px solid ${finalBorder};">
                 <div class="f-icon-bg">${style.char}</div>
                 <div class="featured-header">${icon} ${title}</div>
                 <div class="featured-title">${safeNavn}</div>
@@ -660,7 +720,7 @@
             </div>`;
         };
 
-        let html = '<h3 style="font-size: 13px; text-transform: uppercase; color: var(--text-muted); margin-top: 25px; margin-bottom: 10px; text-align: center;">🇳🇴 Norges Ytterpunkter (Siste 24t)</h3>';
+        let html = '<h3 style="font-size: 13px; text-transform: uppercase; color: var(--text-muted); margin-top: 25px; margin-bottom: 12px; text-align: center; font-weight: 600; letter-spacing: 0.5px;">🇳🇴 Norges Ytterpunkter (Siste 24t)</h3>';
         
         let billigsteId = billigsteData ? billigsteData.id : null;
 
@@ -803,7 +863,7 @@
 
         let gyldigeStasjoner = stasjoner.filter(s => !skjulteStasjoner[s.id]);
 
-        if (gyldigeStasjoner.length === 0) { list.innerHTML = "<p style='text-align:center; color:var(--text-muted); margin-top:20px;'>Ingen stasjoner funnet i dette området.</p>"; return; }
+        if (gyldigeStasjoner.length === 0) { list.innerHTML = "<p style='text-align:center; color:var(--text-muted); margin-top:20px; font-weight:400;'>Ingen stasjoner funnet i dette området.</p>"; return; }
 
         let startOfDay = new Date(new Date().setHours(0,0,0,0)).getTime();
         let startOfYesterday = startOfDay - 86400000;
@@ -919,7 +979,8 @@
             if (!foundLocalKupp && !item.isAuto && item.displayD !== "--" && item.displayD !== "999") {
                 let safeUser = sanitize(item.p.user);
                 let rawTimeText = formaterTid(item.p.timestamp, safeUser).replace("Sist: ", "");
-                item.timeAgoHtml = `<div class="time-ago" style="color: var(--gold); font-weight: bold; font-size: 11px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">🏆 BILLIGSTE LOKALE! • Sist oppdatert ${rawTimeText}</div>`;
+                // Lagt på skygge på gullteksten for lesbarhet på lyse kort
+                item.timeAgoHtml = `<div class="time-ago" style="color: var(--gold); font-weight: 700; font-size: 11px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">🏆 BILLIGSTE LOKALE! • Sist oppdatert ${rawTimeText}</div>`;
                 foundLocalKupp = true;
             }
 
@@ -927,7 +988,8 @@
             card.className = `station-card`;
             card.style.background = item.style.bg;
             card.style.color = item.style.text;
-            card.style.borderColor = item.style.border;
+            // Super-tynn halvgjennomsiktig ramme
+            card.style.borderColor = item.style.border === 'rgba(255,255,255,0.08)' ? 'rgba(255,255,255,0.1)' : item.style.border;
 
             card.innerHTML = `
                 <div class="main-info">
@@ -967,7 +1029,7 @@
 
             featuredContainer.style.display = 'block';
             featuredContainer.innerHTML = `
-                <div class="featured-card" style="background: ${bgColor}; color: ${textColor}; border: 2px solid ${borderColor};">
+                <div class="featured-card" style="background: ${bgColor}; color: ${textColor}; border: 1px solid ${borderColor};">
                     <div class="f-icon-bg">${nyesteStasjon.style.char}</div>
                     <div class="featured-header">⚡ NYESTE OPPDATERING I DITT SØK</div>
                     <div class="featured-title">${nyesteStasjon.navn} ${flag} <span style="margin-left:auto;" class="featured-dist">📍 ${nyesteStasjon.dist.toFixed(1)} km</span></div>
