@@ -57,8 +57,8 @@
         .featured-dist { font-size: 11px; font-weight: normal; opacity: 0.9; }
         .featured-prices { display: flex; gap: 8px; flex-wrap: wrap; z-index: 2; position: relative; }
         .f-price-box { background: rgba(0,0,0,0.4); padding: 6px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); display: flex; align-items: center; gap: 6px; backdrop-filter: blur(2px); }
-        .f-lbl { font-size: 9px; color: #eee; }
-        .f-val { font-size: 15px; font-weight: bold; display: flex; align-items: center; gap: 3px; }
+        .f-lbl { font-size: 9px; color: #fff; }
+        .f-val { font-size: 15px; font-weight: bold; display: flex; align-items: center; gap: 3px; color: #fff; }
         .f-user { margin-top: 8px; font-size: 10px; opacity: 0.8; text-align: right; z-index: 2; position: relative; }
         .f-icon-bg { position: absolute; right: -15px; bottom: -20px; font-size: 80px; opacity: 0.15; transform: rotate(-15deg); z-index: 1; pointer-events: none; line-height: 1; }
 
@@ -75,7 +75,7 @@
         .station-info { flex: 1; display: flex; align-items: center; min-width: 0; } 
         .station-details { flex: 1; min-width: 0; }
         .station-details h3 { margin: 0 0 5px 0; font-size: 15px; word-wrap: break-word; line-height: 1.3; } 
-        .station-details p { margin: 0; font-size: 12px; color: var(--text-muted); }
+        .station-details p { margin: 0; font-size: 12px; }
         .brand-icon { width: 40px; height: 40px; flex-shrink: 0; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 12px; background: #4a4a5a; }
         .prices-container { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; flex-shrink: 0; } 
         
@@ -85,22 +85,19 @@
         .lbl-bensin { background-color: var(--bensin-color); }
         .lbl-bensin98 { background-color: var(--bensin98-color); }
         .lbl-fd { background-color: var(--fd-color); }
-        .price-value { font-size: 16px; font-weight: bold; background-color: #3f3f4e; padding: 4px 8px; border-radius: 6px; min-width: 60px; text-align: right; display: flex; justify-content: flex-end; align-items: center; gap: 4px; }
+        .price-value { font-size: 16px; font-weight: bold; background-color: #3f3f4e; padding: 4px 8px; border-radius: 6px; min-width: 60px; text-align: right; display: flex; justify-content: flex-end; align-items: center; gap: 4px; color: white; }
         
         .trend-up { color: var(--danger); font-size: 14px; } 
         .trend-down { color: var(--success); font-size: 14px; } 
         
         .verify-badge { color: var(--success); font-size: 14px; margin-left: -5px; }
 
-        .action-buttons { display: flex; gap: 5px; margin-top: 15px; border-top: 1px solid #3f3f4e; padding-top: 10px; }
-        .update-btn, .nav-btn, .hist-btn { padding: 8px 4px; font-size: 11px; border-radius: 6px; flex: 1; font-weight: bold; text-align: center; text-decoration: none; cursor:pointer; display: flex; align-items: center; justify-content: center; height: 35px; }
-        .update-btn { border: 1px solid var(--primary); color: var(--primary); background: transparent; }
-        .nav-btn { border: 1px solid #4a4a5a; color: #a0a0a0; background: transparent; }
-        .hist-btn { border: 1px solid #4a4a5a; color: #a0a0a0; background: transparent; }
+        .action-buttons { display: flex; gap: 5px; margin-top: 15px; border-top: 1px solid rgba(0,0,0,0.1); padding-top: 10px; }
+        .update-btn, .nav-btn, .hist-btn { padding: 8px 4px; font-size: 11px; border-radius: 6px; flex: 1; font-weight: bold; text-align: center; text-decoration: none; cursor:pointer; display: flex; align-items: center; justify-content: center; height: 35px; border: 1px solid transparent; background: transparent; }
 
-        .history-panel { display: none; background: #1e1e24; border-radius: 8px; margin-top: 10px; padding: 10px; font-size: 11px; color: var(--text-muted); }
-        .history-item { display: flex; justify-content: space-between; border-bottom: 1px solid #333; padding: 4px 0; }
-        .time-ago { font-size: 10px; color: #7a7a8c; margin-top: 10px; text-align: center; }
+        .history-panel { display: none; background: rgba(0,0,0,0.5); border-radius: 8px; margin-top: 10px; padding: 10px; font-size: 11px; color: white; }
+        .history-item { display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.1); padding: 4px 0; }
+        .time-ago { font-size: 10px; margin-top: 10px; text-align: center; }
 
         #add-station-container { display: none; text-align: center; margin-bottom: 30px; margin-top: 20px; border-top: 1px solid #3f3f4e; padding-top: 20px; }
         .btn-add-station { background-color: transparent; border: 1px dashed var(--primary); color: var(--primary); padding: 12px; border-radius: 8px; font-size: 14px; display: inline-block; cursor: pointer; width: 100%; }
@@ -364,7 +361,7 @@
         if(!navn) { alert("Du må skrive inn et stasjonsnavn!"); return; }
         
         btn.innerText = "Henter posisjon...";
-        navigator.geolocation.getCurrentPosition(async (p) => {
+        navigator.geolocation.getCurrentPosition(async function(p) {
             const nyId = 'egen_' + Date.now();
             await set(ref(db, 'egne_stasjoner/' + nyId), {
                 navn: navn, lat: p.coords.latitude, lon: p.coords.longitude, opprettetAv: myUid
@@ -374,7 +371,7 @@
             lukkLeggTilStasjonModal();
             alert("Stasjonen er lagt til kartet! Oppdaterer søket ditt nå.");
             if(sisteLat && sisteLon) hentStasjoner(sisteLat, sisteLon);
-        }, e => {
+        }, function(e) {
             btn.innerText = "Lagre med GPS";
             alert("Kunne ikke hente GPS. Sjekk at du har gitt nettleseren lov til å se posisjonen din.");
         });
@@ -521,6 +518,31 @@
         document.getElementById('top-list-items').innerHTML = top10Html + myRankHtml;
     }
 
+    // NY OPPDATERT THEME-FUNKSJON MED DINE FARGEVALG!
+    function getBrandStyle(name) {
+        const n = name.toLowerCase();
+        let bg = 'var(--card-bg)';
+        let text = '#ffffff';
+        let border = 'transparent';
+        let char = '⛽';
+
+        if (n.includes("yx")) { bg = '#ed1c24'; text = '#ffffff'; border = '#0055b8'; char = 'Y'; }
+        else if (n.includes("circle k")) { bg = '#ed1c24'; text = '#ffffff'; border = '#ff9800'; char = 'C'; }
+        else if (n.includes("uno-x") || n.includes("unox")) { bg = '#e5a904'; text = '#000000'; border = '#ed1c24'; char = 'U'; }
+        else if (n.includes("esso")) { bg = '#ffffff'; text = '#ed1c24'; border = '#0055b8'; char = 'E'; }
+        else if (n.includes("tanken")) { bg = '#ed1c24'; text = '#ffffff'; border = '#ffffff'; char = 'T'; }
+        else if (n.includes("driv")) { bg = '#ed1c24'; text = '#ffffff'; border = '#ed1c24'; char = 'D'; }
+        else if (n.includes("st1")) { bg = '#ffe100'; text = '#ed1c24'; border = '#ffffff'; char = 'S'; }
+        else if (n.includes("oljeleverandøren")) { bg = '#333333'; text = '#ff9800'; border = '#ffffff'; char = 'O'; }
+        else if (n.includes("best")) { bg = '#0055b8'; text = '#ffffff'; border = '#ff9800'; char = 'B'; }
+        else if (n.includes("bunker oil") || n.includes("bunkeroil")) { bg = '#ffffff'; text = '#0055b8'; border = '#ed1c24'; char = 'B'; }
+        else if (n.includes("haltbakk")) { bg = '#111111'; text = '#4caf50'; border = '#4caf50'; char = 'H'; }
+        else if (n.includes("lpg")) { bg = '#ffffff'; text = '#4caf50'; border = '#4caf50'; char = 'L'; }
+        else if (n.includes("shell")) { bg = '#ffcc00'; text = '#ed1c24'; border = '#ed1c24'; char = 'S'; }
+
+        return { bg, text, border, char };
+    }
+
     function visGlobalSisteOppdatering() {
         if (gjeldendeStasjoner.length > 0) return;
         let nyesteTid = 0; let nyesteData = null;
@@ -534,13 +556,8 @@
         const globalContainer = document.getElementById('global-featured-container');
         if (nyesteData && nyesteTid > (Date.now() - (3 * 24 * 60 * 60 * 1000))) {
             let distStr = "";
-            let sLat = nyesteData.lat;
-            let sLon = nyesteData.lon;
-            
-            if (endredeGps[nyesteData.id]) {
-                sLat = endredeGps[nyesteData.id].lat;
-                sLon = endredeGps[nyesteData.id].lon;
-            }
+            let sLat = nyesteData.lat; let sLon = nyesteData.lon;
+            if (endredeGps[nyesteData.id]) { sLat = endredeGps[nyesteData.id].lat; sLon = endredeGps[nyesteData.id].lon; }
 
             if (sisteLat && sisteLon && sLat && sLon) {
                 const dist = regnUtAvstand(sisteLat, sisteLon, sLat, sLon);
@@ -549,25 +566,23 @@
 
             let bruktNavn = endredeNavn[nyesteData.id] || nyesteData.navn;
             const style = getBrandStyle(bruktNavn);
-            let textColor = style.color === '#ffcc00' ? '#000' : '#fff';
-            let borderColor = style.color === '#ffcc00' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.15)';
             let flag = getFlag(nyesteData.land || 'no'); 
             
             let safeNavn = sanitize(bruktNavn);
             let safeUser = sanitize(nyesteData.user);
 
-            let b98Html = (nyesteData.bensin98 && nyesteData.bensin98 !== "--") ? `<div class="f-price-box" style="border-color:${borderColor}"><span class="f-lbl">98</span><span class="f-val">${nyesteData.bensin98} ${getTrendHtml(nyesteData.bensin98, nyesteData.prev_bensin98)}</span></div>` : '';
-            let fdHtml = (nyesteData.fd && nyesteData.fd !== "--") ? `<div class="f-price-box" style="border-color:${borderColor}"><span class="f-lbl">FD</span><span class="f-val">${nyesteData.fd} ${getTrendHtml(nyesteData.fd, nyesteData.prev_fd)}</span></div>` : '';
+            let b98Html = (nyesteData.bensin98 && nyesteData.bensin98 !== "--") ? `<div class="f-price-box" style="border-color:${style.border}"><span class="f-lbl">98</span><span class="f-val">${nyesteData.bensin98} ${getTrendHtml(nyesteData.bensin98, nyesteData.prev_bensin98)}</span></div>` : '';
+            let fdHtml = (nyesteData.fd && nyesteData.fd !== "--") ? `<div class="f-price-box" style="border-color:${style.border}"><span class="f-lbl">FD</span><span class="f-val">${nyesteData.fd} ${getTrendHtml(nyesteData.fd, nyesteData.prev_fd)}</span></div>` : '';
 
             globalContainer.style.display = 'block';
             globalContainer.innerHTML = `
-                <div class="featured-card" style="background: ${style.bg}; color: ${textColor};">
+                <div class="featured-card" style="background: ${style.bg}; color: ${style.text}; border: 2px solid ${style.border};">
                     <div class="f-icon-bg">${style.char}</div>
                     <div class="featured-header">⚡ NYESTE OPPDATERING I NORGE</div>
                     <div class="featured-title">${safeNavn} ${flag} <span style="margin-left:auto;">${distStr}</span></div>
                     <div class="featured-prices">
-                        <div class="f-price-box" style="border-color:${borderColor}"><span class="f-lbl">D</span><span class="f-val">${nyesteData.diesel} ${getTrendHtml(nyesteData.diesel, nyesteData.prev_diesel)}</span></div>
-                        <div class="f-price-box" style="border-color:${borderColor}"><span class="f-lbl">95</span><span class="f-val">${nyesteData.bensin} ${getTrendHtml(nyesteData.bensin, nyesteData.prev_bensin)}</span></div>
+                        <div class="f-price-box" style="border-color:${style.border}"><span class="f-lbl">D</span><span class="f-val">${nyesteData.diesel} ${getTrendHtml(nyesteData.diesel, nyesteData.prev_diesel)}</span></div>
+                        <div class="f-price-box" style="border-color:${style.border}"><span class="f-lbl">95</span><span class="f-val">${nyesteData.bensin} ${getTrendHtml(nyesteData.bensin, nyesteData.prev_bensin)}</span></div>
                         ${b98Html}
                         ${fdHtml}
                     </div>
@@ -621,26 +636,23 @@
             </div>
         `;
 
-        const renderCard = (data, title, icon, borderColorBase) => {
+        const renderCard = (data, title, icon, fallbackBorderColor) => {
             let bruktNavn = endredeNavn[data.id] || data.navn;
             const style = getBrandStyle(bruktNavn);
-            let textColor = style.color === '#ffcc00' ? '#000' : '#fff';
-            let borderColor = style.color === '#ffcc00' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.15)';
-            
             let safeNavn = sanitize(bruktNavn);
             let safeUser = sanitize(data.user);
 
-            let b98Html = (data.bensin98 && data.bensin98 !== "--") ? `<div class="f-price-box" style="border-color:${borderColor}"><span class="f-lbl">98</span><span class="f-val">${data.bensin98} ${getTrendHtml(data.bensin98, data.prev_bensin98)}</span></div>` : '';
-            let fdHtml = (data.fd && data.fd !== "--") ? `<div class="f-price-box" style="border-color:${borderColor}"><span class="f-lbl">FD</span><span class="f-val">${data.fd} ${getTrendHtml(data.fd, data.prev_fd)}</span></div>` : '';
+            let b98Html = (data.bensin98 && data.bensin98 !== "--") ? `<div class="f-price-box" style="border-color:${style.border}"><span class="f-lbl">98</span><span class="f-val">${data.bensin98} ${getTrendHtml(data.bensin98, data.prev_bensin98)}</span></div>` : '';
+            let fdHtml = (data.fd && data.fd !== "--") ? `<div class="f-price-box" style="border-color:${style.border}"><span class="f-lbl">FD</span><span class="f-val">${data.fd} ${getTrendHtml(data.fd, data.prev_fd)}</span></div>` : '';
 
             return `
-            <div class="featured-card" style="background: ${style.bg}; color: ${textColor}; margin-bottom: 10px; border: 1px solid ${borderColorBase};">
+            <div class="featured-card" style="background: ${style.bg}; color: ${style.text}; margin-bottom: 10px; border: 2px solid ${style.border !== 'transparent' ? style.border : fallbackBorderColor};">
                 <div class="f-icon-bg">${style.char}</div>
                 <div class="featured-header">${icon} ${title}</div>
                 <div class="featured-title">${safeNavn}</div>
                 <div class="featured-prices">
-                    <div class="f-price-box" style="border-color:${borderColor}"><span class="f-lbl">D</span><span class="f-val">${data.diesel} ${getTrendHtml(data.diesel, data.prev_diesel)}</span></div>
-                    <div class="f-price-box" style="border-color:${borderColor}"><span class="f-lbl">95</span><span class="f-val">${data.bensin} ${getTrendHtml(data.bensin, data.prev_bensin)}</span></div>
+                    <div class="f-price-box" style="border-color:${style.border}"><span class="f-lbl">D</span><span class="f-val">${data.diesel} ${getTrendHtml(data.diesel, data.prev_diesel)}</span></div>
+                    <div class="f-price-box" style="border-color:${style.border}"><span class="f-lbl">95</span><span class="f-val">${data.bensin} ${getTrendHtml(data.bensin, data.prev_bensin)}</span></div>
                     ${b98Html}
                     ${fdHtml}
                 </div>
@@ -745,7 +757,7 @@
         lukkModal();
     };
 
-    window.slettStasjon = async () => {
+    window.slettStasjon = async function() {
         if (confirm("⚠️ ER DU SIKKER?\n\nVil du slette denne stasjonen fra kartet for alle brukere? Bruk dette kun dersom stasjonen er permanent nedlagt eller ikke finnes.")) {
             await set(ref(db, 'skjulte_stasjoner/' + valgtStasjonId), true);
             lukkModal();
@@ -753,7 +765,7 @@
         }
     };
 
-    window.endreStasjonsNavn = async () => {
+    window.endreStasjonsNavn = async function() {
         let currentNavn = document.getElementById('modal-station-name').innerText;
         let nyttNavn = prompt("Skriv inn nytt navn for stasjonen:", currentNavn);
         if (nyttNavn && nyttNavn.trim() !== "") {
@@ -763,13 +775,13 @@
         }
     };
 
-    window.oppdaterStasjonsGps = () => {
+    window.oppdaterStasjonsGps = function() {
         if (confirm("Vil du oppdatere stasjonens plassering til din NÅVÆRENDE posisjon?\n\nSørg for at du står fysisk på stasjonen nå!")) {
-            navigator.geolocation.getCurrentPosition(async p => {
+            navigator.geolocation.getCurrentPosition(async function(p) {
                 await set(ref(db, 'stasjon_gps/' + valgtStasjonId), { lat: p.coords.latitude, lon: p.coords.longitude });
                 lukkModal();
                 alert("GPS-posisjonen for stasjonen er flyttet til der du står!");
-            }, e => alert("Kunne ikke hente posisjonen din. Sjekk at GPS er på."));
+            }, function(e) { alert("Kunne ikke hente posisjonen din. Sjekk at GPS er på."); });
         }
     };
 
@@ -781,17 +793,6 @@
         if (!data) { p.innerText = "Ingen historikk."; return; }
         const h = Object.values(data).reverse().slice(1, 4);
         p.innerHTML = h.length ? h.map(i => `<div class="history-item"><span>D: ${i.diesel} | 95: ${i.bensin} ${i.bensin98 && i.bensin98 !== '--' ? '| 98: '+i.bensin98 : ''} ${i.fd && i.fd !== '--' ? '| FD: '+i.fd : ''}</span><span>${new Date(i.timestamp).toLocaleDateString()}</span></div>`).join('') : "Ingen tidligere data.";
-    }
-
-    function getBrandStyle(name) {
-        const n = name.toLowerCase();
-        if (n.includes("circle k")) return { char: 'C', color: '#ed1c24', bg: 'linear-gradient(135deg, #ed1c24 0%, #a60f16 100%)' }; 
-        if (n.includes("shell")) return { char: 'S', color: '#ffcc00', text: '#ed1c24', bg: 'linear-gradient(135deg, #ffcc00 0%, #e65c00 100%)' }; 
-        if (n.includes("uno-x") || n.includes("unox")) return { char: 'U', color: '#ffcc00', text: '#000', bg: 'linear-gradient(135deg, #ffcc00 0%, #b38f00 100%)' }; 
-        if (n.includes("yx")) return { char: 'Y', color: '#0055b8', bg: 'linear-gradient(135deg, #0055b8 0%, #00336b 100%)' }; 
-        if (n.includes("esso")) return { char: 'E', color: '#ed1c24', bg: 'linear-gradient(135deg, #ed1c24 0%, #a60f16 100%)' }; 
-        if (n.includes("best")) return { char: 'B', color: '#ffcc00', text: '#000', bg: 'linear-gradient(135deg, #ffcc00 0%, #b38f00 100%)' };
-        return { char: '⛽', color: '#4a4a5a', bg: 'linear-gradient(135deg, #4a4a5a 0%, #2b2b36 100%)' }; 
     }
 
     function visStasjoner(stasjoner, lat, lon) {
@@ -888,7 +889,7 @@
                 trendFd = getTrendHtml(p.fd, p.prev_fd);
                 
                 let safeUser = sanitize(p.user);
-                timeAgoHtml = `<div class="time-ago">${formaterTid(p.timestamp, safeUser)}</div>`;
+                timeAgoHtml = `<div class="time-ago" style="color: inherit; opacity: 0.85;">${formaterTid(p.timestamp, safeUser)}</div>`;
                 if (p.verified) verifiedHtml = '<span class="verify-badge">✅</span>';
             } else {
                 isAuto = true;
@@ -896,7 +897,7 @@
                 displayB = localAvgB;
                 displayB98 = "--";
                 displayFd = "--";
-                timeAgoHtml = `<div class="time-ago" style="opacity: 0.7;">🤖 ${avgTypeStr}</div>`;
+                timeAgoHtml = `<div class="time-ago" style="color: inherit; opacity: 0.7;">🤖 ${avgTypeStr}</div>`;
             }
 
             return { s, id, p, dist, navn, escapedName, style, flag, displayD, displayB, displayB98, displayFd, trendD, trendB, trendB98, trendFd, timeAgoHtml, isAuto, verifiedHtml, brukLat, brukLon };
@@ -918,18 +919,47 @@
             if (!foundLocalKupp && !item.isAuto && item.displayD !== "--" && item.displayD !== "999") {
                 let safeUser = sanitize(item.p.user);
                 let rawTimeText = formaterTid(item.p.timestamp, safeUser).replace("Sist: ", "");
-                item.timeAgoHtml = `<div class="time-ago" style="color: var(--gold); font-weight: bold; font-size: 11px;">🏆 BILLIGSTE LOKALE! • Sist oppdatert ${rawTimeText}</div>`;
+                item.timeAgoHtml = `<div class="time-ago" style="color: var(--gold); font-weight: bold; font-size: 11px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">🏆 BILLIGSTE LOKALE! • Sist oppdatert ${rawTimeText}</div>`;
                 foundLocalKupp = true;
             }
 
-            const card = document.createElement('div'); card.className = `station-card`;
-            card.innerHTML = `<div class="main-info"><div class="station-info"><div class="brand-icon" style="background-color: ${item.style.color}; color: ${item.style.text || '#fff'}">${item.style.char}</div><div class="station-details"><h3>${item.navn} ${item.flag}</h3><p>${item.dist.toFixed(1)} km unna</p></div></div><div class="prices-container"><div class="price-row"><span class="price-label lbl-diesel">DIESEL</span><div class="price-value">${item.displayD} ${item.trendD}</div> ${item.verifiedHtml}</div><div class="price-row"><span class="price-label lbl-bensin">BENSIN 95</span><div class="price-value">${item.displayB} ${item.trendB}</div> ${item.verifiedHtml}</div>${b98Html}${fdHtml}</div></div><div class="action-buttons"><div class="update-btn" onclick="apneModal('${item.id}','${item.escapedName}', ${item.brukLat}, ${item.brukLon})">OPPDATER</div><a class="nav-btn" href="https://www.google.com/maps/dir/?api=1&destination=${item.brukLat},${item.brukLon}" target="_blank">KJØR HIT</a><div class="hist-btn" onclick="visHistorikk('${item.id}')">⌛ HISTORIKK</div></div><div id="hist-${item.id}" class="history-panel"></div>${item.timeAgoHtml}`;
+            const card = document.createElement('div'); 
+            card.className = `station-card`;
+            card.style.background = item.style.bg;
+            card.style.color = item.style.text;
+            card.style.borderColor = item.style.border;
+
+            card.innerHTML = `
+                <div class="main-info">
+                    <div class="station-info">
+                        <div class="brand-icon" style="background-color: rgba(0,0,0,0.15); color: ${item.style.text};">${item.style.char}</div>
+                        <div class="station-details">
+                            <h3 style="color: ${item.style.text};">${item.navn} ${item.flag}</h3>
+                            <p style="color: ${item.style.text}; opacity: 0.85;">${item.dist.toFixed(1)} km unna</p>
+                        </div>
+                    </div>
+                    <div class="prices-container">
+                        <div class="price-row"><span class="price-label lbl-diesel">DIESEL</span><div class="price-value">${item.displayD} ${item.trendD}</div> ${item.verifiedHtml}</div>
+                        <div class="price-row"><span class="price-label lbl-bensin">BENSIN 95</span><div class="price-value">${item.displayB} ${item.trendB}</div> ${item.verifiedHtml}</div>
+                        ${b98Html}${fdHtml}
+                    </div>
+                </div>
+                <div class="action-buttons">
+                    <div class="update-btn" style="border-color: ${item.style.text}; color: ${item.style.text}; opacity: 0.9;" onclick="apneModal('${item.id}','${item.escapedName}', ${item.brukLat}, ${item.brukLon})">OPPDATER</div>
+                    <a class="nav-btn" style="border-color: ${item.style.text}; color: ${item.style.text}; opacity: 0.9;" href="https://www.google.com/maps/dir/?api=1&destination=${item.brukLat},${item.brukLon}" target="_blank">KJØR HIT</a>
+                    <div class="hist-btn" style="border-color: ${item.style.text}; color: ${item.style.text}; opacity: 0.9;" onclick="visHistorikk('${item.id}')">⌛ HISTORIKK</div>
+                </div>
+                <div id="hist-${item.id}" class="history-panel"></div>
+                ${item.timeAgoHtml}
+            `;
             list.appendChild(card);
         });
 
         if (nyesteStasjon && nyesteTid > startOfDay) {
-            let textColor = nyesteStasjon.style.color === '#ffcc00' ? '#000' : '#fff';
-            let borderColor = nyesteStasjon.style.color === '#ffcc00' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.15)';
+            let textColor = nyesteStasjon.style.text;
+            let borderColor = nyesteStasjon.style.border;
+            let bgColor = nyesteStasjon.style.bg;
+
             let b98Html = (nyesteData.bensin98 && nyesteData.bensin98 !== "--") ? `<div class="f-price-box" style="border-color:${borderColor}"><span class="f-lbl">98</span><span class="f-val">${nyesteData.bensin98} ${getTrendHtml(nyesteData.bensin98, nyesteData.prev_bensin98)}</span></div>` : '';
             let fdHtml = (nyesteData.fd && nyesteData.fd !== "--") ? `<div class="f-price-box" style="border-color:${borderColor}"><span class="f-lbl">FD</span><span class="f-val">${nyesteData.fd} ${getTrendHtml(nyesteData.fd, nyesteData.prev_fd)}</span></div>` : '';
             let flag = getFlag(sisteLand);
@@ -937,7 +967,7 @@
 
             featuredContainer.style.display = 'block';
             featuredContainer.innerHTML = `
-                <div class="featured-card" style="background: ${nyesteStasjon.style.bg}; color: ${textColor};">
+                <div class="featured-card" style="background: ${bgColor}; color: ${textColor}; border: 2px solid ${borderColor};">
                     <div class="f-icon-bg">${nyesteStasjon.style.char}</div>
                     <div class="featured-header">⚡ NYESTE OPPDATERING I DITT SØK</div>
                     <div class="featured-title">${nyesteStasjon.navn} ${flag} <span style="margin-left:auto;" class="featured-dist">📍 ${nyesteStasjon.dist.toFixed(1)} km</span></div>
@@ -1037,7 +1067,7 @@
         } catch (e) { document.getElementById('station-list').innerHTML = "<p style='text-align:center; color:var(--danger);'>Kartfeil. Prøv igjen.</p>"; }
     }
 
-    function formaterTid(ts, u) { if(!ts) return "Aldri"; const d = Math.floor((Date.now()-ts)/1000); let txt = d<60?"nå":d<3600?Math.floor(d/60)+"m":d<86400?Math.floor(d/3600)+"t":Math.floor(d/86400)+"d"; return `Sist: ${txt} siden ${u?'av '+u:''}`; }
+    function formaterTid(ts, u) { if(!ts) return "Aldri"; const d = Math.floor((Date.now()-ts)/1000); let txt = d<60?"nå":d<3600?Math.floor(d/60)+"m":d<86400?Math.floor(d/3600)+"t":Math.floor(d/86400)+"d"; return `Sist: ${txt} siden av ${u}`; }
     function regnUtAvstand(l1,o1,l2,o2){const R=6371;const dL=(l2-l1)*Math.PI/180;const dO=(o2-o1)*Math.PI/180;const a=Math.sin(dL/2)**2+Math.cos(l1*Math.PI/180)*Math.cos(l2*Math.PI/180)*Math.sin(dO/2)**2;return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));}
 </script>
 </body>
