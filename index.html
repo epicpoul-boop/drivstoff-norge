@@ -275,7 +275,6 @@
         bannerText.innerHTML = `⚠️ <b>Du er i Facebook sin nettleser.</b><br>Appen fungerer best utenfor FB. For å installere appen:<br>Trykk på de tre prikkene ⋯ og velg <b>"Åpne i ekstern nettleser"</b>.`;
     } else if (!isStandalone) { installBanner.style.display = 'block'; }
 
-    // NYTT: Vaskemaskin-funksjon (Sanitizer) som fjerner farlig kode fra tekst!
     function sanitize(str) {
         if (!str) return "";
         const temp = document.createElement('div');
@@ -332,7 +331,6 @@
     
     window.lagreNyStasjon = () => {
         const btn = document.getElementById('btn-save-station');
-        // Kjører vaskemaskinen på nytt stasjonsnavn
         const navn = sanitize(document.getElementById('new-station-name').value.trim());
         if(!navn) { alert("Du må skrive inn et stasjonsnavn!"); return; }
         
@@ -403,6 +401,7 @@
         return "Fersking 🐣";
     }
 
+    // OPPDATERT: Bruker totale poeng for Topp 10-listen!
     function beregnTopplister(alleData) {
         const dagTellere = {}; const ukeTellere = {}; const totalTellere = {};
         const userDays = {}; 
@@ -416,7 +415,6 @@
         Object.values(alleData).forEach(p => {
             if (!p.user || p.user === "Anonym") return; 
             
-            // Vi vasker navnet her også bare for sikkerhets skyld
             let safeUser = sanitize(p.user);
 
             totalTellere[safeUser] = (totalTellere[safeUser] || 0) + 1;
@@ -444,13 +442,18 @@
 
         const dagSortert = Object.entries(dagTellere).sort((a,b) => b[1]-a[1]);
         const ukeSortert = Object.entries(ukeTellere).sort((a,b) => b[1]-a[1]);
+        
+        // NYTT: Sorterer Topp 10 basert på TOTALE poeng, ikke ukespoeng!
+        const totalSortert = Object.entries(totalTellere).sort((a,b) => b[1]-a[1]);
+        
         const formatName = (user) => { let streak = userStreaks[user] || 0; return streak > 1 ? `${user} 🔥${streak}` : user; };
 
         document.getElementById('best-day').innerText = dagSortert.length ? `${formatName(dagSortert[0][0])} (${dagSortert[0][1]})` : "Ingen enda i dag";
         document.getElementById('best-week').innerText = ukeSortert.length ? `${formatName(ukeSortert[0][0])} (${ukeSortert[0][1]})` : "Ingen enda denne uken";
 
-        let top10Html = ukeSortert.slice(0, 10).map((u, i) => {
-            let tittel = getTittel(totalTellere[u[0]]); let streak = userStreaks[u[0]] || 0;
+        // Viser Topp 10 basert på historiske poeng
+        let top10Html = totalSortert.slice(0, 10).map((u, i) => {
+            let tittel = getTittel(u[1]); let streak = userStreaks[u[0]] || 0;
             let streakHtml = streak > 1 ? `<span style="color:var(--primary); font-size:12px; margin-left:5px;">🔥${streak}</span>` : '';
             return `<div class="top-list-item"><div><span>${i+1}. ${u[0]}</span>${streakHtml} <span class="user-title">${tittel}</span></div><span>${u[1]}</span></div>`;
         }).join('');
@@ -458,9 +461,9 @@
         let myName = localStorage.getItem('drivstoff_navn'); let myRankHtml = "";
         if (myName && myName !== "Anonym") {
             let safeMyName = sanitize(myName);
-            let myIndex = ukeSortert.findIndex(u => u[0].toLowerCase() === safeMyName.toLowerCase());
+            let myIndex = totalSortert.findIndex(u => u[0].toLowerCase() === safeMyName.toLowerCase());
             if (myIndex >= 10) {
-                let myData = ukeSortert[myIndex]; let tittel = getTittel(totalTellere[myData[0]]); let streak = userStreaks[myData[0]] || 0;
+                let myData = totalSortert[myIndex]; let tittel = getTittel(myData[1]); let streak = userStreaks[myData[0]] || 0;
                 let streakHtml = streak > 1 ? `<span style="color:var(--primary); font-size:12px; margin-left:5px;">🔥${streak}</span>` : '';
                 myRankHtml = `<div class="top-list-item my-rank-item"><div><span>${myIndex + 1}. ${myData[0]} (Deg)</span>${streakHtml} <span class="user-title">${tittel}</span></div><span>${myData[1]}</span></div>`;
             }
@@ -490,7 +493,6 @@
             let borderColor = style.color === '#ffcc00' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.15)';
             let flag = getFlag(nyesteData.land || 'no'); 
             
-            // Vasker tekstene
             let safeNavn = sanitize(nyesteData.navn);
             let safeUser = sanitize(nyesteData.user);
 
@@ -560,7 +562,6 @@
             let textColor = style.color === '#ffcc00' ? '#000' : '#fff';
             let borderColor = style.color === '#ffcc00' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.15)';
             
-            // Vasker tekstene for sikkerhets skyld!
             let safeNavn = sanitize(data.navn);
             let safeUser = sanitize(data.user);
 
@@ -607,10 +608,9 @@
         let d = document.getElementById('input-diesel').value.trim();
         let b = document.getElementById('input-bensin').value.trim();
         let b98 = document.getElementById('input-bensin98').value.trim();
-        // Vasker kallenavnet med en gang noen skriver det inn!
         let n = sanitize(document.getElementById('input-nickname').value.trim());
         const modalError = document.getElementById('modal-error');
-        const stasjonNavn = document.getElementById('modal-station-name').innerText; // Har allerede blitt vasket ved opprettelse
+        const stasjonNavn = document.getElementById('modal-station-name').innerText; 
 
         if (!d && !b && !b98) { modalError.innerText = "Du må fylle inn minst én pris!"; modalError.style.display = "block"; return; }
 
@@ -708,7 +708,6 @@
             const id = s.id; const p = skylagredePriser[id] || { diesel: "--", bensin: "--", bensin98: "--", timestamp: 0 };
             const dist = regnUtAvstand(lat, lon, s.lat, s.lon);
             
-            // Vi vasker stasjonsnavnet i tilfelle noen har lagt til en custom-stasjon med script!
             const navn = sanitize(s.tags.name || s.tags.brand || "Stasjon");
             const escapedName = navn.replace(/'/g, "\\'");
             const style = getBrandStyle(navn);
@@ -723,7 +722,6 @@
             
             const flag = getFlag(sisteLand);
 
-            // Vasker også navnet til brukeren som la inn
             let safeUser = sanitize(p.user);
             let timeAgoHtml = `<div class="time-ago">${formaterTid(p.timestamp, safeUser)}</div>`;
             if (index === 0 && safeUser && p.diesel !== "--") {
