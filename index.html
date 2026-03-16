@@ -534,9 +534,15 @@
         const globalContainer = document.getElementById('global-featured-container');
         if (nyesteData && nyesteTid > (Date.now() - (3 * 24 * 60 * 60 * 1000))) {
             let distStr = "";
-            if (sisteLat && sisteLon && nyesteData.lat && nyesteData.lon) {
-                let sLat = endredeGps[nyesteData.id]?.lat || nyesteData.lat;
-                let sLon = endredeGps[nyesteData.id]?.lon || nyesteData.lon;
+            let sLat = nyesteData.lat;
+            let sLon = nyesteData.lon;
+            
+            if (endredeGps[nyesteData.id]) {
+                sLat = endredeGps[nyesteData.id].lat;
+                sLon = endredeGps[nyesteData.id].lon;
+            }
+
+            if (sisteLat && sisteLon && sLat && sLon) {
                 const dist = regnUtAvstand(sisteLat, sisteLon, sLat, sLon);
                 distStr = `<span class="featured-dist">📍 ${dist.toFixed(1)} km</span>`;
             }
@@ -644,10 +650,12 @@
 
         let html = '<h3 style="font-size: 13px; text-transform: uppercase; color: var(--text-muted); margin-top: 25px; margin-bottom: 10px; text-align: center;">🇳🇴 Norges Ytterpunkter (Siste 24t)</h3>';
         
+        let billigsteId = billigsteData ? billigsteData.id : null;
+
         if (billigsteData) html += renderCard(billigsteData, 'DAGENS BILLIGSTE (Snitt D/95)', '🟢', 'rgba(76, 175, 80, 0.4)');
         else html += renderPlaceholder('DAGENS BILLIGSTE', '🟢', 'rgba(76, 175, 80, 0.4)');
 
-        if (dyresteData && (dyresteData.id !== billigsteData?.id || dyresteAvg !== billigsteAvg)) {
+        if (dyresteData && (dyresteData.id !== billigsteId || dyresteAvg !== billigsteAvg)) {
             html += renderCard(dyresteData, 'DAGENS DYRESTE (Snitt D/95)', '🔴', 'rgba(255, 68, 68, 0.4)');
         } else if (!dyresteData) {
             html += renderPlaceholder('DAGENS DYRESTE', '🔴', 'rgba(255, 68, 68, 0.4)');
@@ -816,8 +824,12 @@
                 if (validD) { sumDNat += d; countDNat++; }
                 if (validB) { sumBNat += b; countBNat++; }
 
-                let pLat = endredeGps[p.id]?.lat || p.lat;
-                let pLon = endredeGps[p.id]?.lon || p.lon;
+                let pLat = p.lat;
+                let pLon = p.lon;
+                if (endredeGps[p.id]) {
+                    pLat = endredeGps[p.id].lat;
+                    pLon = endredeGps[p.id].lon;
+                }
 
                 if (pLat && pLon && lat && lon) {
                     let dist = regnUtAvstand(lat, lon, pLat, pLon);
@@ -842,8 +854,12 @@
             const id = s.id;
             const p = skylagredePriser[id] || { diesel: "--", bensin: "--", bensin98: "--", fd: "--", timestamp: 0 };
             
-            let brukLat = endredeGps[id]?.lat || s.lat;
-            let brukLon = endredeGps[id]?.lon || s.lon;
+            let brukLat = s.lat;
+            let brukLon = s.lon;
+            if (endredeGps[id]) {
+                brukLat = endredeGps[id].lat;
+                brukLon = endredeGps[id].lon;
+            }
             const dist = regnUtAvstand(lat, lon, brukLat, brukLon);
             
             let bruktNavn = endredeNavn[id] || (s.tags && (s.tags.name || s.tags.brand)) || "Stasjon";
@@ -880,7 +896,7 @@
                 displayB = localAvgB;
                 displayB98 = "--";
                 displayFd = "--";
-                timeAgoHtml = `<div class="time-ago" style="opacity: 0.6; font-style: italic;">🤖 ${avgTypeStr}</div>`;
+                timeAgoHtml = `<div class="time-ago" style="opacity: 0.7;">🤖 ${avgTypeStr}</div>`;
             }
 
             return { s, id, p, dist, navn, escapedName, style, flag, displayD, displayB, displayB98, displayFd, trendD, trendB, trendB98, trendFd, timeAgoHtml, isAuto, verifiedHtml, brukLat, brukLon };
@@ -940,6 +956,30 @@
         setTimeout(sjekkScroll, 200);
     }
 
+    window.toggleTopList = function() { const c = document.getElementById('top-list-content'); c.style.display = c.style.display==='block'?'none':'block'; setTimeout(sjekkScroll, 200); };
+    window.lukkModal = function() { document.getElementById('update-modal').style.display='none'; document.getElementById('modal-error').style.display='none'; };
+    window.oppdaterRadiusText = function() { document.getElementById('radius-val').innerText = document.getElementById('radius').value; };
+    
+    window.apneModal = function(id, n, lat, lon) { 
+        valgtStasjonId = id; valgtStasjonLat = lat; valgtStasjonLon = lon;
+        document.getElementById('modal-station-name').innerText = n; 
+        document.getElementById('input-nickname').value = localStorage.getItem('drivstoff_navn') || ""; 
+        const p = skylagredePriser[id] || { diesel: "", bensin: "", bensin98: "", fd: "" };
+        
+        document.getElementById('input-diesel').value = p.diesel === "--" ? "" : (p.diesel || "");
+        document.getElementById('input-bensin').value = p.bensin === "--" ? "" : (p.bensin || "");
+        document.getElementById('input-bensin98').value = p.bensin98 === "--" ? "" : (p.bensin98 || "");
+        document.getElementById('input-fd').value = p.fd === "--" ? "" : (p.fd || "");
+        
+        if (p.bensin98 && p.bensin98 !== "--") { document.getElementById('div-bensin98').style.display = 'block'; document.getElementById('btn-show-98').style.display = 'none';
+        } else { document.getElementById('div-bensin98').style.display = 'none'; document.getElementById('btn-show-98').style.display = 'block'; }
+        
+        if (p.fd && p.fd !== "--") { document.getElementById('div-fd').style.display = 'block'; document.getElementById('btn-show-fd').style.display = 'none';
+        } else { document.getElementById('div-fd').style.display = 'none'; document.getElementById('btn-show-fd').style.display = 'block'; }
+
+        document.getElementById('update-modal').style.display = 'block'; 
+    };
+
     window.sokPaaSted = async function() { 
         const s = document.getElementById('stedsnavn').value; 
         if(!s) return;
@@ -950,28 +990,28 @@
             const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(s)}&countrycodes=no,se,dk&format=json&addressdetails=1&limit=1`); 
             const d = await res.json(); 
             if(d.length>0) { 
-                sisteLand = d[0].address?.country_code || 'no'; 
+                sisteLand = d[0].address && d[0].address.country_code ? d[0].address.country_code : 'no'; 
                 hentStasjoner(parseFloat(d[0].lat), parseFloat(d[0].lon)); 
             }
             else { document.getElementById('station-list').innerHTML = "<p style='text-align:center; color:var(--danger);'>Kunne ikke finne stedet.</p>"; }
         } catch (e) { document.getElementById('station-list').innerHTML = "<p style='text-align:center; color:var(--danger);'>Nettverksfeil.</p>"; }
     };
 
-    window.startGpsSok = () => {
+    window.startGpsSok = function() {
         document.getElementById('station-list').innerHTML = "<p class='loading-msg'>📍 Finner din posisjon...</p>";
         document.getElementById('featured-station-container').style.display = 'none'; document.getElementById('global-featured-container').style.display = 'none'; document.getElementById('add-station-container').style.display = 'none';
         document.getElementById('extremes-container').style.display = 'none'; 
         navigator.geolocation.getCurrentPosition(
-            async p => { 
+            async function(p) { 
                 sisteLat = p.coords.latitude; sisteLon = p.coords.longitude; 
                 try {
                     const revRes = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${sisteLat}&lon=${sisteLon}&format=json`);
                     const revData = await revRes.json();
-                    sisteLand = revData.address?.country_code || 'no';
+                    sisteLand = revData.address && revData.address.country_code ? revData.address.country_code : 'no';
                 } catch(e) { sisteLand = 'no'; }
                 hentStasjoner(sisteLat, sisteLon); 
             },
-            e => { document.getElementById('station-list').innerHTML = "<p style='text-align:center; color:var(--danger);'>GPS-feil.</p>"; }
+            function(e) { document.getElementById('station-list').innerHTML = "<p style='text-align:center; color:var(--danger);'>GPS-feil.</p>"; }
         );
     };
 
