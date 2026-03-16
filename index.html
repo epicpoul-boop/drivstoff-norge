@@ -19,6 +19,7 @@
             --diesel-color: #ff9800;
             --bensin-color: #4caf50;
             --bensin98-color: #2196f3;
+            --fd-color: #009688; /* NY: Farge for Farget Diesel (Teal) */
             --danger: #ff4444;
             --gold: #ffd700;
             --silver: #c0c0c0;
@@ -67,6 +68,7 @@
         button { width: 100%; padding: 15px; background-color: var(--primary); color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; }
         .gps-btn { background-color: #3f3f4e; margin-top: 10px; }
         .loading-msg { text-align: center; color: var(--primary); font-weight: bold; margin-top: 20px; font-size: 14px; }
+        .error-msg { text-align: center; color: var(--danger); font-weight: bold; margin-top: 20px; font-size: 14px; line-height: 1.5; }
 
         .station-card { background-color: var(--card-bg); border-radius: 10px; padding: 15px; margin-bottom: 15px; display: flex; flex-direction: column; border: 2px solid transparent; }
         .main-info { display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 10px; }
@@ -82,6 +84,7 @@
         .lbl-diesel { background-color: var(--diesel-color); }
         .lbl-bensin { background-color: var(--bensin-color); }
         .lbl-bensin98 { background-color: var(--bensin98-color); }
+        .lbl-fd { background-color: var(--fd-color); }
         .price-value { font-size: 16px; font-weight: bold; background-color: #3f3f4e; padding: 4px 8px; border-radius: 6px; min-width: 60px; text-align: right; display: flex; justify-content: flex-end; align-items: center; gap: 4px; }
         
         .trend-up { color: var(--danger); font-size: 14px; } 
@@ -99,7 +102,7 @@
         .history-item { display: flex; justify-content: space-between; border-bottom: 1px solid #333; padding: 4px 0; }
         .time-ago { font-size: 10px; color: #7a7a8c; margin-top: 10px; text-align: center; }
 
-        #add-station-container { display: none; text-align: center; margin-bottom: 30px; border-top: 1px solid #3f3f4e; padding-top: 20px; }
+        #add-station-container { display: none; text-align: center; margin-bottom: 30px; margin-top: 20px; border-top: 1px solid #3f3f4e; padding-top: 20px; }
         .btn-add-station { background-color: transparent; border: 1px dashed var(--primary); color: var(--primary); padding: 12px; border-radius: 8px; font-size: 14px; display: inline-block; cursor: pointer; width: 100%; }
 
         .footer { margin-top: 10px; text-align: center; padding: 20px; border-top: 1px solid #2b2b36; }
@@ -116,7 +119,17 @@
         #update-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); z-index: 1000; overflow-y: auto; }
         .modal-content { position: relative; margin: 40px auto; background-color: var(--card-bg); padding: 25px; border-radius: 15px; width: 90%; max-width: 350px; box-sizing: border-box; }
         #modal-error { color: var(--danger); font-size: 13px; margin-bottom: 12px; display: none; padding: 10px; background: rgba(255,0,0,0.1); border-radius: 8px; font-weight: bold; }
-        .btn-add-98 { background: transparent; border: 1px dashed #555; color: #a0a0a0; padding: 10px; font-size: 12px; margin-bottom: 12px; border-radius: 8px; width: 100%; }
+        
+        .btn-add-98 { background: transparent; border: 1px dashed #555; color: #a0a0a0; padding: 8px; font-size: 11px; border-radius: 8px; width: 100%; }
+        
+        /* Knapper for administrasjon av stasjon */
+        .admin-section { margin-top: 20px; border-top: 1px dashed #3f3f4e; padding-top: 15px; }
+        .admin-title { font-size: 10px; color: var(--text-muted); text-align: center; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 10px 0; }
+        .admin-row { display: flex; gap: 8px; justify-content: space-between; }
+        .admin-btn { flex: 1; background: transparent; border: 1px solid #555; color: #ccc; padding: 8px 4px; font-size: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; text-align: center; }
+        .admin-btn:hover { background: #3f3f4e; }
+        .danger-btn { border-color: rgba(255, 68, 68, 0.4); color: #ff4444; }
+        .danger-btn:hover { background: rgba(255, 68, 68, 0.1); }
     </style>
 </head>
 <body>
@@ -156,12 +169,12 @@
 
     <div id="station-list"></div>
 
-    <div id="extremes-container" style="display: none; margin-bottom: 30px;"></div>
-
     <div id="add-station-container">
         <p style="font-size: 13px; color: var(--text-muted); margin-top: 0;">Finner du ikke stasjonen du leter etter?</p>
         <button class="btn-add-station" onclick="apneLeggTilStasjonModal()">+ Legg til manglende stasjon</button>
     </div>
+
+    <div id="extremes-container" style="display: none; margin-bottom: 30px;"></div>
 
     <div class="footer">
         <button class="share-app-btn" onclick="delAppen()">📢 Hjelp dugnaden – Inviter en venn</button>
@@ -205,7 +218,7 @@
         <input type="text" id="new-station-name" placeholder="Navn på stasjon">
         <div style="display:flex; gap:10px; margin-top:15px">
             <button style="background-color:#555" onclick="lukkLeggTilStasjonModal()">Avbryt</button>
-            <button id="btn-save-station" onclick="lagre med GPS</button>
+            <button id="btn-save-station" onclick="lagreNyStasjon()">Lagre med GPS</button>
         </div>
     </div>
 </div>
@@ -227,7 +240,15 @@
             <input type="text" inputmode="decimal" id="input-bensin" oninput="this.value = this.value.replace(',', '.')">
         </div>
         
-        <button type="button" id="btn-show-98" class="btn-add-98" onclick="vis98Felt()">+ Legg til Bensin 98</button>
+        <div style="display:flex; gap: 10px; margin-bottom: 12px;">
+            <button type="button" class="btn-add-98" id="btn-show-fd" onclick="visFdFelt()">+ Farget Diesel</button>
+            <button type="button" class="btn-add-98" id="btn-show-98" onclick="vis98Felt()">+ Bensin 98</button>
+        </div>
+        
+        <div id="div-fd" style="display:none; margin-bottom:12px">
+            <label style="color: var(--fd-color); font-size:12px">Farget Diesel (Avg.fri)</label>
+            <input type="text" inputmode="decimal" id="input-fd" oninput="this.value = this.value.replace(',', '.')">
+        </div>
         
         <div id="div-bensin98" style="display:none; margin-bottom:12px">
             <label style="color: var(--bensin98-color); font-size:12px">Bensin 98</label>
@@ -236,7 +257,16 @@
 
         <div style="display:flex; gap:10px">
             <button style="background-color:#555" onclick="lukkModal()">Avbryt</button>
-            <button onclick="lagrePris()">Lagre</button>
+            <button onclick="lagrePris()">Lagre Priser</button>
+        </div>
+
+        <div class="admin-section">
+            <p class="admin-title">⚙️ Administrer stasjon</p>
+            <div class="admin-row">
+                <button class="admin-btn" onclick="endreStasjonsNavn()">✏️ Endre navn</button>
+                <button class="admin-btn" onclick="oppdaterStasjonsGps()">📍 Flytt GPS hit</button>
+                <button class="admin-btn danger-btn" onclick="slettStasjon()">🗑️ Slett stasjon</button>
+            </div>
         </div>
     </div>
 </div>
@@ -355,6 +385,11 @@
     let gjeldendeStasjoner = []; let sisteLat = null, sisteLon = null;
     let skylagredePriser = {}; let egneStasjoner = {}; 
     
+    // NYTT: Ordbøker for fellesskapets stasjonsendringer
+    let skjulteStasjoner = {};
+    let endredeNavn = {};
+    let endredeGps = {};
+    
     let sisteLand = 'no'; 
 
     onValue(ref(db, 'priser'), async (snapshot) => {
@@ -367,10 +402,10 @@
         setTimeout(sjekkScroll, 500); 
     });
 
-    onValue(ref(db, 'egne_stasjoner'), (snapshot) => {
-        egneStasjoner = snapshot.val() || {};
-        if (gjeldendeStasjoner.length > 0) hentStasjoner(sisteLat, sisteLon); 
-    });
+    onValue(ref(db, 'egne_stasjoner'), (snapshot) => { egneStasjoner = snapshot.val() || {}; if (gjeldendeStasjoner.length > 0) hentStasjoner(sisteLat, sisteLon); });
+    onValue(ref(db, 'skjulte_stasjoner'), (snapshot) => { skjulteStasjoner = snapshot.val() || {}; if (gjeldendeStasjoner.length > 0) visStasjoner(gjeldendeStasjoner, sisteLat, sisteLon); });
+    onValue(ref(db, 'stasjon_navn'), (snapshot) => { endredeNavn = snapshot.val() || {}; if (gjeldendeStasjoner.length > 0) visStasjoner(gjeldendeStasjoner, sisteLat, sisteLon); });
+    onValue(ref(db, 'stasjon_gps'), (snapshot) => { endredeGps = snapshot.val() || {}; if (gjeldendeStasjoner.length > 0) visStasjoner(gjeldendeStasjoner, sisteLat, sisteLon); });
 
     function getTrendHtml(curr, prev) {
         if(!curr || !prev || curr==="--" || prev==="--") return "";
@@ -472,6 +507,7 @@
         let nyesteTid = 0; let nyesteData = null;
 
         for (const id in skylagredePriser) {
+            if (skjulteStasjoner[id]) continue; // Hopper over slettede stasjoner
             const p = skylagredePriser[id];
             if (p.timestamp > nyesteTid && p.navn) { nyesteTid = p.timestamp; nyesteData = p; }
         }
@@ -480,19 +516,23 @@
         if (nyesteData && nyesteTid > (Date.now() - (3 * 24 * 60 * 60 * 1000))) {
             let distStr = "";
             if (sisteLat && sisteLon && nyesteData.lat && nyesteData.lon) {
-                const dist = regnUtAvstand(sisteLat, sisteLon, nyesteData.lat, nyesteData.lon);
+                let sLat = endredeGps[nyesteData.id]?.lat || nyesteData.lat;
+                let sLon = endredeGps[nyesteData.id]?.lon || nyesteData.lon;
+                const dist = regnUtAvstand(sisteLat, sisteLon, sLat, sLon);
                 distStr = `<span class="featured-dist">📍 ${dist.toFixed(1)} km</span>`;
             }
 
-            const style = getBrandStyle(nyesteData.navn);
+            let bruktNavn = endredeNavn[nyesteData.id] || nyesteData.navn;
+            const style = getBrandStyle(bruktNavn);
             let textColor = style.color === '#ffcc00' ? '#000' : '#fff';
             let borderColor = style.color === '#ffcc00' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.15)';
             let flag = getFlag(nyesteData.land || 'no'); 
             
-            let safeNavn = sanitize(nyesteData.navn);
+            let safeNavn = sanitize(bruktNavn);
             let safeUser = sanitize(nyesteData.user);
 
             let b98Html = (nyesteData.bensin98 && nyesteData.bensin98 !== "--") ? `<div class="f-price-box" style="border-color:${borderColor}"><span class="f-lbl">98</span><span class="f-val">${nyesteData.bensin98} ${getTrendHtml(nyesteData.bensin98, nyesteData.prev_bensin98)}</span></div>` : '';
+            let fdHtml = (nyesteData.fd && nyesteData.fd !== "--") ? `<div class="f-price-box" style="border-color:${borderColor}"><span class="f-lbl">FD</span><span class="f-val">${nyesteData.fd} ${getTrendHtml(nyesteData.fd, nyesteData.prev_fd)}</span></div>` : '';
 
             globalContainer.style.display = 'block';
             globalContainer.innerHTML = `
@@ -504,6 +544,7 @@
                         <div class="f-price-box" style="border-color:${borderColor}"><span class="f-lbl">D</span><span class="f-val">${nyesteData.diesel} ${getTrendHtml(nyesteData.diesel, nyesteData.prev_diesel)}</span></div>
                         <div class="f-price-box" style="border-color:${borderColor}"><span class="f-lbl">95</span><span class="f-val">${nyesteData.bensin} ${getTrendHtml(nyesteData.bensin, nyesteData.prev_bensin)}</span></div>
                         ${b98Html}
+                        ${fdHtml}
                     </div>
                     <div class="f-user">${formaterTid(nyesteData.timestamp, safeUser)}</div>
                 </div>
@@ -521,7 +562,9 @@
         let dyresteData = null;
 
         for (const id in skylagredePriser) {
+            if (skjulteStasjoner[id]) continue; // Hopper over slettede stasjoner
             const p = skylagredePriser[id];
+            
             if (p.timestamp > grense && p.navn) {
                 if (p.land && p.land !== 'no') continue;
 
@@ -533,11 +576,11 @@
                     
                     if (avg < billigsteAvg) {
                         billigsteAvg = avg;
-                        billigsteData = p;
+                        billigsteData = { ...p, id: id };
                     }
                     if (avg > dyresteAvg && avg <= 35) {
                         dyresteAvg = avg;
-                        dyresteData = p;
+                        dyresteData = { ...p, id: id };
                     }
                 }
             }
@@ -554,14 +597,16 @@
         `;
 
         const renderCard = (data, title, icon, borderColorBase) => {
-            const style = getBrandStyle(data.navn);
+            let bruktNavn = endredeNavn[data.id] || data.navn;
+            const style = getBrandStyle(bruktNavn);
             let textColor = style.color === '#ffcc00' ? '#000' : '#fff';
             let borderColor = style.color === '#ffcc00' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.15)';
             
-            let safeNavn = sanitize(data.navn);
+            let safeNavn = sanitize(bruktNavn);
             let safeUser = sanitize(data.user);
 
             let b98Html = (data.bensin98 && data.bensin98 !== "--") ? `<div class="f-price-box" style="border-color:${borderColor}"><span class="f-lbl">98</span><span class="f-val">${data.bensin98} ${getTrendHtml(data.bensin98, data.prev_bensin98)}</span></div>` : '';
+            let fdHtml = (data.fd && data.fd !== "--") ? `<div class="f-price-box" style="border-color:${borderColor}"><span class="f-lbl">FD</span><span class="f-val">${data.fd} ${getTrendHtml(data.fd, data.prev_fd)}</span></div>` : '';
 
             return `
             <div class="featured-card" style="background: ${style.bg}; color: ${textColor}; margin-bottom: 10px; border: 1px solid ${borderColorBase};">
@@ -572,6 +617,7 @@
                     <div class="f-price-box" style="border-color:${borderColor}"><span class="f-lbl">D</span><span class="f-val">${data.diesel} ${getTrendHtml(data.diesel, data.prev_diesel)}</span></div>
                     <div class="f-price-box" style="border-color:${borderColor}"><span class="f-lbl">95</span><span class="f-val">${data.bensin} ${getTrendHtml(data.bensin, data.prev_bensin)}</span></div>
                     ${b98Html}
+                    ${fdHtml}
                 </div>
                 <div class="f-user">${formaterTid(data.timestamp, safeUser)}</div>
             </div>`;
@@ -582,7 +628,7 @@
         if (billigsteData) html += renderCard(billigsteData, 'DAGENS BILLIGSTE (Snitt D/95)', '🟢', 'rgba(76, 175, 80, 0.4)');
         else html += renderPlaceholder('DAGENS BILLIGSTE', '🟢', 'rgba(76, 175, 80, 0.4)');
 
-        if (dyresteData && (dyresteData.navn !== billigsteData?.navn || dyresteAvg !== billigsteAvg)) {
+        if (dyresteData && (dyresteData.id !== billigsteData?.id || dyresteAvg !== billigsteAvg)) {
             html += renderCard(dyresteData, 'DAGENS DYRESTE (Snitt D/95)', '🔴', 'rgba(255, 68, 68, 0.4)');
         } else if (!dyresteData) {
             html += renderPlaceholder('DAGENS DYRESTE', '🔴', 'rgba(255, 68, 68, 0.4)');
@@ -592,6 +638,7 @@
     }
 
     window.vis98Felt = function() { document.getElementById('div-bensin98').style.display = 'block'; document.getElementById('btn-show-98').style.display = 'none'; }
+    window.visFdFelt = function() { document.getElementById('div-fd').style.display = 'block'; document.getElementById('btn-show-fd').style.display = 'none'; }
 
     function validerPris(pris) {
         if (!pris || pris === "--") return true; 
@@ -604,13 +651,14 @@
         let d = document.getElementById('input-diesel').value.trim();
         let b = document.getElementById('input-bensin').value.trim();
         let b98 = document.getElementById('input-bensin98').value.trim();
+        let fd = document.getElementById('input-fd').value.trim();
         let n = sanitize(document.getElementById('input-nickname').value.trim());
         const modalError = document.getElementById('modal-error');
         const stasjonNavn = document.getElementById('modal-station-name').innerText; 
 
-        if (!d && !b && !b98) { modalError.innerText = "Du må fylle inn minst én pris!"; modalError.style.display = "block"; return; }
+        if (!d && !b && !b98 && !fd) { modalError.innerText = "Du må fylle inn minst én pris!"; modalError.style.display = "block"; return; }
 
-        if (!validerPris(d) || !validerPris(b) || !validerPris(b98)) {
+        if (!validerPris(d) || !validerPris(b) || !validerPris(b98) || !validerPris(fd)) {
             modalError.innerHTML = "⚠️ <b>Urealistisk pris!</b><br>Prisen må være mellom 10.00 og 35.00 kr.";
             modalError.style.display = "block"; return;
         }
@@ -626,7 +674,7 @@
             const nameSnap = await get(nameRef);
             
             if (nameSnap.exists() && nameSnap.val() !== myUid) {
-                const bekreft = confirm(`Kallenavnet '${n}' er allerede i bruk av noen andre (eller din gamle profil).\n\nEr dette deg? Trykk OK for å hente tilbake profilen din.\nTrykk Avbryt for å velge et annet navn.`);
+                const bekreft = confirm(`Kallenavnet '${n}' er allerede i bruk av noen andre.\n\nEr dette deg? Trykk OK for å hente tilbake profilen din.\nTrykk Avbryt for å velge et annet navn.`);
                 if (!bekreft) return; 
                 myUid = nameSnap.val(); localStorage.setItem('drivstoff_uid', myUid);
             } else if (!nameSnap.exists()) { 
@@ -638,7 +686,7 @@
         const currentRef = ref(db, 'priser/' + valgtStasjonId);
         const oldData = skylagredePriser[valgtStasjonId] || {};
 
-        let prev_d = oldData.diesel || "--"; let prev_b = oldData.bensin || "--"; let prev_b98 = oldData.bensin98 || "--";
+        let prev_d = oldData.diesel || "--"; let prev_b = oldData.bensin || "--"; let prev_b98 = oldData.bensin98 || "--"; let prev_fd = oldData.fd || "--";
 
         if (!d) d = oldData.diesel || "--";
         else if (d !== oldData.diesel && oldData.diesel && oldData.diesel !== "--") prev_d = oldData.diesel;
@@ -652,19 +700,51 @@
         else if (b98 !== oldData.bensin98 && oldData.bensin98 && oldData.bensin98 !== "--") prev_b98 = oldData.bensin98;
         else prev_b98 = oldData.prev_bensin98 || "--";
 
+        if (!fd) fd = oldData.fd || "--";
+        else if (fd !== oldData.fd && oldData.fd && oldData.fd !== "--") prev_fd = oldData.fd;
+        else prev_fd = oldData.prev_fd || "--";
+
         let verified = false;
         if (oldData && oldData.uid !== myUid && oldData.diesel === d && oldData.bensin === b) {
             if (Date.now() - oldData.timestamp < 86400000) verified = true;
         }
 
         const newData = { 
-            diesel: d, prev_diesel: prev_d, bensin: b, prev_bensin: prev_b, bensin98: b98, prev_bensin98: prev_b98, 
-            timestamp: Date.now(), user: n, uid: myUid, verified: verified, navn: stasjonNavn, lat: valgtStasjonLat, lon: valgtStasjonLon,
-            land: sisteLand 
+            diesel: d, prev_diesel: prev_d, bensin: b, prev_bensin: prev_b, bensin98: b98, prev_bensin98: prev_b98, fd: fd, prev_fd: prev_fd,
+            timestamp: Date.now(), user: n, uid: myUid, verified: verified, navn: stasjonNavn, lat: valgtStasjonLat, lon: valgtStasjonLon, land: sisteLand 
         };
         
         await set(currentRef, newData); push(ref(db, 'historikk/' + valgtStasjonId), newData); push(ref(db, 'alle_oppdateringer'), newData); 
         lukkModal();
+    };
+
+    // ADMINGRENSESNITT FUNKSJONER
+    window.slettStasjon = async () => {
+        if (confirm("⚠️ ER DU SIKKER?\n\nVil du slette denne stasjonen fra kartet for alle brukere? Bruk dette kun dersom stasjonen er permanent nedlagt eller ikke finnes.")) {
+            await set(ref(db, 'skjulte_stasjoner/' + valgtStasjonId), true);
+            lukkModal();
+            alert("Stasjonen er fjernet. Den blir borte neste gang kartet lastes inn.");
+        }
+    };
+
+    window.endreStasjonsNavn = async () => {
+        let currentNavn = document.getElementById('modal-station-name').innerText;
+        let nyttNavn = prompt("Skriv inn nytt navn for stasjonen:", currentNavn);
+        if (nyttNavn && nyttNavn.trim() !== "") {
+            await set(ref(db, 'stasjon_navn/' + valgtStasjonId), sanitize(nyttNavn.trim()));
+            lukkModal();
+            alert("Stasjonsnavnet er endret for alle brukere! Det oppdateres neste gang kartet lastes inn.");
+        }
+    };
+
+    window.oppdaterStasjonsGps = () => {
+        if (confirm("Vil du oppdatere stasjonens plassering til din NÅVÆRENDE posisjon?\n\nSørg for at du står fysisk på stasjonen nå!")) {
+            navigator.geolocation.getCurrentPosition(async p => {
+                await set(ref(db, 'stasjon_gps/' + valgtStasjonId), { lat: p.coords.latitude, lon: p.coords.longitude });
+                lukkModal();
+                alert("GPS-posisjonen for stasjonen er flyttet til der du står!");
+            }, e => alert("Kunne ikke hente posisjonen din. Sjekk at GPS er på."));
+        }
     };
 
     window.visHistorikk = async function(id) {
@@ -674,7 +754,7 @@
         const snap = await get(ref(db, 'historikk/' + id)); const data = snap.val();
         if (!data) { p.innerText = "Ingen historikk."; return; }
         const h = Object.values(data).reverse().slice(1, 4);
-        p.innerHTML = h.length ? h.map(i => `<div class="history-item"><span>D: ${i.diesel} | 95: ${i.bensin} ${i.bensin98 && i.bensin98 !== '--' ? '| 98: '+i.bensin98 : ''}</span><span>${new Date(i.timestamp).toLocaleDateString()}</span></div>`).join('') : "Ingen tidligere data.";
+        p.innerHTML = h.length ? h.map(i => `<div class="history-item"><span>D: ${i.diesel} | 95: ${i.bensin} ${i.bensin98 && i.bensin98 !== '--' ? '| 98: '+i.bensin98 : ''} ${i.fd && i.fd !== '--' ? '| FD: '+i.fd : ''}</span><span>${new Date(i.timestamp).toLocaleDateString()}</span></div>`).join('') : "Ingen tidligere data.";
     }
 
     function getBrandStyle(name) {
@@ -688,93 +768,50 @@
         return { char: '⛽', color: '#4a4a5a', bg: 'linear-gradient(135deg, #4a4a5a 0%, #2b2b36 100%)' }; 
     }
 
-    // NYTT: Utregning av snitt på stasjoner innebakt HER!
     function visStasjoner(stasjoner, lat, lon) {
         const list = document.getElementById('station-list'); list.innerHTML = "";
         const featuredContainer = document.getElementById('featured-station-container');
         featuredContainer.innerHTML = ""; featuredContainer.style.display = 'none';
         document.getElementById('global-featured-container').style.display = 'none';
 
-        if (stasjoner.length === 0) { list.innerHTML = "<p style='text-align:center; color:var(--text-muted); margin-top:20px;'>Ingen stasjoner funnet i dette området.</p>"; return; }
+        // Fjerner stasjoner som fellesskapet har slettet (skjulteStasjoner)
+        let gyldigeStasjoner = stasjoner.filter(s => !skjulteStasjoner[s.id]);
 
-        let startOfDay = new Date(new Date().setHours(0,0,0,0)).getTime();
-        let startOfYesterday = startOfDay - 86400000;
-
-        let sumDNat = 0, countDNat = 0, sumBNat = 0, countBNat = 0;
-        let sumDLoc = 0, countDLoc = 0, sumBLoc = 0, countBLoc = 0;
-
-        Object.values(skylagredePriser).forEach(p => {
-            if (p.land && p.land !== 'no') return;
-            let d = parseFloat(p.diesel ? String(p.diesel).replace(',', '.') : NaN);
-            let b = parseFloat(p.bensin ? String(p.bensin).replace(',', '.') : NaN);
-
-            let validD = !isNaN(d) && d >= 10 && d <= 35;
-            let validB = !isNaN(b) && b >= 10 && b <= 35;
-
-            if (p.timestamp >= startOfYesterday) {
-                if (validD) { sumDNat += d; countDNat++; }
-                if (validB) { sumBNat += b; countBNat++; }
-
-                if (p.lat && p.lon && lat && lon) {
-                    let dist = regnUtAvstand(lat, lon, p.lat, p.lon);
-                    if (dist <= 100) {
-                        if (validD) { sumDLoc += d; countDLoc++; }
-                        if (validB) { sumBLoc += b; countBLoc++; }
-                    }
-                }
-            }
-        });
-
-        let avgD = countDLoc > 0 ? (sumDLoc/countDLoc) : (countDNat > 0 ? (sumDNat/countDNat) : NaN);
-        let avgB = countBLoc > 0 ? (sumBLoc/countBLoc) : (countBNat > 0 ? (sumBNat/countBNat) : NaN);
-        let avgTypeStr = countDLoc > 0 ? "Estimert lokalsnitt (10 mil)" : "Estimert Norgessnitt";
-
-        let localAvgD = !isNaN(avgD) ? avgD.toFixed(2).replace('.', ',') : "--";
-        let localAvgB = !isNaN(avgB) ? avgB.toFixed(2).replace('.', ',') : "--";
+        if (gyldigeStasjoner.length === 0) { list.innerHTML = "<p style='text-align:center; color:var(--text-muted); margin-top:20px;'>Ingen stasjoner funnet i dette området.</p>"; return; }
 
         let nyesteTid = 0; let nyesteStasjon = null; let nyesteData = null;
 
-        let processedStasjoner = stasjoner.map((s, index) => {
+        let processedStasjoner = gyldigeStasjoner.map((s, index) => {
             const id = s.id;
-            const p = skylagredePriser[id] || { diesel: "--", bensin: "--", bensin98: "--", timestamp: 0 };
-            const dist = regnUtAvstand(lat, lon, s.lat, s.lon);
-            const navn = sanitize(s.tags.name || s.tags.brand || "Stasjon");
+            const p = skylagredePriser[id] || { diesel: "--", bensin: "--", bensin98: "--", fd: "--", timestamp: 0 };
+            
+            // Bruker endret GPS hvis den finnes
+            let brukLat = endredeGps[id]?.lat || s.lat;
+            let brukLon = endredeGps[id]?.lon || s.lon;
+            const dist = regnUtAvstand(lat, lon, brukLat, brukLon);
+            
+            // Bruker endret navn hvis det finnes
+            let bruktNavn = endredeNavn[id] || (s.tags && (s.tags.name || s.tags.brand)) || "Stasjon";
+            const navn = sanitize(bruktNavn);
             const escapedName = navn.replace(/'/g, "\\'");
             const style = getBrandStyle(navn);
 
-            if (p.timestamp > nyesteTid) { nyesteTid = p.timestamp; nyesteStasjon = { id, navn, escapedName, dist, style }; nyesteData = p; }
+            if (p.timestamp > nyesteTid) { nyesteTid = p.timestamp; nyesteStasjon = { id, navn, escapedName, dist, style, lat: brukLat, lon: brukLon }; nyesteData = p; }
+            
+            const trendD = getTrendHtml(p.diesel, p.prev_diesel);
+            const trendB = getTrendHtml(p.bensin, p.prev_bensin);
+            const trendB98 = getTrendHtml(p.bensin98, p.prev_bensin98);
+            const trendFd = getTrendHtml(p.fd, p.prev_fd);
 
-            let displayD, displayB, displayB98;
-            let trendD = "", trendB = "", trendB98 = "";
-            let timeAgoHtml = "";
-            let isAuto = false;
-            let verifiedHtml = "";
+            const flag = getFlag(sisteLand);
 
-            if (p.timestamp >= startOfDay) {
-                displayD = p.diesel || "--";
-                displayB = p.bensin || "--";
-                displayB98 = p.bensin98 && p.bensin98 !== "--" ? p.bensin98 : "--";
-                trendD = getTrendHtml(p.diesel, p.prev_diesel);
-                trendB = getTrendHtml(p.bensin, p.prev_bensin);
-                trendB98 = getTrendHtml(p.bensin98, p.prev_bensin98);
-
-                let safeUser = sanitize(p.user);
-                timeAgoHtml = `<div class="time-ago">${formaterTid(p.timestamp, safeUser)}</div>`;
-                if (p.verified) verifiedHtml = '<span class="verify-badge">✅</span>';
-            } else {
-                isAuto = true;
-                displayD = localAvgD;
-                displayB = localAvgB;
-                displayB98 = "--";
-                timeAgoHtml = `<div class="time-ago" style="opacity: 0.6; font-style: italic;">🤖 ${avgTypeStr}</div>`;
-            }
-
-            return { s, id, p, dist, navn, escapedName, style, displayD, displayB, displayB98, trendD, trendB, trendB98, timeAgoHtml, isAuto, verifiedHtml };
+            return { s, id, p, dist, navn, escapedName, style, flag, trendD, trendB, trendB98, trendFd, brukLat, brukLon };
         });
 
+        // Sorterer etter dieselpris
         processedStasjoner.sort((a,b) => {
-            let valA = parseFloat(a.displayD !== "--" ? String(a.displayD).replace(',','.') : 999);
-            let valB = parseFloat(b.displayD !== "--" ? String(b.displayD).replace(',','.') : 999);
+            let valA = parseFloat(a.p.diesel !== "--" ? String(a.p.diesel).replace(',','.') : 999);
+            let valB = parseFloat(b.p.diesel !== "--" ? String(b.p.diesel).replace(',','.') : 999);
             if (valA === valB) { return a.dist - b.dist; }
             return valA - valB;
         });
@@ -782,25 +819,28 @@
         let foundLocalKupp = false;
 
         processedStasjoner.forEach((item, index) => {
-            let b98Html = (item.displayB98 !== "--") ? `<div class="price-row"><span class="price-label lbl-bensin98">BENSIN 98</span><div class="price-value">${item.displayB98} ${item.trendB98}</div></div>` : '';
-            const flag = getFlag(sisteLand);
-
-            if (!foundLocalKupp && !item.isAuto && item.displayD !== "--" && item.displayD !== "999") {
-                let safeUser = sanitize(item.p.user);
+            let b98Html = (item.p.bensin98 && item.p.bensin98 !== "--") ? `<div class="price-row"><span class="price-label lbl-bensin98">BENSIN 98</span><div class="price-value">${item.p.bensin98} ${item.trendB98}</div></div>` : '';
+            let fdHtml = (item.p.fd && item.p.fd !== "--") ? `<div class="price-row"><span class="price-label lbl-fd">FARGET DIESEL</span><div class="price-value">${item.p.fd} ${item.trendFd}</div></div>` : '';
+            
+            let safeUser = sanitize(item.p.user);
+            let timeAgoHtml = `<div class="time-ago">${formaterTid(item.p.timestamp, safeUser)}</div>`;
+            
+            if (index === 0 && safeUser && item.p.diesel !== "--") {
                 let rawTimeText = formaterTid(item.p.timestamp, safeUser).replace("Sist: ", "");
-                item.timeAgoHtml = `<div class="time-ago" style="color: var(--gold); font-weight: bold; font-size: 11px;">🏆 LOKALT KUPP! • Sist oppdatert ${rawTimeText}</div>`;
+                timeAgoHtml = `<div class="time-ago" style="color: var(--gold); font-weight: bold; font-size: 11px;">🏆 BILLIGSTE LOKALE! • Sist oppdatert ${rawTimeText}</div>`;
                 foundLocalKupp = true;
             }
 
             const card = document.createElement('div'); card.className = `station-card`;
-            card.innerHTML = `<div class="main-info"><div class="station-info"><div class="brand-icon" style="background-color: ${item.style.color}; color: ${item.style.text || '#fff'}">${item.style.char}</div><div class="station-details"><h3>${item.navn} ${flag}</h3><p>${item.dist.toFixed(1)} km unna</p></div></div><div class="prices-container"><div class="price-row"><span class="price-label lbl-diesel">DIESEL</span><div class="price-value">${item.displayD} ${item.trendD}</div> ${item.verifiedHtml}</div><div class="price-row"><span class="price-label lbl-bensin">BENSIN 95</span><div class="price-value">${item.displayB} ${item.trendB}</div> ${item.verifiedHtml}</div>${b98Html}</div></div><div class="action-buttons"><div class="update-btn" onclick="apneModal('${item.id}','${item.escapedName}', ${item.s.lat}, ${item.s.lon})">OPPDATER</div><a class="nav-btn" href="https://www.google.com/maps/dir/?api=1&destination=${item.s.lat},${item.s.lon}" target="_blank">KJØR HIT</a><div class="hist-btn" onclick="visHistorikk('${item.id}')">⌛ HISTORIKK</div></div><div id="hist-${item.id}" class="history-panel"></div>${item.timeAgoHtml}`;
+            card.innerHTML = `<div class="main-info"><div class="station-info"><div class="brand-icon" style="background-color: ${item.style.color}; color: ${item.style.text || '#fff'}">${item.style.char}</div><div class="station-details"><h3>${item.navn} ${item.flag}</h3><p>${item.dist.toFixed(1)} km unna</p></div></div><div class="prices-container"><div class="price-row"><span class="price-label lbl-diesel">DIESEL</span><div class="price-value">${item.p.diesel || "--"} ${item.trendD}</div> ${item.p.verified?'<span class="verify-badge">✅</span>':''}</div><div class="price-row"><span class="price-label lbl-bensin">BENSIN 95</span><div class="price-value">${item.p.bensin || "--"} ${item.trendB}</div> ${item.p.verified?'<span class="verify-badge">✅</span>':''}</div>${b98Html}${fdHtml}</div></div><div class="action-buttons"><div class="update-btn" onclick="apneModal('${item.id}','${item.escapedName}', ${item.brukLat}, ${item.brukLon})">OPPDATER</div><a class="nav-btn" href="https://www.google.com/maps/dir/?api=1&destination=${item.brukLat},${item.brukLon}" target="_blank">KJØR HIT</a><div class="hist-btn" onclick="visHistorikk('${item.id}')">⌛ HISTORIKK</div></div><div id="hist-${item.id}" class="history-panel"></div>${timeAgoHtml}`;
             list.appendChild(card);
         });
 
-        if (nyesteStasjon && nyesteTid > startOfDay) {
+        if (nyesteStasjon && nyesteTid > (Date.now() - (3 * 24 * 60 * 60 * 1000))) {
             let textColor = nyesteStasjon.style.color === '#ffcc00' ? '#000' : '#fff';
             let borderColor = nyesteStasjon.style.color === '#ffcc00' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.15)';
             let b98Html = (nyesteData.bensin98 && nyesteData.bensin98 !== "--") ? `<div class="f-price-box" style="border-color:${borderColor}"><span class="f-lbl">98</span><span class="f-val">${nyesteData.bensin98} ${getTrendHtml(nyesteData.bensin98, nyesteData.prev_bensin98)}</span></div>` : '';
+            let fdHtml = (nyesteData.fd && nyesteData.fd !== "--") ? `<div class="f-price-box" style="border-color:${borderColor}"><span class="f-lbl">FD</span><span class="f-val">${nyesteData.fd} ${getTrendHtml(nyesteData.fd, nyesteData.prev_fd)}</span></div>` : '';
             let flag = getFlag(sisteLand);
             let safeUser = sanitize(nyesteData.user);
 
@@ -814,6 +854,7 @@
                         <div class="f-price-box" style="border-color:${borderColor}"><span class="f-lbl">D</span><span class="f-val">${nyesteData.diesel} ${getTrendHtml(nyesteData.diesel, nyesteData.prev_diesel)}</span></div>
                         <div class="f-price-box" style="border-color:${borderColor}"><span class="f-lbl">95</span><span class="f-val">${nyesteData.bensin} ${getTrendHtml(nyesteData.bensin, nyesteData.prev_bensin)}</span></div>
                         ${b98Html}
+                        ${fdHtml}
                     </div>
                     <div class="f-user">${formaterTid(nyesteData.timestamp, safeUser)}</div>
                 </div>
@@ -832,13 +873,19 @@
         valgtStasjonId = id; valgtStasjonLat = lat; valgtStasjonLon = lon;
         document.getElementById('modal-station-name').innerText = n; 
         document.getElementById('input-nickname').value = localStorage.getItem('drivstoff_navn') || ""; 
-        const p = skylagredePriser[id] || { diesel: "", bensin: "", bensin98: "" };
-        document.getElementById('input-diesel').value = p.diesel === "--" ? "" : p.diesel;
-        document.getElementById('input-bensin').value = p.bensin === "--" ? "" : p.bensin;
-        document.getElementById('input-bensin98').value = p.bensin98 === "--" || !p.bensin98 ? "" : p.bensin98;
+        const p = skylagredePriser[id] || { diesel: "", bensin: "", bensin98: "", fd: "" };
+        
+        document.getElementById('input-diesel').value = p.diesel === "--" ? "" : (p.diesel || "");
+        document.getElementById('input-bensin').value = p.bensin === "--" ? "" : (p.bensin || "");
+        document.getElementById('input-bensin98').value = p.bensin98 === "--" ? "" : (p.bensin98 || "");
+        document.getElementById('input-fd').value = p.fd === "--" ? "" : (p.fd || "");
         
         if (p.bensin98 && p.bensin98 !== "--") { document.getElementById('div-bensin98').style.display = 'block'; document.getElementById('btn-show-98').style.display = 'none';
         } else { document.getElementById('div-bensin98').style.display = 'none'; document.getElementById('btn-show-98').style.display = 'block'; }
+        
+        if (p.fd && p.fd !== "--") { document.getElementById('div-fd').style.display = 'block'; document.getElementById('btn-show-fd').style.display = 'none';
+        } else { document.getElementById('div-fd').style.display = 'none'; document.getElementById('btn-show-fd').style.display = 'block'; }
+
         document.getElementById('update-modal').style.display = 'block'; 
     };
 
@@ -883,13 +930,15 @@
         try {
             const res = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(`[out:json];node["amenity"="fuel"](around:${r},${lat},${lon});out;`)}`); 
             const data = await res.json(); 
-            gjeldendeStasjoner = data.elements; 
+            gjeldendeStasjoner = data.elements || []; 
             
             for (const key in egneStasjoner) {
                 const cs = egneStasjoner[key];
-                const dist = regnUtAvstand(lat, lon, cs.lat, cs.lon);
-                if (dist <= r/1000) {
-                    gjeldendeStasjoner.push({ id: key, lat: cs.lat, lon: cs.lon, tags: { name: cs.navn, brand: cs.navn } });
+                if (cs.lat && cs.lon) {
+                    const dist = regnUtAvstand(lat, lon, cs.lat, cs.lon);
+                    if (dist <= r/1000) {
+                        gjeldendeStasjoner.push({ id: key, lat: cs.lat, lon: cs.lon, tags: { name: cs.navn, brand: cs.navn } });
+                    }
                 }
             }
             visStasjoner(gjeldendeStasjoner, lat, lon);
