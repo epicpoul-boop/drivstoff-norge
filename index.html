@@ -385,9 +385,38 @@
     let skylagredePriser = {}; let egneStasjoner = {}; 
     let skjulteStasjoner = {}; let endredeNavn = {}; let endredeGps = {};
     let sisteLand = 'no'; 
+    let globalAvgD = "--";
+    let globalAvgB = "--";
 
     onValue(ref(db, 'priser'), async (snapshot) => {
         skylagredePriser = snapshot.val() || {};
+        
+        let startOfDay = new Date(new Date().setHours(0,0,0,0)).getTime();
+        let startOfYesterday = startOfDay - 86400000;
+        
+        let sumDToday = 0, countDToday = 0; let sumBToday = 0, countBToday = 0;
+        let sumDYes = 0, countDYes = 0; let sumBYes = 0, countBYes = 0;
+
+        Object.values(skylagredePriser).forEach(p => {
+            if (p.land && p.land !== 'no') return; 
+            let d = parseFloat(p.diesel ? String(p.diesel).replace(',', '.') : NaN);
+            let b = parseFloat(p.bensin ? String(p.bensin).replace(',', '.') : NaN);
+
+            if (p.timestamp >= startOfDay) {
+                if (!isNaN(d) && d >= 10 && d <= 35) { sumDToday += d; countDToday++; }
+                if (!isNaN(b) && b >= 10 && b <= 35) { sumBToday += b; countBToday++; }
+            } else if (p.timestamp >= startOfYesterday) {
+                if (!isNaN(d) && d >= 10 && d <= 35) { sumDYes += d; countDYes++; }
+                if (!isNaN(b) && b >= 10 && b <= 35) { sumBYes += b; countBYes++; }
+            }
+        });
+
+        let avgDNum = countDToday > 0 ? (sumDToday/countDToday) : (countDYes > 0 ? (sumDYes/countDYes) : NaN);
+        let avgBNum = countBToday > 0 ? (sumBToday/countBToday) : (countBYes > 0 ? (sumBYes/countBYes) : NaN);
+
+        globalAvgD = !isNaN(avgDNum) ? avgDNum.toFixed(2).replace('.', ',') : "--";
+        globalAvgB = !isNaN(avgBNum) ? avgBNum.toFixed(2).replace('.', ',') : "--";
+
         const histSnap = await get(ref(db, 'alle_oppdateringer'));
         beregnTopplister(histSnap.val() || {});
         visGlobalSisteOppdatering();
@@ -757,7 +786,6 @@
         return { char: '⛽', color: '#4a4a5a', bg: 'linear-gradient(135deg, #4a4a5a 0%, #2b2b36 100%)' }; 
     }
 
-    // OPPDATERT: Lokalsnittet er flettet sammen med de nye admin-funksjonene!
     function visStasjoner(stasjoner, lat, lon) {
         const list = document.getElementById('station-list'); list.innerHTML = "";
         const featuredContainer = document.getElementById('featured-station-container');
