@@ -67,8 +67,6 @@
         button { width: 100%; padding: 15px; background-color: var(--primary); color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; }
         .gps-btn { background-color: #3f3f4e; margin-top: 10px; }
         .loading-msg { text-align: center; color: var(--primary); font-weight: bold; margin-top: 20px; font-size: 14px; }
-        
-        /* Ekstra feilmelding-stil */
         .error-msg { text-align: center; color: var(--danger); font-weight: bold; margin-top: 20px; font-size: 14px; line-height: 1.5; }
 
         .station-card { background-color: var(--card-bg); border-radius: 10px; padding: 15px; margin-bottom: 15px; display: flex; flex-direction: column; border: 2px solid transparent; }
@@ -358,10 +356,38 @@
     let gjeldendeStasjoner = []; let sisteLat = null, sisteLon = null;
     let skylagredePriser = {}; let egneStasjoner = {}; 
     let sisteLand = 'no'; 
+    let globalAvgD = "--";
+    let globalAvgB = "--";
 
     onValue(ref(db, 'priser'), async (snapshot) => {
         skylagredePriser = snapshot.val() || {};
         
+        let startOfDay = new Date(new Date().setHours(0,0,0,0)).getTime();
+        let startOfYesterday = startOfDay - 86400000;
+        
+        let sumDToday = 0, countDToday = 0; let sumBToday = 0, countBToday = 0;
+        let sumDYes = 0, countDYes = 0; let sumBYes = 0, countBYes = 0;
+
+        Object.values(skylagredePriser).forEach(p => {
+            if (p.land && p.land !== 'no') return; 
+            let d = parseFloat(p.diesel ? String(p.diesel).replace(',', '.') : NaN);
+            let b = parseFloat(p.bensin ? String(p.bensin).replace(',', '.') : NaN);
+
+            if (p.timestamp >= startOfDay) {
+                if (!isNaN(d) && d >= 10 && d <= 35) { sumDToday += d; countDToday++; }
+                if (!isNaN(b) && b >= 10 && b <= 35) { sumBToday += b; countBToday++; }
+            } else if (p.timestamp >= startOfYesterday) {
+                if (!isNaN(d) && d >= 10 && d <= 35) { sumDYes += d; countDYes++; }
+                if (!isNaN(b) && b >= 10 && b <= 35) { sumBYes += b; countBYes++; }
+            }
+        });
+
+        let avgDNum = countDToday > 0 ? (sumDToday/countDToday) : (countDYes > 0 ? (sumDYes/countDYes) : NaN);
+        let avgBNum = countBToday > 0 ? (sumBToday/countBToday) : (countBYes > 0 ? (sumBYes/countBYes) : NaN);
+
+        globalAvgD = !isNaN(avgDNum) ? avgDNum.toFixed(2).replace('.', ',') : "--";
+        globalAvgB = !isNaN(avgBNum) ? avgBNum.toFixed(2).replace('.', ',') : "--";
+
         const histSnap = await get(ref(db, 'alle_oppdateringer'));
         beregnTopplister(histSnap.val() || {});
         visGlobalSisteOppdatering();
@@ -687,7 +713,6 @@
         return { char: '⛽', color: '#4a4a5a', bg: 'linear-gradient(135deg, #4a4a5a 0%, #2b2b36 100%)' }; 
     }
 
-    // NYTT: Regner ut lokalsnitt og viser det på tomme stasjoner
     function visStasjoner(stasjoner, lat, lon) {
         const list = document.getElementById('station-list'); list.innerHTML = "";
         const featuredContainer = document.getElementById('featured-station-container');
@@ -710,12 +735,10 @@
             let validD = !isNaN(d) && d >= 10 && d <= 35;
             let validB = !isNaN(b) && b >= 10 && b <= 35;
 
-            // Ser på prisene fra i går og i dag
             if (p.timestamp >= startOfYesterday) {
                 if (validD) { sumDNat += d; countDNat++; }
                 if (validB) { sumBNat += b; countBNat++; }
 
-                // Er stasjonen innenfor 10 mil av søket?
                 if (p.lat && p.lon && lat && lon) {
                     let dist = regnUtAvstand(lat, lon, p.lat, p.lon);
                     if (dist <= 100) { 
@@ -726,7 +749,6 @@
             }
         });
 
-        // Velger lokalsnitt hvis det finnes, ellers Norgessnitt
         let avgD = countDLoc > 0 ? (sumDLoc/countDLoc) : (countDNat > 0 ? (sumDNat/countDNat) : NaN);
         let avgB = countBLoc > 0 ? (sumBLoc/countBLoc) : (countBNat > 0 ? (sumBNat/countBNat) : NaN);
         let avgTypeStr = countDLoc > 0 ? "Estimert lokalsnitt (10 mil)" : "Estimert Norgessnitt";
@@ -736,7 +758,6 @@
 
         let nyesteTid = 0; let nyesteStasjon = null; let nyesteData = null;
 
-        // Bytter ut prisen på de stasjonene som er utdaterte
         let processedStasjoner = stasjoner.map(s => {
             const id = s.id;
             const p = skylagredePriser[id] || { diesel: "--", bensin: "--", bensin98: "--", timestamp: 0 };
@@ -755,7 +776,6 @@
             let verifiedHtml = "";
 
             if (p.timestamp >= startOfDay) {
-                // Manuelt oppdatert i dag
                 displayD = p.diesel || "--";
                 displayB = p.bensin || "--";
                 displayB98 = p.bensin98 && p.bensin98 !== "--" ? p.bensin98 : "--";
@@ -767,22 +787,20 @@
                 timeAgoHtml = `<div class="time-ago">${formaterTid(p.timestamp, safeUser)}</div>`;
                 if (p.verified) verifiedHtml = '<span class="verify-badge">✅</span>';
             } else {
-                // Gammel stasjon, får estimert snitt
                 isAuto = true;
                 displayD = localAvgD;
                 displayB = localAvgB;
-                displayB98 = "--"; // Viser ikke B98 for estimater
+                displayB98 = "--";
                 timeAgoHtml = `<div class="time-ago" style="opacity: 0.6; font-style: italic;">🤖 ${avgTypeStr}</div>`;
             }
 
             return { s, id, p, dist, navn, escapedName, style, flag, displayD, displayB, displayB98, trendD, trendB, trendB98, timeAgoHtml, isAuto, verifiedHtml };
         });
 
-        // Sorterer listen: Billigste øverst (eller estimert snitt)
         processedStasjoner.sort((a,b) => {
             let valA = parseFloat(a.displayD !== "--" ? a.displayD.replace(',','.') : 999);
             let valB = parseFloat(b.displayD !== "--" ? b.displayD.replace(',','.') : 999);
-            if (valA === valB) { return a.dist - b.dist; } // Hvis samme pris, vis den nærmeste
+            if (valA === valB) { return a.dist - b.dist; }
             return valA - valB;
         });
 
@@ -791,7 +809,6 @@
         processedStasjoner.forEach((item, index) => {
             let b98Html = (item.displayB98 !== "--") ? `<div class="price-row"><span class="price-label lbl-bensin98">BENSIN 98</span><div class="price-value">${item.displayB98} ${item.trendB98}</div></div>` : '';
             
-            // Lokalt kupp tildeles kun hvis stasjonen faktisk er oppdatert manuelt!
             if (!foundLocalKupp && !item.isAuto && item.displayD !== "--" && item.displayD !== "999") {
                 let safeUser = sanitize(item.p.user);
                 let rawTimeText = formaterTid(item.p.timestamp, safeUser).replace("Sist: ", "");
@@ -804,7 +821,6 @@
             list.appendChild(card);
         });
 
-        // Featured Card for DITT SØK (Viser aldri roboter her)
         if (nyesteStasjon && nyesteTid > startOfDay) {
             let textColor = nyesteStasjon.style.color === '#ffcc00' ? '#000' : '#fff';
             let borderColor = nyesteStasjon.style.color === '#ffcc00' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.15)';
@@ -891,12 +907,24 @@
         );
     };
 
+    // OPPDATERT: Dobbelt opp med servere for å forhindre "Kartfeil"!
     async function hentStasjoner(lat, lon) { 
         sisteLat=lat; sisteLon=lon; const r=document.getElementById('radius').value*1000; 
         document.getElementById('station-list').innerHTML = "<p class='loading-msg'>📡 Henter data (" + r/1000 + " km)...</p>";
+        
+        const query = encodeURIComponent(`[out:json];node["amenity"="fuel"](around:${r},${lat},${lon});out;`);
+        const url1 = `https://overpass-api.de/api/interpreter?data=${query}`;
+        // Fallback-server i Frankrike hvis hovedserveren er overbelastet!
+        const url2 = `https://overpass.openstreetmap.fr/api/interpreter?data=${query}`;
+
         try {
-            const res = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(`[out:json];node["amenity"="fuel"](around:${r},${lat},${lon});out;`)}`); 
+            let res = await fetch(url1);
+            if (!res.ok) {
+                console.log("Tysk hovedserver er overbelastet, bytter til fransk backup-server...");
+                res = await fetch(url2);
+            }
             if (!res.ok) throw new Error("Overpass API overbelastet");
+            
             const data = await res.json(); 
             gjeldendeStasjoner = data.elements || []; 
             
@@ -913,11 +941,7 @@
             visDagensEkstremer(); 
         } catch (e) { 
             console.error("Kartfeil:", e);
-            if (e.message.includes("Overpass")) {
-                document.getElementById('station-list').innerHTML = "<p class='error-msg'>Kart-serveren er midlertidig overbelastet<br>(for mange søk på rad).<br><br>Vent litt og prøv igjen! ⏱️</p>";
-            } else {
-                document.getElementById('station-list').innerHTML = "<p class='error-msg'>En feil oppstod ved lesing av kartdata. Prøv igjen.</p>"; 
-            }
+            document.getElementById('station-list').innerHTML = "<p class='error-msg'>Både hoved- og backup-serveren for kart er midlertidig overbelastet.<br><br>Vent et par minutter og prøv igjen! ⏱️</p>";
         }
     }
 
