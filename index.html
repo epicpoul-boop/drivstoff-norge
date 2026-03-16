@@ -205,7 +205,7 @@
         <input type="text" id="new-station-name" placeholder="Navn på stasjon">
         <div style="display:flex; gap:10px; margin-top:15px">
             <button style="background-color:#555" onclick="lukkLeggTilStasjonModal()">Avbryt</button>
-            <button id="btn-save-station" onclick="lagreNyStasjon()">Lagre med GPS</button>
+            <button id="btn-save-station" onclick="lagre med GPS</button>
         </div>
     </div>
 </div>
@@ -374,8 +374,8 @@
 
     function getTrendHtml(curr, prev) {
         if(!curr || !prev || curr==="--" || prev==="--") return "";
-        let c = parseFloat(curr.replace(',', '.'));
-        let p = parseFloat(prev.replace(',', '.'));
+        let c = parseFloat(String(curr).replace(',', '.'));
+        let p = parseFloat(String(prev).replace(',', '.'));
         if(c > p) return '<span class="trend-up">↑</span>'; 
         if(c < p) return '<span class="trend-down">↓</span>'; 
         return "";
@@ -401,7 +401,6 @@
         return "Fersking 🐣";
     }
 
-    // OPPDATERT: Bruker totale poeng for Topp 10-listen!
     function beregnTopplister(alleData) {
         const dagTellere = {}; const ukeTellere = {}; const totalTellere = {};
         const userDays = {}; 
@@ -442,8 +441,6 @@
 
         const dagSortert = Object.entries(dagTellere).sort((a,b) => b[1]-a[1]);
         const ukeSortert = Object.entries(ukeTellere).sort((a,b) => b[1]-a[1]);
-        
-        // NYTT: Sorterer Topp 10 basert på TOTALE poeng, ikke ukespoeng!
         const totalSortert = Object.entries(totalTellere).sort((a,b) => b[1]-a[1]);
         
         const formatName = (user) => { let streak = userStreaks[user] || 0; return streak > 1 ? `${user} 🔥${streak}` : user; };
@@ -451,7 +448,6 @@
         document.getElementById('best-day').innerText = dagSortert.length ? `${formatName(dagSortert[0][0])} (${dagSortert[0][1]})` : "Ingen enda i dag";
         document.getElementById('best-week').innerText = ukeSortert.length ? `${formatName(ukeSortert[0][0])} (${ukeSortert[0][1]})` : "Ingen enda denne uken";
 
-        // Viser Topp 10 basert på historiske poeng
         let top10Html = totalSortert.slice(0, 10).map((u, i) => {
             let tittel = getTittel(u[1]); let streak = userStreaks[u[0]] || 0;
             let streakHtml = streak > 1 ? `<span style="color:var(--primary); font-size:12px; margin-left:5px;">🔥${streak}</span>` : '';
@@ -529,8 +525,8 @@
             if (p.timestamp > grense && p.navn) {
                 if (p.land && p.land !== 'no') continue;
 
-                let d = parseFloat(p.diesel ? p.diesel.replace(',', '.') : NaN);
-                let b = parseFloat(p.bensin ? p.bensin.replace(',', '.') : NaN);
+                let d = parseFloat(p.diesel ? String(p.diesel).replace(',', '.') : NaN);
+                let b = parseFloat(p.bensin ? String(p.bensin).replace(',', '.') : NaN);
 
                 if (!isNaN(d) && !isNaN(b) && d >= 10 && b >= 10) {
                     let avg = (d + b) / 2;
@@ -599,7 +595,7 @@
 
     function validerPris(pris) {
         if (!pris || pris === "--") return true; 
-        let val = parseFloat(pris.replace(',', '.'));
+        let val = parseFloat(String(pris).replace(',', '.'));
         if (isNaN(val)) return false;
         return (val >= 10 && val <= 35); 
     }
@@ -692,54 +688,120 @@
         return { char: '⛽', color: '#4a4a5a', bg: 'linear-gradient(135deg, #4a4a5a 0%, #2b2b36 100%)' }; 
     }
 
+    // NYTT: Utregning av snitt på stasjoner innebakt HER!
     function visStasjoner(stasjoner, lat, lon) {
         const list = document.getElementById('station-list'); list.innerHTML = "";
         const featuredContainer = document.getElementById('featured-station-container');
         featuredContainer.innerHTML = ""; featuredContainer.style.display = 'none';
         document.getElementById('global-featured-container').style.display = 'none';
 
-        const sorted = [...stasjoner].sort((a,b) => (parseFloat(skylagredePriser[a.id]?.diesel)||99) - (parseFloat(skylagredePriser[b.id]?.diesel)||99));
-        
-        if (sorted.length === 0) { list.innerHTML = "<p style='text-align:center; color:var(--text-muted); margin-top:20px;'>Ingen stasjoner funnet i dette området.</p>"; }
+        if (stasjoner.length === 0) { list.innerHTML = "<p style='text-align:center; color:var(--text-muted); margin-top:20px;'>Ingen stasjoner funnet i dette området.</p>"; return; }
+
+        let startOfDay = new Date(new Date().setHours(0,0,0,0)).getTime();
+        let startOfYesterday = startOfDay - 86400000;
+
+        let sumDNat = 0, countDNat = 0, sumBNat = 0, countBNat = 0;
+        let sumDLoc = 0, countDLoc = 0, sumBLoc = 0, countBLoc = 0;
+
+        Object.values(skylagredePriser).forEach(p => {
+            if (p.land && p.land !== 'no') return;
+            let d = parseFloat(p.diesel ? String(p.diesel).replace(',', '.') : NaN);
+            let b = parseFloat(p.bensin ? String(p.bensin).replace(',', '.') : NaN);
+
+            let validD = !isNaN(d) && d >= 10 && d <= 35;
+            let validB = !isNaN(b) && b >= 10 && b <= 35;
+
+            if (p.timestamp >= startOfYesterday) {
+                if (validD) { sumDNat += d; countDNat++; }
+                if (validB) { sumBNat += b; countBNat++; }
+
+                if (p.lat && p.lon && lat && lon) {
+                    let dist = regnUtAvstand(lat, lon, p.lat, p.lon);
+                    if (dist <= 100) {
+                        if (validD) { sumDLoc += d; countDLoc++; }
+                        if (validB) { sumBLoc += b; countBLoc++; }
+                    }
+                }
+            }
+        });
+
+        let avgD = countDLoc > 0 ? (sumDLoc/countDLoc) : (countDNat > 0 ? (sumDNat/countDNat) : NaN);
+        let avgB = countBLoc > 0 ? (sumBLoc/countBLoc) : (countBNat > 0 ? (sumBNat/countBNat) : NaN);
+        let avgTypeStr = countDLoc > 0 ? "Estimert lokalsnitt (10 mil)" : "Estimert Norgessnitt";
+
+        let localAvgD = !isNaN(avgD) ? avgD.toFixed(2).replace('.', ',') : "--";
+        let localAvgB = !isNaN(avgB) ? avgB.toFixed(2).replace('.', ',') : "--";
 
         let nyesteTid = 0; let nyesteStasjon = null; let nyesteData = null;
 
-        sorted.forEach((s, index) => {
-            const id = s.id; const p = skylagredePriser[id] || { diesel: "--", bensin: "--", bensin98: "--", timestamp: 0 };
+        let processedStasjoner = stasjoner.map((s, index) => {
+            const id = s.id;
+            const p = skylagredePriser[id] || { diesel: "--", bensin: "--", bensin98: "--", timestamp: 0 };
             const dist = regnUtAvstand(lat, lon, s.lat, s.lon);
-            
             const navn = sanitize(s.tags.name || s.tags.brand || "Stasjon");
             const escapedName = navn.replace(/'/g, "\\'");
             const style = getBrandStyle(navn);
 
             if (p.timestamp > nyesteTid) { nyesteTid = p.timestamp; nyesteStasjon = { id, navn, escapedName, dist, style }; nyesteData = p; }
-            
-            const trendD = getTrendHtml(p.diesel, p.prev_diesel);
-            const trendB = getTrendHtml(p.bensin, p.prev_bensin);
-            const trendB98 = getTrendHtml(p.bensin98, p.prev_bensin98);
 
-            let b98Html = (p.bensin98 && p.bensin98 !== "--") ? `<div class="price-row"><span class="price-label lbl-bensin98">BENSIN 98</span><div class="price-value">${p.bensin98} ${trendB98}</div></div>` : '';
-            
+            let displayD, displayB, displayB98;
+            let trendD = "", trendB = "", trendB98 = "";
+            let timeAgoHtml = "";
+            let isAuto = false;
+            let verifiedHtml = "";
+
+            if (p.timestamp >= startOfDay) {
+                displayD = p.diesel || "--";
+                displayB = p.bensin || "--";
+                displayB98 = p.bensin98 && p.bensin98 !== "--" ? p.bensin98 : "--";
+                trendD = getTrendHtml(p.diesel, p.prev_diesel);
+                trendB = getTrendHtml(p.bensin, p.prev_bensin);
+                trendB98 = getTrendHtml(p.bensin98, p.prev_bensin98);
+
+                let safeUser = sanitize(p.user);
+                timeAgoHtml = `<div class="time-ago">${formaterTid(p.timestamp, safeUser)}</div>`;
+                if (p.verified) verifiedHtml = '<span class="verify-badge">✅</span>';
+            } else {
+                isAuto = true;
+                displayD = localAvgD;
+                displayB = localAvgB;
+                displayB98 = "--";
+                timeAgoHtml = `<div class="time-ago" style="opacity: 0.6; font-style: italic;">🤖 ${avgTypeStr}</div>`;
+            }
+
+            return { s, id, p, dist, navn, escapedName, style, displayD, displayB, displayB98, trendD, trendB, trendB98, timeAgoHtml, isAuto, verifiedHtml };
+        });
+
+        processedStasjoner.sort((a,b) => {
+            let valA = parseFloat(a.displayD !== "--" ? String(a.displayD).replace(',','.') : 999);
+            let valB = parseFloat(b.displayD !== "--" ? String(b.displayD).replace(',','.') : 999);
+            if (valA === valB) { return a.dist - b.dist; }
+            return valA - valB;
+        });
+
+        let foundLocalKupp = false;
+
+        processedStasjoner.forEach((item, index) => {
+            let b98Html = (item.displayB98 !== "--") ? `<div class="price-row"><span class="price-label lbl-bensin98">BENSIN 98</span><div class="price-value">${item.displayB98} ${item.trendB98}</div></div>` : '';
             const flag = getFlag(sisteLand);
 
-            let safeUser = sanitize(p.user);
-            let timeAgoHtml = `<div class="time-ago">${formaterTid(p.timestamp, safeUser)}</div>`;
-            if (index === 0 && safeUser && p.diesel !== "--") {
-                let rawTimeText = formaterTid(p.timestamp, safeUser).replace("Sist: ", "");
-                timeAgoHtml = `<div class="time-ago" style="color: var(--gold); font-weight: bold; font-size: 11px;">🏆 LOKALT KUPP! • Sist oppdatert ${rawTimeText}</div>`;
+            if (!foundLocalKupp && !item.isAuto && item.displayD !== "--" && item.displayD !== "999") {
+                let safeUser = sanitize(item.p.user);
+                let rawTimeText = formaterTid(item.p.timestamp, safeUser).replace("Sist: ", "");
+                item.timeAgoHtml = `<div class="time-ago" style="color: var(--gold); font-weight: bold; font-size: 11px;">🏆 LOKALT KUPP! • Sist oppdatert ${rawTimeText}</div>`;
+                foundLocalKupp = true;
             }
 
             const card = document.createElement('div'); card.className = `station-card`;
-            card.innerHTML = `<div class="main-info"><div class="station-info"><div class="brand-icon" style="background-color: ${style.color}; color: ${style.text || '#fff'}">${style.char}</div><div class="station-details"><h3>${navn} ${flag}</h3><p>${dist.toFixed(1)} km unna</p></div></div><div class="prices-container"><div class="price-row"><span class="price-label lbl-diesel">DIESEL</span><div class="price-value">${p.diesel} ${trendD}</div> ${p.verified?'<span class="verify-badge">✅</span>':''}</div><div class="price-row"><span class="price-label lbl-bensin">BENSIN 95</span><div class="price-value">${p.bensin} ${trendB}</div> ${p.verified?'<span class="verify-badge">✅</span>':''}</div>${b98Html}</div></div><div class="action-buttons"><div class="update-btn" onclick="apneModal('${id}','${escapedName}', ${s.lat}, ${s.lon})">OPPDATER</div><a class="nav-btn" href="https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lon}" target="_blank">KJØR HIT</a><div class="hist-btn" onclick="visHistorikk('${id}')">⌛ HISTORIKK</div></div><div id="hist-${id}" class="history-panel"></div>${timeAgoHtml}`;
+            card.innerHTML = `<div class="main-info"><div class="station-info"><div class="brand-icon" style="background-color: ${item.style.color}; color: ${item.style.text || '#fff'}">${item.style.char}</div><div class="station-details"><h3>${item.navn} ${flag}</h3><p>${item.dist.toFixed(1)} km unna</p></div></div><div class="prices-container"><div class="price-row"><span class="price-label lbl-diesel">DIESEL</span><div class="price-value">${item.displayD} ${item.trendD}</div> ${item.verifiedHtml}</div><div class="price-row"><span class="price-label lbl-bensin">BENSIN 95</span><div class="price-value">${item.displayB} ${item.trendB}</div> ${item.verifiedHtml}</div>${b98Html}</div></div><div class="action-buttons"><div class="update-btn" onclick="apneModal('${item.id}','${item.escapedName}', ${item.s.lat}, ${item.s.lon})">OPPDATER</div><a class="nav-btn" href="https://www.google.com/maps/dir/?api=1&destination=${item.s.lat},${item.s.lon}" target="_blank">KJØR HIT</a><div class="hist-btn" onclick="visHistorikk('${item.id}')">⌛ HISTORIKK</div></div><div id="hist-${item.id}" class="history-panel"></div>${item.timeAgoHtml}`;
             list.appendChild(card);
         });
 
-        if (nyesteStasjon && nyesteTid > (Date.now() - (3 * 24 * 60 * 60 * 1000))) {
+        if (nyesteStasjon && nyesteTid > startOfDay) {
             let textColor = nyesteStasjon.style.color === '#ffcc00' ? '#000' : '#fff';
             let borderColor = nyesteStasjon.style.color === '#ffcc00' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.15)';
             let b98Html = (nyesteData.bensin98 && nyesteData.bensin98 !== "--") ? `<div class="f-price-box" style="border-color:${borderColor}"><span class="f-lbl">98</span><span class="f-val">${nyesteData.bensin98} ${getTrendHtml(nyesteData.bensin98, nyesteData.prev_bensin98)}</span></div>` : '';
             let flag = getFlag(sisteLand);
-            
             let safeUser = sanitize(nyesteData.user);
 
             featuredContainer.style.display = 'block';
