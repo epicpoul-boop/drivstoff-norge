@@ -25,7 +25,7 @@
             --silver: #c0c0c0;
             --share-color: #4a90e2;
             --success: #4caf50;
-            --price-box-bg: #3f3f4e; /* Standard bakgrunn for prisbokser */
+            --price-box-bg: #3f3f4e; 
             --radius-md: 12px;
             --shadow-md: 0 4px 15px rgba(0,0,0,0.3);
             --transition: all 0.2s ease;
@@ -57,60 +57,63 @@
         .share-app-btn:active { background: rgba(74, 144, 226, 0.25); }
 
         #global-featured-container, #featured-station-container { display: none; margin-bottom: 20px; }
-        .featured-card { border-radius: var(--radius-md); padding: 15px; color: white; position: relative; overflow: hidden; box-shadow: 0 6px 20px rgba(0,0,0,0.4); transition: var(--transition); }
-        .featured-header { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; opacity: 0.9; font-weight: 700; display: flex; align-items: center; z-index: 2; position: relative; }
-        .featured-title { font-size: 16px; font-weight: 700; margin: 0 0 12px 0; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); display: flex; justify-content: space-between; align-items: center; z-index: 2; position: relative; }
-        .featured-dist { font-size: 11px; font-weight: 400; opacity: 0.9; }
-        .featured-prices { display: flex; gap: 10px; flex-wrap: wrap; z-index: 2; position: relative; }
-        .f-price-box { background: rgba(0,0,0,0.3); padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 6px; backdrop-filter: blur(2px); }
-        .f-lbl { font-size: 10px; color: rgba(255,255,255,0.9); font-weight: 600; }
-        .f-val { font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 3px; color: #ffffff; }
-        .f-user { margin-top: 10px; font-size: 11px; opacity: 0.85; text-align: right; z-index: 2; position: relative; font-weight: 400; }
-        .f-icon-bg { position: absolute; right: -15px; bottom: -20px; font-size: 80px; opacity: 0.15; transform: rotate(-15deg); z-index: 1; pointer-events: none; line-height: 1; }
-
-        .panel { background-color: var(--card-bg); padding: 15px; border-radius: var(--radius-md); margin-bottom: 20px; box-shadow: var(--shadow-md); }
-        input[type=text] { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: none; background-color: #3f3f4e; color: white; box-sizing: border-box; font-size: 15px; }
-        input[type=range] { width: 100%; accent-color: var(--primary); margin-bottom: 10px; border-radius: 8px;}
-        button { width: 100%; padding: 15px; background-color: var(--primary); color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 15px; transition: var(--transition); }
-        button:active { opacity: 0.9; }
-        .gps-btn { background-color: #3f3f4e; margin-top: 10px; }
+        
+        /* Oppdatert søkepanelet til å være mer proft og "i stil" med resten */
+        .panel { background: linear-gradient(135deg, #3a3a4d 0%, #2b2b36 100%); padding: 15px; border-radius: var(--radius-md); margin-bottom: 20px; box-shadow: var(--shadow-md); border: 1px solid rgba(255,255,255,0.08); }
+        input[type=text] { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background-color: rgba(0,0,0,0.2); color: white; box-sizing: border-box; font-size: 15px; outline: none; transition: var(--transition); }
+        input[type=text]:focus { border-color: var(--primary); background-color: rgba(0,0,0,0.3); }
+        input[type=range] { width: 100%; accent-color: var(--primary); margin-bottom: 10px; }
+        button { width: 100%; padding: 14px; background-color: var(--primary); color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 15px; transition: var(--transition); }
+        button:active { opacity: 0.8; transform: scale(0.98); }
+        
+        /* Mer dempet farge på GPS-knappen */
+        .gps-btn { background-color: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text-main); margin-top: 10px; }
+        .gps-btn:active { background-color: rgba(255,255,255,0.1); }
+        
         .loading-msg { text-align: center; color: var(--primary); font-weight: 700; margin-top: 20px; font-size: 14px; }
         .error-msg { text-align: center; color: var(--danger); font-weight: 700; margin-top: 20px; font-size: 14px; line-height: 1.5; }
 
-        .station-card { background-color: var(--card-bg); border-radius: var(--radius-md); padding: 15px; margin-bottom: 15px; display: flex; flex-direction: column; border: 1px solid transparent; box-shadow: var(--shadow-md); transition: var(--transition); }
-        .main-info { display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 10px; }
-        .station-info { flex: 1; display: flex; align-items: center; min-width: 0; } 
-        .station-details { flex: 1; min-width: 0; }
-        .station-details h3 { margin: 0 0 5px 0; font-size: 16px; word-wrap: break-word; line-height: 1.3; font-weight: 600;} 
-        .station-details p { margin: 0; font-size: 12px; font-weight: 400;}
-        .brand-icon { width: 42px; height: 42px; flex-shrink: 0; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; margin-right: 12px; font-size: 18px; }
-        .prices-container { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; flex-shrink: 0; } 
+        /* OPPDATERT: Universelt stasjonskort som brukes overalt */
+        .station-card, .featured-card { 
+            border-radius: var(--radius-md); 
+            padding: 12px 15px; /* Redusert vertikal padding */
+            margin-bottom: 12px; 
+            color: white; 
+            position: relative; 
+            overflow: hidden; 
+            border: 2.5px solid transparent; 
+            box-shadow: var(--shadow-md); 
+            transition: var(--transition); 
+        }
         
-        .price-row { display: flex; align-items: center; gap: 8px; position: relative; }
-        .price-label { font-size: 10px; font-weight: 700; border-radius: 4px; padding: 3px 6px; width: 45px; text-align: center; color: white; flex-shrink: 0; letter-spacing: 0.3px;}
-        .lbl-diesel { background-color: var(--diesel-color); }
-        .lbl-bensin { background-color: var(--bensin-color); }
-        .lbl-bensin98 { background-color: var(--bensin98-color); }
-        .lbl-fd { background-color: var(--fd-color); }
-        /* Standardisert prisboks: Alltid mørkegrå, alltid hvit skrift */
-        .price-value { font-size: 17px; font-weight: 700; background-color: var(--price-box-bg); padding: 5px 10px; border-radius: 6px; min-width: 60px; text-align: right; display: flex; justify-content: flex-end; align-items: center; gap: 4px; color: #ffffff; box-shadow: inset 0 1px 3px rgba(0,0,0,0.2); }
+        .featured-header { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; opacity: 0.9; font-weight: 700; display: flex; align-items: center; z-index: 2; position: relative; }
+        .featured-title { font-size: 15px; font-weight: 700; margin: 0 0 10px 0; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); display: flex; justify-content: space-between; align-items: center; z-index: 2; position: relative; }
+        .featured-dist { font-size: 11px; font-weight: 400; opacity: 0.9; }
         
-        .trend-up { color: var(--danger); font-size: 14px; } 
-        .trend-down { color: var(--success); font-size: 14px; } 
+        .featured-prices { display: flex; gap: 6px; flex-wrap: wrap; z-index: 2; position: relative; }
+        /* Prisboksene er kompakte og ryddige */
+        .f-price-box { background: var(--price-box-bg); padding: 5px 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 4px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.2); }
+        .f-lbl { font-size: 9px; color: rgba(255,255,255,0.9); font-weight: 700; letter-spacing: 0.5px; }
+        .f-val { font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 3px; color: #ffffff; }
         
-        .verify-badge { color: var(--success); font-size: 14px; margin-left: -5px; }
+        .f-icon-bg { position: absolute; right: -15px; bottom: -20px; font-size: 80px; opacity: 0.15; transform: rotate(-15deg); z-index: 1; pointer-events: none; line-height: 1; }
 
-        .action-buttons { display: flex; gap: 8px; margin-top: 15px; border-top: 1px solid rgba(0,0,0,0.1); padding-top: 12px; }
-        .update-btn, .nav-btn, .hist-btn { padding: 8px 4px; font-size: 11px; border-radius: 6px; flex: 1; font-weight: 700; text-align: center; text-decoration: none; cursor:pointer; display: flex; align-items: center; justify-content: center; height: 35px; border: 1px solid transparent; background: transparent; transition: var(--transition); }
-        /* Knappene arver farge fra kortet og får en tynn ramme */
-        .update-btn:active, .nav-btn:active, .hist-btn:active { background: rgba(255,255,255,0.1); }
+        .trend-up { color: var(--danger); font-size: 13px; } 
+        .trend-down { color: var(--success); font-size: 13px; } 
+        .verify-badge { color: var(--success); font-size: 12px; margin-left: 2px; }
 
-        .history-panel { display: none; background: rgba(0,0,0,0.3); border-radius: 8px; margin-top: 10px; padding: 12px; font-size: 11px; color: inherit; box-shadow: inset 0 2px 5px rgba(0,0,0,0.2); }
-        .history-item { display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.1); padding: 6px 0; }
-        .time-ago { font-size: 11px; margin-top: 10px; text-align: center; font-weight: 400;}
+        /* OPPDATERT: Kompakte knapper (28px høyde) */
+        .action-buttons { display: flex; gap: 6px; margin-top: 12px; border-top: 1px solid rgba(0,0,0,0.15); padding-top: 10px; z-index: 2; position: relative; }
+        .update-btn, .nav-btn, .hist-btn { padding: 0 4px; font-size: 10px; border-radius: 6px; flex: 1; font-weight: 700; text-align: center; text-decoration: none; cursor:pointer; display: flex; align-items: center; justify-content: center; height: 28px; border: 1px solid transparent; background: transparent; transition: var(--transition); letter-spacing: 0.5px; text-transform: uppercase; }
+        .update-btn:active, .nav-btn:active, .hist-btn:active { background: rgba(255,255,255,0.15); }
+
+        .history-panel { display: none; background: rgba(0,0,0,0.3); border-radius: 8px; margin-top: 10px; padding: 10px; font-size: 11px; color: inherit; box-shadow: inset 0 2px 5px rgba(0,0,0,0.2); z-index: 2; position: relative; }
+        .history-item { display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.1); padding: 4px 0; }
+        
+        .time-ago { font-size: 10px; margin-top: 10px; text-align: center; font-weight: 400; z-index: 2; position: relative; opacity: 0.85; }
 
         #add-station-container { display: none; text-align: center; margin-bottom: 30px; margin-top: 20px; border-top: 1px solid #3f3f4e; padding-top: 20px; }
-        .btn-add-station { background-color: transparent; border: 1px dashed var(--primary); color: var(--primary); padding: 15px; border-radius: var(--radius-md); font-size: 14px; display: inline-block; cursor: pointer; width: 100%; font-weight: 600;}
+        .btn-add-station { background-color: transparent; border: 1px dashed var(--primary); color: var(--primary); padding: 12px; border-radius: var(--radius-md); font-size: 13px; display: inline-block; cursor: pointer; width: 100%; font-weight: 600;}
 
         .footer { margin-top: 10px; text-align: center; padding: 25px 20px; border-top: 1px solid #2b2b36; }
         .footer-text { font-size: 12px; color: var(--text-muted); line-height: 1.6; margin-bottom: 15px; font-weight: 400;}
@@ -133,7 +136,7 @@
         .admin-section { margin-top: 22px; border-top: 1px dashed #3f3f4e; padding-top: 18px; }
         .admin-title { font-size: 10px; color: var(--text-muted); text-align: center; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 12px 0; font-weight: 600; }
         .admin-row { display: flex; gap: 8px; justify-content: space-between; }
-        .admin-btn { flex: 1; background: transparent; border: 1px solid #555; color: #ccc; padding: 10px 4px; font-size: 11px; border-radius: 6px; cursor: pointer; font-weight: 600; text-align: center; }
+        .admin-btn { flex: 1; background: transparent; border: 1px solid #555; color: #ccc; padding: 10px 4px; font-size: 10px; border-radius: 6px; cursor: pointer; font-weight: 600; text-align: center; height: auto; }
         .admin-btn:hover { background: #3f3f4e; }
         .danger-btn { border-color: rgba(255, 68, 68, 0.5); color: #ff6666; }
         .danger-btn:hover { background: rgba(255, 68, 68, 0.15); }
@@ -167,9 +170,9 @@
     </div>
     
     <div class="panel">
-        <label>Søk innenfor: <span id="radius-val">10</span> km</label>
+        <label style="font-weight:600; margin-bottom:8px; display:block;">Søk innenfor: <span id="radius-val" style="color:var(--primary)">10</span> km</label>
         <input type="range" id="radius" min="1" max="50" value="10" oninput="oppdaterRadiusText()">
-        <input type="text" id="stedsnavn" placeholder="By eller sted">
+        <input type="text" id="stedsnavn" placeholder="Skriv by eller sted...">
         <button onclick="sokPaaSted()">Søk på sted</button>
         <button class="gps-btn" onclick="startGpsSok()">📍 Bruk min posisjon</button>
     </div>
@@ -177,7 +180,7 @@
     <div id="station-list"></div>
 
     <div id="add-station-container">
-        <p style="font-size: 13px; color: var(--text-muted); margin-top: 0;">Finner du ikke stasjonen du leter etter?</p>
+        <p style="font-size: 12px; color: var(--text-muted); margin-top: 0;">Finner du ikke stasjonen du leter etter?</p>
         <button class="btn-add-station" onclick="apneLeggTilStasjonModal()">+ Legg til manglende stasjon</button>
     </div>
 
@@ -529,71 +532,66 @@
         document.getElementById('top-list-items').innerHTML = top10Html + myRankHtml;
     }
 
-    // OPPDATERT THEME-MOTOR: Bruker gradienter, mindre kontrast, standard fonter.
     function getBrandStyle(name) {
         const n = name.toLowerCase();
         let styles = {
-            bg: 'linear-gradient(135deg, #3a3a4d 0%, #2b2b36 100%)', // Default pro mørk
-            text: '#f0f0f0', // Soft hvit standard
-            border: 'rgba(255,255,255,0.08)', // Nesten usynlig ramme
+            bg: 'linear-gradient(135deg, #3a3a4d 0%, #2b2b36 100%)', 
+            text: '#f0f0f0', 
+            border: 'transparent', 
             char: '⛽'
         };
 
         if (n.includes("yx")) { 
             styles.bg = 'linear-gradient(135deg, #ff3a40 0%, #ed1c24 100%)'; 
-            styles.text = '#ffffff'; styles.border = 'rgba(0, 85, 184, 0.4)'; styles.char = 'Y'; 
+            styles.text = '#ffffff'; styles.border = '#0055b8'; styles.char = 'Y'; 
         }
         else if (n.includes("circle k")) { 
             styles.bg = 'linear-gradient(135deg, #ff4d52 0%, #ed1c24 100%)'; 
-            styles.text = '#ffffff'; styles.border = 'rgba(255, 152, 0, 0.4)'; styles.char = 'C'; 
+            styles.text = '#ffffff'; styles.border = '#ff9800'; styles.char = 'C'; 
         }
         else if (n.includes("uno-x") || n.includes("unox")) { 
-            // Tonet ned sennep/sort kontrast
             styles.bg = 'linear-gradient(135deg, #ffcc33 0%, #e5a904 100%)'; 
-            styles.text = '#222222'; styles.border = 'rgba(237, 28, 36, 0.4)'; styles.char = 'U'; 
+            styles.text = '#222222'; styles.border = '#ed1c24'; styles.char = 'U'; 
         }
         else if (n.includes("esso")) { 
-            // Myk hvit/grå gradient
             styles.bg = 'linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%)'; 
-            styles.text = '#df1820'; styles.border = 'rgba(0, 85, 184, 0.3)'; styles.char = 'E'; 
+            styles.text = '#df1820'; styles.border = '#0055b8'; styles.char = 'E'; 
         }
         else if (n.includes("tanken")) { 
             styles.bg = 'linear-gradient(135deg, #ff2026 0%, #ed1c24 100%)'; 
-            styles.text = '#ffffff'; styles.border = 'rgba(255, 255, 255, 0.5)'; styles.char = 'T'; 
+            styles.text = '#ffffff'; styles.border = '#ffffff'; styles.char = 'T'; 
         }
         else if (n.includes("driv")) { 
             styles.bg = 'linear-gradient(135deg, #ff3a40 0%, #ed1c24 100%)'; 
-            styles.text = '#ffffff'; styles.border = 'rgba(237, 28, 36, 0.3)'; styles.char = 'D'; 
+            styles.text = '#ffffff'; styles.border = '#ed1c24'; styles.char = 'D'; 
         }
         else if (n.includes("st1")) { 
             styles.bg = 'linear-gradient(135deg, #ffff33 0%, #ffe100 100%)'; 
-            styles.text = '#ed1c24'; styles.border = 'rgba(255, 255, 255, 0.5)'; styles.char = 'S'; 
+            styles.text = '#ed1c24'; styles.border = '#ffffff'; styles.char = 'S'; 
         }
         else if (n.includes("oljeleverandøren")) { 
             styles.bg = 'linear-gradient(135deg, #4d4d4d 0%, #333333 100%)'; 
-            styles.text = '#ff9800'; styles.border = 'rgba(255, 255, 255, 0.4)'; styles.char = 'O'; 
+            styles.text = '#ff9800'; styles.border = '#ffffff'; styles.char = 'O'; 
         }
         else if (n.includes("best")) { 
-            // Dyp blå gradient
             styles.bg = 'linear-gradient(135deg, #1a75ff 0%, #0055b8 100%)'; 
-            styles.text = '#ffffff'; styles.border = 'rgba(255, 152, 0, 0.4)'; styles.char = 'B'; 
+            styles.text = '#ffffff'; styles.border = '#ff9800'; styles.char = 'B'; 
         }
         else if (n.includes("bunker oil") || n.includes("bunkeroil")) { 
             styles.bg = 'linear-gradient(135deg, #ffffff 0%, #f9f9f9 100%)'; 
-            styles.text = '#0055b8'; styles.border = 'rgba(237, 28, 36, 0.3)'; styles.char = 'B'; 
+            styles.text = '#0055b8'; styles.border = '#ed1c24'; styles.char = 'B'; 
         }
         else if (n.includes("haltbakk")) { 
-            // Nesten sort, veldig dyp grønn kant
             styles.bg = 'linear-gradient(135deg, #222222 0%, #111111 100%)'; 
-            styles.text = '#4caf50'; styles.border = 'rgba(76, 175, 80, 0.4)'; styles.char = 'H'; 
+            styles.text = '#4caf50'; styles.border = '#4caf50'; styles.char = 'H'; 
         }
         else if (n.includes("lpg")) { 
             styles.bg = 'linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%)'; 
-            styles.text = '#4caf50'; styles.border = 'rgba(76, 175, 80, 0.3)'; styles.char = 'L'; 
+            styles.text = '#4caf50'; styles.border = '#4caf50'; styles.char = 'L'; 
         }
         else if (n.includes("shell")) { 
             styles.bg = 'linear-gradient(135deg, #ffe066 0%, #ffcc00 100%)'; 
-            styles.text = '#ed1c24'; styles.border = 'rgba(237, 28, 36, 0.3)'; styles.char = 'S'; 
+            styles.text = '#ed1c24'; styles.border = '#ed1c24'; styles.char = 'S'; 
         }
 
         return styles;
@@ -627,13 +625,14 @@
             let safeNavn = sanitize(bruktNavn);
             let safeUser = sanitize(nyesteData.user);
 
-            // Featured cards bruker fortsatt gjennomsiktig boks for "fancy" look
             let b98Html = (nyesteData.bensin98 && nyesteData.bensin98 !== "--") ? `<div class="f-price-box" style="border-color:${style.border}"><span class="f-lbl">98</span><span class="f-val">${nyesteData.bensin98} ${getTrendHtml(nyesteData.bensin98, nyesteData.prev_bensin98)}</span></div>` : '';
             let fdHtml = (nyesteData.fd && nyesteData.fd !== "--") ? `<div class="f-price-box" style="border-color:${style.border}"><span class="f-lbl">FD</span><span class="f-val">${nyesteData.fd} ${getTrendHtml(nyesteData.fd, nyesteData.prev_fd)}</span></div>` : '';
 
+            let finalBorder = style.border === 'transparent' ? 'rgba(255,255,255,0.1)' : style.border;
+
             globalContainer.style.display = 'block';
             globalContainer.innerHTML = `
-                <div class="featured-card" style="background: ${style.bg}; color: ${style.text}; border: 1px solid ${style.border};">
+                <div class="featured-card" style="background: ${style.bg}; color: ${style.text}; border: 3px solid ${finalBorder};">
                     <div class="f-icon-bg">${style.char}</div>
                     <div class="featured-header">⚡ NYESTE OPPDATERING I NORGE</div>
                     <div class="featured-title">${safeNavn} ${flag} <span style="margin-left:auto;">${distStr}</span></div>
@@ -702,11 +701,10 @@
             let b98Html = (data.bensin98 && data.bensin98 !== "--") ? `<div class="f-price-box" style="border-color:${style.border}"><span class="f-lbl">98</span><span class="f-val">${data.bensin98} ${getTrendHtml(data.bensin98, data.prev_bensin98)}</span></div>` : '';
             let fdHtml = (data.fd && data.fd !== "--") ? `<div class="f-price-box" style="border-color:${style.border}"><span class="f-lbl">FD</span><span class="f-val">${data.fd} ${getTrendHtml(data.fd, data.prev_fd)}</span></div>` : '';
 
-            // Bruker fallback ramme hvis merkevaren ikke har definert ramme (gjennomsiktig)
-            let finalBorder = style.border === 'rgba(255,255,255,0.08)' ? fallbackBorderColor : style.border;
+            let finalBorder = style.border === 'transparent' ? fallbackBorderColor : style.border;
 
             return `
-            <div class="featured-card" style="background: ${style.bg}; color: ${style.text}; margin-bottom: 15px; border: 1px solid ${finalBorder};">
+            <div class="featured-card" style="background: ${style.bg}; color: ${style.text}; margin-bottom: 15px; border: 3px solid ${finalBorder};">
                 <div class="f-icon-bg">${style.char}</div>
                 <div class="featured-header">${icon} ${title}</div>
                 <div class="featured-title">${safeNavn}</div>
@@ -855,6 +853,7 @@
         p.innerHTML = h.length ? h.map(i => `<div class="history-item"><span>D: ${i.diesel} | 95: ${i.bensin} ${i.bensin98 && i.bensin98 !== '--' ? '| 98: '+i.bensin98 : ''} ${i.fd && i.fd !== '--' ? '| FD: '+i.fd : ''}</span><span>${new Date(i.timestamp).toLocaleDateString()}</span></div>`).join('') : "Ingen tidligere data.";
     }
 
+    // OPPDATERT: Søkeresultat-kort er nå helt like Ytterpunktene!
     function visStasjoner(stasjoner, lat, lon) {
         const list = document.getElementById('station-list'); list.innerHTML = "";
         const featuredContainer = document.getElementById('featured-station-container');
@@ -949,8 +948,12 @@
                 trendFd = getTrendHtml(p.fd, p.prev_fd);
                 
                 let safeUser = sanitize(p.user);
+                let verifiedBadge = p.verified ? '<span class="verify-badge">✅</span>' : '';
                 timeAgoHtml = `<div class="time-ago" style="color: inherit; opacity: 0.85;">${formaterTid(p.timestamp, safeUser)}</div>`;
-                if (p.verified) verifiedHtml = '<span class="verify-badge">✅</span>';
+                
+                // Legger til verified-badge i trend-variabelen for å få den inn i f-val
+                trendD += verifiedBadge;
+                trendB += verifiedBadge;
             } else {
                 isAuto = true;
                 displayD = localAvgD;
@@ -973,43 +976,45 @@
         let foundLocalKupp = false;
 
         processedStasjoner.forEach((item, index) => {
-            let b98Html = (item.displayB98 !== "--") ? `<div class="price-row"><span class="price-label lbl-bensin98">BENSIN 98</span><div class="price-value">${item.displayB98} ${item.trendB98}</div></div>` : '';
-            let fdHtml = (item.displayFd !== "--") ? `<div class="price-row"><span class="price-label lbl-fd">FARGET DIESEL</span><div class="price-value">${item.displayFd} ${item.trendFd}</div></div>` : '';
+            let b98Html = (item.displayB98 !== "--") ? `<div class="f-price-box" style="border-color:${item.style.border}"><span class="f-lbl">98</span><span class="f-val">${item.displayB98} ${item.trendB98}</span></div>` : '';
+            let fdHtml = (item.displayFd !== "--") ? `<div class="f-price-box" style="border-color:${item.style.border}"><span class="f-lbl">FD</span><span class="f-val">${item.displayFd} ${item.trendFd}</span></div>` : '';
             
             if (!foundLocalKupp && !item.isAuto && item.displayD !== "--" && item.displayD !== "999") {
                 let safeUser = sanitize(item.p.user);
                 let rawTimeText = formaterTid(item.p.timestamp, safeUser).replace("Sist: ", "");
-                // Lagt på skygge på gullteksten for lesbarhet på lyse kort
                 item.timeAgoHtml = `<div class="time-ago" style="color: var(--gold); font-weight: 700; font-size: 11px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">🏆 BILLIGSTE LOKALE! • Sist oppdatert ${rawTimeText}</div>`;
                 foundLocalKupp = true;
             }
 
+            let finalBorder = item.style.border === 'transparent' ? 'rgba(255,255,255,0.1)' : item.style.border;
+
+            // Oppdatert HTML for stasjonskortet for å matche Extremes-kortene
             const card = document.createElement('div'); 
             card.className = `station-card`;
             card.style.background = item.style.bg;
             card.style.color = item.style.text;
-            // Super-tynn halvgjennomsiktig ramme
-            card.style.borderColor = item.style.border === 'rgba(255,255,255,0.08)' ? 'rgba(255,255,255,0.1)' : item.style.border;
+            card.style.borderColor = finalBorder;
 
             card.innerHTML = `
-                <div class="main-info">
-                    <div class="station-info">
-                        <div class="brand-icon" style="background-color: rgba(0,0,0,0.15); color: ${item.style.text};">${item.style.char}</div>
-                        <div class="station-details">
-                            <h3 style="color: ${item.style.text};">${item.navn} ${item.flag}</h3>
-                            <p style="color: ${item.style.text}; opacity: 0.85;">${item.dist.toFixed(1)} km unna</p>
-                        </div>
+                <div class="f-icon-bg">${item.style.char}</div>
+                <div class="featured-title" style="font-size:16px; margin-bottom:10px;">
+                    ${item.navn} ${item.flag}
+                    <span class="featured-dist">📍 ${item.dist.toFixed(1)} km</span>
+                </div>
+                <div class="featured-prices">
+                    <div class="f-price-box" style="border-color:${item.style.border}">
+                        <span class="f-lbl">D</span><span class="f-val">${item.displayD} ${item.trendD}</span>
                     </div>
-                    <div class="prices-container">
-                        <div class="price-row"><span class="price-label lbl-diesel">DIESEL</span><div class="price-value">${item.displayD} ${item.trendD}</div> ${item.verifiedHtml}</div>
-                        <div class="price-row"><span class="price-label lbl-bensin">BENSIN 95</span><div class="price-value">${item.displayB} ${item.trendB}</div> ${item.verifiedHtml}</div>
-                        ${b98Html}${fdHtml}
+                    <div class="f-price-box" style="border-color:${item.style.border}">
+                        <span class="f-lbl">95</span><span class="f-val">${item.displayB} ${item.trendB}</span>
                     </div>
+                    ${b98Html}
+                    ${fdHtml}
                 </div>
                 <div class="action-buttons">
-                    <div class="update-btn" style="border-color: ${item.style.text}; color: ${item.style.text}; opacity: 0.9;" onclick="apneModal('${item.id}','${item.escapedName}', ${item.brukLat}, ${item.brukLon})">OPPDATER</div>
-                    <a class="nav-btn" style="border-color: ${item.style.text}; color: ${item.style.text}; opacity: 0.9;" href="https://www.google.com/maps/dir/?api=1&destination=${item.brukLat},${item.brukLon}" target="_blank">KJØR HIT</a>
-                    <div class="hist-btn" style="border-color: ${item.style.text}; color: ${item.style.text}; opacity: 0.9;" onclick="visHistorikk('${item.id}')">⌛ HISTORIKK</div>
+                    <div class="update-btn" style="border-color: ${item.style.text}; color: ${item.style.text};" onclick="apneModal('${item.id}','${item.escapedName}', ${item.brukLat}, ${item.brukLon})">OPPDATER</div>
+                    <a class="nav-btn" style="border-color: ${item.style.text}; color: ${item.style.text};" href="https://www.google.com/maps/dir/?api=1&destination=${item.brukLat},${item.brukLon}" target="_blank">KJØR HIT</a>
+                    <div class="hist-btn" style="border-color: ${item.style.text}; color: ${item.style.text};" onclick="visHistorikk('${item.id}')">⌛ HISTORIKK</div>
                 </div>
                 <div id="hist-${item.id}" class="history-panel"></div>
                 ${item.timeAgoHtml}
@@ -1029,7 +1034,7 @@
 
             featuredContainer.style.display = 'block';
             featuredContainer.innerHTML = `
-                <div class="featured-card" style="background: ${bgColor}; color: ${textColor}; border: 1px solid ${borderColor};">
+                <div class="featured-card" style="background: ${bgColor}; color: ${textColor}; border: 3px solid ${borderColor === 'transparent' ? 'rgba(255,255,255,0.1)' : borderColor};">
                     <div class="f-icon-bg">${nyesteStasjon.style.char}</div>
                     <div class="featured-header">⚡ NYESTE OPPDATERING I DITT SØK</div>
                     <div class="featured-title">${nyesteStasjon.navn} ${flag} <span style="margin-left:auto;" class="featured-dist">📍 ${nyesteStasjon.dist.toFixed(1)} km</span></div>
@@ -1047,30 +1052,6 @@
         document.getElementById('add-station-container').style.display = 'block'; 
         setTimeout(sjekkScroll, 200);
     }
-
-    window.toggleTopList = function() { const c = document.getElementById('top-list-content'); c.style.display = c.style.display==='block'?'none':'block'; setTimeout(sjekkScroll, 200); };
-    window.lukkModal = function() { document.getElementById('update-modal').style.display='none'; document.getElementById('modal-error').style.display='none'; };
-    window.oppdaterRadiusText = function() { document.getElementById('radius-val').innerText = document.getElementById('radius').value; };
-    
-    window.apneModal = function(id, n, lat, lon) { 
-        valgtStasjonId = id; valgtStasjonLat = lat; valgtStasjonLon = lon;
-        document.getElementById('modal-station-name').innerText = n; 
-        document.getElementById('input-nickname').value = localStorage.getItem('drivstoff_navn') || ""; 
-        const p = skylagredePriser[id] || { diesel: "", bensin: "", bensin98: "", fd: "" };
-        
-        document.getElementById('input-diesel').value = p.diesel === "--" ? "" : (p.diesel || "");
-        document.getElementById('input-bensin').value = p.bensin === "--" ? "" : (p.bensin || "");
-        document.getElementById('input-bensin98').value = p.bensin98 === "--" ? "" : (p.bensin98 || "");
-        document.getElementById('input-fd').value = p.fd === "--" ? "" : (p.fd || "");
-        
-        if (p.bensin98 && p.bensin98 !== "--") { document.getElementById('div-bensin98').style.display = 'block'; document.getElementById('btn-show-98').style.display = 'none';
-        } else { document.getElementById('div-bensin98').style.display = 'none'; document.getElementById('btn-show-98').style.display = 'block'; }
-        
-        if (p.fd && p.fd !== "--") { document.getElementById('div-fd').style.display = 'block'; document.getElementById('btn-show-fd').style.display = 'none';
-        } else { document.getElementById('div-fd').style.display = 'none'; document.getElementById('btn-show-fd').style.display = 'block'; }
-
-        document.getElementById('update-modal').style.display = 'block'; 
-    };
 
     window.sokPaaSted = async function() { 
         const s = document.getElementById('stedsnavn').value; 
