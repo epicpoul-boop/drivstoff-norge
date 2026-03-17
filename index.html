@@ -71,7 +71,6 @@
         .loading-msg { text-align: center; color: var(--primary); font-weight: 700; margin-top: 20px; font-size: 14px; }
         .error-msg { text-align: center; color: var(--danger); font-weight: 700; margin-top: 20px; font-size: 14px; line-height: 1.5; }
 
-        /* OPPDATERT: Her er de tykke, tydelige 3px rammene */
         .station-card, .featured-card { 
             border-radius: var(--radius-md); 
             padding: 12px 15px; 
@@ -233,6 +232,8 @@
     <div class="modal-content">
         <h3 id="modal-station-name" style="margin-top:0">Oppdater pris</h3>
         <p id="modal-error"></p>
+        <p style="font-size:11px; color:var(--text-muted); margin-top:-5px; margin-bottom:15px; text-align:center;">Tips: Skriv et bindestrek (-) for å fjerne en feil pris.</p>
+        
         <div style="margin-bottom:12px">
             <label style="font-size:12px; color:var(--text-muted)">Kallenavn (Valgfritt)</label>
             <input type="text" id="input-nickname" placeholder="La stå tom for å være Anonym">
@@ -282,7 +283,6 @@
     import { getDatabase, ref, set, get, onValue, push } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
     // --- 1. BULLETPROOF UI BINDINGS ---
-    // Dette sikrer at knapper og popups alltid fungerer, uavhengig av Firebase eller internett!
     window.toggleTopList = function() { const c = document.getElementById('top-list-content'); c.style.display = c.style.display==='block'?'none':'block'; setTimeout(sjekkScroll, 200); };
     window.lukkModal = function() { document.getElementById('update-modal').style.display='none'; document.getElementById('modal-error').style.display='none'; };
     window.oppdaterRadiusText = function() { document.getElementById('radius-val').innerText = document.getElementById('radius').value; };
@@ -309,7 +309,6 @@
     window.lukkLeggTilStasjonModal = () => document.getElementById('add-station-modal').style.display = 'none';
     window.blaNedover = () => { window.scrollBy({ top: window.innerHeight * 0.7, behavior: 'smooth' }); };
     
-    // Admin-funksjoner bundet tidlig
     window.slettStasjon = async function() {
         if (confirm("⚠️ ER DU SIKKER?\n\nVil du slette denne stasjonen fra kartet for alle brukere? Bruk dette kun dersom stasjonen er permanent nedlagt eller ikke finnes.")) {
             await set(ref(db, 'skjulte_stasjoner/' + valgtStasjonId), true);
@@ -317,15 +316,20 @@
             alert("Stasjonen er fjernet. Den blir borte neste gang kartet lastes inn.");
         }
     };
+    
+    // OPPDATERT: Nå med "Er du sikker?" advarsel før den lar deg skrive nytt navn!
     window.endreStasjonsNavn = async function() {
-        let currentNavn = document.getElementById('modal-station-name').innerText;
-        let nyttNavn = prompt("Skriv inn nytt navn for stasjonen:", currentNavn);
-        if (nyttNavn && nyttNavn.trim() !== "") {
-            await set(ref(db, 'stasjon_navn/' + valgtStasjonId), sanitize(nyttNavn.trim()));
-            lukkModal();
-            alert("Stasjonsnavnet er endret for alle brukere! Det oppdateres neste gang kartet lastes inn.");
+        if (confirm("⚠️ ER DU SIKKER?\n\nVil du endre navnet på denne stasjonen for alle brukere i hele Norge?")) {
+            let currentNavn = document.getElementById('modal-station-name').innerText;
+            let nyttNavn = prompt("Skriv inn nytt navn for stasjonen:", currentNavn);
+            if (nyttNavn && nyttNavn.trim() !== "" && nyttNavn.trim() !== currentNavn) {
+                await set(ref(db, 'stasjon_navn/' + valgtStasjonId), sanitize(nyttNavn.trim()));
+                window.lukkModal();
+                alert("Stasjonsnavnet er endret! Det oppdateres på kartet nå.");
+            }
         }
     };
+    
     window.oppdaterStasjonsGps = function() {
         if (confirm("Vil du oppdatere stasjonens plassering til din NÅVÆRENDE posisjon?\n\nSørg for at du står fysisk på stasjonen nå!")) {
             navigator.geolocation.getCurrentPosition(async function(p) {
@@ -374,11 +378,12 @@
         return temp.innerHTML;
     }
 
+    // OPPDATERT: Deler nå det nye .no domenet!
     window.delAppen = async () => {
         const shareData = {
             title: 'Drivstoff Norge ⛽',
             text: 'Jeg bruker Drivstoff Norge! En gratis og reklamefri dugnads-app for å finne og dele de billigste drivstoffprisene. Sjekk den ut:',
-            url: 'https://is.gd/drivstoffnorge' 
+            url: 'https://drivstoffnorge.no' 
         };
         try {
             if (navigator.share) { await navigator.share(shareData); } 
@@ -779,8 +784,9 @@
         container.innerHTML = html;
     }
 
+    // OPPDATERT: Godtar nå bindestrek ("-") som en gyldig slette-kommando
     function validerPris(pris) {
-        if (!pris || pris === "--") return true; 
+        if (!pris || pris === "--" || pris === "-") return true; 
         let val = parseFloat(String(pris).replace(',', '.'));
         if (isNaN(val)) return false;
         return (val >= 10 && val <= 35); 
@@ -827,19 +833,24 @@
 
         let prev_d = oldData.diesel || "--"; let prev_b = oldData.bensin || "--"; let prev_b98 = oldData.bensin98 || "--"; let prev_fd = oldData.fd || "--";
 
-        if (!d) d = oldData.diesel || "--";
+        // OPPDATERT: Logikk for å slette (skrive bindestrek) eller beholde gammel (la stå tom)
+        if (d === "-") d = "--";
+        else if (!d) d = oldData.diesel || "--";
         else if (d !== oldData.diesel && oldData.diesel && oldData.diesel !== "--") prev_d = oldData.diesel;
         else prev_d = oldData.prev_diesel || "--";
 
-        if (!b) b = oldData.bensin || "--";
+        if (b === "-") b = "--";
+        else if (!b) b = oldData.bensin || "--";
         else if (b !== oldData.bensin && oldData.bensin && oldData.bensin !== "--") prev_b = oldData.bensin;
         else prev_b = oldData.prev_bensin || "--";
 
-        if (!b98) b98 = oldData.bensin98 || "--";
+        if (b98 === "-") b98 = "--";
+        else if (!b98) b98 = oldData.bensin98 || "--";
         else if (b98 !== oldData.bensin98 && oldData.bensin98 && oldData.bensin98 !== "--") prev_b98 = oldData.bensin98;
         else prev_b98 = oldData.prev_bensin98 || "--";
 
-        if (!fd) fd = oldData.fd || "--";
+        if (fd === "-") fd = "--";
+        else if (!fd) fd = oldData.fd || "--";
         else if (fd !== oldData.fd && oldData.fd && oldData.fd !== "--") prev_fd = oldData.fd;
         else prev_fd = oldData.prev_fd || "--";
 
