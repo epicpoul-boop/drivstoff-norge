@@ -58,7 +58,6 @@
 
         #global-featured-container, #featured-station-container { display: none; margin-bottom: 20px; }
         
-        /* Oppdatert søkepanelet til å være mer proft og "i stil" med resten */
         .panel { background: linear-gradient(135deg, #3a3a4d 0%, #2b2b36 100%); padding: 15px; border-radius: var(--radius-md); margin-bottom: 20px; box-shadow: var(--shadow-md); border: 1px solid rgba(255,255,255,0.08); }
         input[type=text] { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background-color: rgba(0,0,0,0.2); color: white; box-sizing: border-box; font-size: 15px; outline: none; transition: var(--transition); }
         input[type=text]:focus { border-color: var(--primary); background-color: rgba(0,0,0,0.3); }
@@ -66,22 +65,21 @@
         button { width: 100%; padding: 14px; background-color: var(--primary); color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 15px; transition: var(--transition); }
         button:active { opacity: 0.8; transform: scale(0.98); }
         
-        /* Mer dempet farge på GPS-knappen */
         .gps-btn { background-color: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text-main); margin-top: 10px; }
         .gps-btn:active { background-color: rgba(255,255,255,0.1); }
         
         .loading-msg { text-align: center; color: var(--primary); font-weight: 700; margin-top: 20px; font-size: 14px; }
         .error-msg { text-align: center; color: var(--danger); font-weight: 700; margin-top: 20px; font-size: 14px; line-height: 1.5; }
 
-        /* OPPDATERT: Universelt stasjonskort som brukes overalt */
+        /* OPPDATERT: Her er de tykke, tydelige 3px rammene */
         .station-card, .featured-card { 
             border-radius: var(--radius-md); 
-            padding: 12px 15px; /* Redusert vertikal padding */
-            margin-bottom: 12px; 
+            padding: 12px 15px; 
+            margin-bottom: 15px; 
             color: white; 
             position: relative; 
             overflow: hidden; 
-            border: 2.5px solid transparent; 
+            border: 3px solid transparent; 
             box-shadow: var(--shadow-md); 
             transition: var(--transition); 
         }
@@ -91,7 +89,6 @@
         .featured-dist { font-size: 11px; font-weight: 400; opacity: 0.9; }
         
         .featured-prices { display: flex; gap: 6px; flex-wrap: wrap; z-index: 2; position: relative; }
-        /* Prisboksene er kompakte og ryddige */
         .f-price-box { background: var(--price-box-bg); padding: 5px 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 4px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.2); }
         .f-lbl { font-size: 9px; color: rgba(255,255,255,0.9); font-weight: 700; letter-spacing: 0.5px; }
         .f-val { font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 3px; color: #ffffff; }
@@ -102,7 +99,6 @@
         .trend-down { color: var(--success); font-size: 13px; } 
         .verify-badge { color: var(--success); font-size: 12px; margin-left: 2px; }
 
-        /* OPPDATERT: Kompakte knapper (28px høyde) */
         .action-buttons { display: flex; gap: 6px; margin-top: 12px; border-top: 1px solid rgba(0,0,0,0.15); padding-top: 10px; z-index: 2; position: relative; }
         .update-btn, .nav-btn, .hist-btn { padding: 0 4px; font-size: 10px; border-radius: 6px; flex: 1; font-weight: 700; text-align: center; text-decoration: none; cursor:pointer; display: flex; align-items: center; justify-content: center; height: 28px; border: 1px solid transparent; background: transparent; transition: var(--transition); letter-spacing: 0.5px; text-transform: uppercase; }
         .update-btn:active, .nav-btn:active, .hist-btn:active { background: rgba(255,255,255,0.15); }
@@ -136,7 +132,7 @@
         .admin-section { margin-top: 22px; border-top: 1px dashed #3f3f4e; padding-top: 18px; }
         .admin-title { font-size: 10px; color: var(--text-muted); text-align: center; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 12px 0; font-weight: 600; }
         .admin-row { display: flex; gap: 8px; justify-content: space-between; }
-        .admin-btn { flex: 1; background: transparent; border: 1px solid #555; color: #ccc; padding: 10px 4px; font-size: 10px; border-radius: 6px; cursor: pointer; font-weight: 600; text-align: center; height: auto; }
+        .admin-btn { flex: 1; background: transparent; border: 1px solid #555; color: #ccc; padding: 10px 4px; font-size: 11px; border-radius: 6px; cursor: pointer; font-weight: 600; text-align: center; height: auto; }
         .admin-btn:hover { background: #3f3f4e; }
         .danger-btn { border-color: rgba(255, 68, 68, 0.5); color: #ff6666; }
         .danger-btn:hover { background: rgba(255, 68, 68, 0.15); }
@@ -285,6 +281,62 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
     import { getDatabase, ref, set, get, onValue, push } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
+    // --- 1. BULLETPROOF UI BINDINGS ---
+    // Dette sikrer at knapper og popups alltid fungerer, uavhengig av Firebase eller internett!
+    window.toggleTopList = function() { const c = document.getElementById('top-list-content'); c.style.display = c.style.display==='block'?'none':'block'; setTimeout(sjekkScroll, 200); };
+    window.lukkModal = function() { document.getElementById('update-modal').style.display='none'; document.getElementById('modal-error').style.display='none'; };
+    window.oppdaterRadiusText = function() { document.getElementById('radius-val').innerText = document.getElementById('radius').value; };
+    window.apneModal = function(id, n, lat, lon) { 
+        valgtStasjonId = id; valgtStasjonLat = lat; valgtStasjonLon = lon;
+        document.getElementById('modal-station-name').innerText = n; 
+        document.getElementById('input-nickname').value = localStorage.getItem('drivstoff_navn') || ""; 
+        const p = skylagredePriser[id] || { diesel: "", bensin: "", bensin98: "", fd: "" };
+        
+        document.getElementById('input-diesel').value = p.diesel === "--" ? "" : (p.diesel || "");
+        document.getElementById('input-bensin').value = p.bensin === "--" ? "" : (p.bensin || "");
+        document.getElementById('input-bensin98').value = p.bensin98 === "--" ? "" : (p.bensin98 || "");
+        document.getElementById('input-fd').value = p.fd === "--" ? "" : (p.fd || "");
+        
+        if (p.bensin98 && p.bensin98 !== "--") { document.getElementById('div-bensin98').style.display = 'block'; document.getElementById('btn-show-98').style.display = 'none'; } else { document.getElementById('div-bensin98').style.display = 'none'; document.getElementById('btn-show-98').style.display = 'block'; }
+        if (p.fd && p.fd !== "--") { document.getElementById('div-fd').style.display = 'block'; document.getElementById('btn-show-fd').style.display = 'none'; } else { document.getElementById('div-fd').style.display = 'none'; document.getElementById('btn-show-fd').style.display = 'block'; }
+        document.getElementById('update-modal').style.display = 'block'; 
+    };
+    window.vis98Felt = function() { document.getElementById('div-bensin98').style.display = 'block'; document.getElementById('btn-show-98').style.display = 'none'; };
+    window.visFdFelt = function() { document.getElementById('div-fd').style.display = 'block'; document.getElementById('btn-show-fd').style.display = 'none'; };
+    window.visInfoModal = () => document.getElementById('info-modal').style.display = 'block';
+    window.lukkInfoModal = () => document.getElementById('info-modal').style.display = 'none';
+    window.apneLeggTilStasjonModal = () => document.getElementById('add-station-modal').style.display = 'block';
+    window.lukkLeggTilStasjonModal = () => document.getElementById('add-station-modal').style.display = 'none';
+    window.blaNedover = () => { window.scrollBy({ top: window.innerHeight * 0.7, behavior: 'smooth' }); };
+    
+    // Admin-funksjoner bundet tidlig
+    window.slettStasjon = async function() {
+        if (confirm("⚠️ ER DU SIKKER?\n\nVil du slette denne stasjonen fra kartet for alle brukere? Bruk dette kun dersom stasjonen er permanent nedlagt eller ikke finnes.")) {
+            await set(ref(db, 'skjulte_stasjoner/' + valgtStasjonId), true);
+            lukkModal();
+            alert("Stasjonen er fjernet. Den blir borte neste gang kartet lastes inn.");
+        }
+    };
+    window.endreStasjonsNavn = async function() {
+        let currentNavn = document.getElementById('modal-station-name').innerText;
+        let nyttNavn = prompt("Skriv inn nytt navn for stasjonen:", currentNavn);
+        if (nyttNavn && nyttNavn.trim() !== "") {
+            await set(ref(db, 'stasjon_navn/' + valgtStasjonId), sanitize(nyttNavn.trim()));
+            lukkModal();
+            alert("Stasjonsnavnet er endret for alle brukere! Det oppdateres neste gang kartet lastes inn.");
+        }
+    };
+    window.oppdaterStasjonsGps = function() {
+        if (confirm("Vil du oppdatere stasjonens plassering til din NÅVÆRENDE posisjon?\n\nSørg for at du står fysisk på stasjonen nå!")) {
+            navigator.geolocation.getCurrentPosition(async function(p) {
+                await set(ref(db, 'stasjon_gps/' + valgtStasjonId), { lat: p.coords.latitude, lon: p.coords.longitude });
+                lukkModal();
+                alert("GPS-posisjonen for stasjonen er flyttet til der du står!");
+            }, function(e) { alert("Kunne ikke hente posisjonen din. Sjekk at GPS er på."); });
+        }
+    };
+
+    // --- 2. LOGIKK OG FIREBASE ---
     const firebaseConfig = {
       apiKey: "AIzaSyBlEIj2yxM-mJdBPw7zgDsirF9yAipdPkw",
       authDomain: "drivstoff-norge-caeaa.firebaseapp.com",
@@ -349,8 +401,8 @@
         let dWeek = Math.floor(diffWeek / (1000 * 60 * 60 * 24));
         let hWeek = Math.floor((diffWeek / (1000 * 60 * 60)) % 24);
 
-        document.getElementById('cd-day').innerText = `(Restarter om ${hDay}t ${mDay}m)`;
-        document.getElementById('cd-week').innerText = `(Restarter om ${dWeek}d ${hWeek}t)`;
+        if(document.getElementById('cd-day')) document.getElementById('cd-day').innerText = `(Restarter om ${hDay}t ${mDay}m)`;
+        if(document.getElementById('cd-week')) document.getElementById('cd-week').innerText = `(Restarter om ${dWeek}d ${hWeek}t)`;
     }
     setInterval(oppdaterKlokker, 60000); oppdaterKlokker();
 
@@ -358,17 +410,12 @@
     function sjekkScroll() {
         const erLangNok = document.documentElement.scrollHeight > window.innerHeight;
         const erIkkeIBunnen = window.innerHeight + window.scrollY < document.documentElement.scrollHeight - 100;
-        if (erLangNok && erIkkeIBunnen) { scrollBtn.style.display = 'flex'; } else { scrollBtn.style.display = 'none'; }
+        if (scrollBtn) {
+            if (erLangNok && erIkkeIBunnen) { scrollBtn.style.display = 'flex'; } else { scrollBtn.style.display = 'none'; }
+        }
     }
     window.addEventListener('scroll', sjekkScroll); window.addEventListener('resize', sjekkScroll);
-    window.blaNedover = () => { window.scrollBy({ top: window.innerHeight * 0.7, behavior: 'smooth' }); };
 
-    window.visInfoModal = () => document.getElementById('info-modal').style.display = 'block';
-    window.lukkInfoModal = () => document.getElementById('info-modal').style.display = 'none';
-    
-    window.apneLeggTilStasjonModal = () => document.getElementById('add-station-modal').style.display = 'block';
-    window.lukkLeggTilStasjonModal = () => document.getElementById('add-station-modal').style.display = 'none';
-    
     window.lagreNyStasjon = () => {
         const btn = document.getElementById('btn-save-station');
         const navn = sanitize(document.getElementById('new-station-name').value.trim());
@@ -382,9 +429,9 @@
             });
             btn.innerText = "Lagre med GPS";
             document.getElementById('new-station-name').value = '';
-            lukkLeggTilStasjonModal();
+            window.lukkLeggTilStasjonModal();
             alert("Stasjonen er lagt til kartet! Oppdaterer søket ditt nå.");
-            if(sisteLat && sisteLon) hentStasjoner(sisteLat, sisteLon);
+            if(sisteLat && sisteLon) window.hentStasjoner(sisteLat, sisteLon);
         }, function(e) {
             btn.innerText = "Lagre med GPS";
             alert("Kunne ikke hente GPS. Sjekk at du har gitt nettleseren lov til å se posisjonen din.");
@@ -401,10 +448,8 @@
 
     onValue(ref(db, 'priser'), async (snapshot) => {
         skylagredePriser = snapshot.val() || {};
-        
         let startOfDay = new Date(new Date().setHours(0,0,0,0)).getTime();
         let startOfYesterday = startOfDay - 86400000;
-        
         let sumDToday = 0, countDToday = 0; let sumBToday = 0, countBToday = 0;
         let sumDYes = 0, countDYes = 0; let sumBYes = 0, countBYes = 0;
 
@@ -436,7 +481,7 @@
         setTimeout(sjekkScroll, 500); 
     });
 
-    onValue(ref(db, 'egne_stasjoner'), (snapshot) => { egneStasjoner = snapshot.val() || {}; if (gjeldendeStasjoner.length > 0) hentStasjoner(sisteLat, sisteLon); });
+    onValue(ref(db, 'egne_stasjoner'), (snapshot) => { egneStasjoner = snapshot.val() || {}; if (gjeldendeStasjoner.length > 0) window.hentStasjoner(sisteLat, sisteLon); });
     onValue(ref(db, 'skjulte_stasjoner'), (snapshot) => { skjulteStasjoner = snapshot.val() || {}; if (gjeldendeStasjoner.length > 0) visStasjoner(gjeldendeStasjoner, sisteLat, sisteLon); });
     onValue(ref(db, 'stasjon_navn'), (snapshot) => { endredeNavn = snapshot.val() || {}; if (gjeldendeStasjoner.length > 0) visStasjoner(gjeldendeStasjoner, sisteLat, sisteLon); });
     onValue(ref(db, 'stasjon_gps'), (snapshot) => { endredeGps = snapshot.val() || {}; if (gjeldendeStasjoner.length > 0) visStasjoner(gjeldendeStasjoner, sisteLat, sisteLon); });
@@ -734,9 +779,6 @@
         container.innerHTML = html;
     }
 
-    window.vis98Felt = function() { document.getElementById('div-bensin98').style.display = 'block'; document.getElementById('btn-show-98').style.display = 'none'; }
-    window.visFdFelt = function() { document.getElementById('div-fd').style.display = 'block'; document.getElementById('btn-show-fd').style.display = 'none'; }
-
     function validerPris(pris) {
         if (!pris || pris === "--") return true; 
         let val = parseFloat(String(pris).replace(',', '.'));
@@ -812,35 +854,7 @@
         };
         
         await set(currentRef, newData); push(ref(db, 'historikk/' + valgtStasjonId), newData); push(ref(db, 'alle_oppdateringer'), newData); 
-        lukkModal();
-    };
-
-    window.slettStasjon = async function() {
-        if (confirm("⚠️ ER DU SIKKER?\n\nVil du slette denne stasjonen fra kartet for alle brukere? Bruk dette kun dersom stasjonen er permanent nedlagt eller ikke finnes.")) {
-            await set(ref(db, 'skjulte_stasjoner/' + valgtStasjonId), true);
-            lukkModal();
-            alert("Stasjonen er fjernet. Den blir borte neste gang kartet lastes inn.");
-        }
-    };
-
-    window.endreStasjonsNavn = async function() {
-        let currentNavn = document.getElementById('modal-station-name').innerText;
-        let nyttNavn = prompt("Skriv inn nytt navn for stasjonen:", currentNavn);
-        if (nyttNavn && nyttNavn.trim() !== "") {
-            await set(ref(db, 'stasjon_navn/' + valgtStasjonId), sanitize(nyttNavn.trim()));
-            lukkModal();
-            alert("Stasjonsnavnet er endret for alle brukere! Det oppdateres neste gang kartet lastes inn.");
-        }
-    };
-
-    window.oppdaterStasjonsGps = function() {
-        if (confirm("Vil du oppdatere stasjonens plassering til din NÅVÆRENDE posisjon?\n\nSørg for at du står fysisk på stasjonen nå!")) {
-            navigator.geolocation.getCurrentPosition(async function(p) {
-                await set(ref(db, 'stasjon_gps/' + valgtStasjonId), { lat: p.coords.latitude, lon: p.coords.longitude });
-                lukkModal();
-                alert("GPS-posisjonen for stasjonen er flyttet til der du står!");
-            }, function(e) { alert("Kunne ikke hente posisjonen din. Sjekk at GPS er på."); });
-        }
+        window.lukkModal();
     };
 
     window.visHistorikk = async function(id) {
@@ -853,7 +867,6 @@
         p.innerHTML = h.length ? h.map(i => `<div class="history-item"><span>D: ${i.diesel} | 95: ${i.bensin} ${i.bensin98 && i.bensin98 !== '--' ? '| 98: '+i.bensin98 : ''} ${i.fd && i.fd !== '--' ? '| FD: '+i.fd : ''}</span><span>${new Date(i.timestamp).toLocaleDateString()}</span></div>`).join('') : "Ingen tidligere data.";
     }
 
-    // OPPDATERT: Søkeresultat-kort er nå helt like Ytterpunktene!
     function visStasjoner(stasjoner, lat, lon) {
         const list = document.getElementById('station-list'); list.innerHTML = "";
         const featuredContainer = document.getElementById('featured-station-container');
@@ -951,7 +964,6 @@
                 let verifiedBadge = p.verified ? '<span class="verify-badge">✅</span>' : '';
                 timeAgoHtml = `<div class="time-ago" style="color: inherit; opacity: 0.85;">${formaterTid(p.timestamp, safeUser)}</div>`;
                 
-                // Legger til verified-badge i trend-variabelen for å få den inn i f-val
                 trendD += verifiedBadge;
                 trendB += verifiedBadge;
             } else {
@@ -988,7 +1000,6 @@
 
             let finalBorder = item.style.border === 'transparent' ? 'rgba(255,255,255,0.1)' : item.style.border;
 
-            // Oppdatert HTML for stasjonskortet for å matche Extremes-kortene
             const card = document.createElement('div'); 
             card.className = `station-card`;
             card.style.background = item.style.bg;
@@ -1013,7 +1024,7 @@
                 </div>
                 <div class="action-buttons">
                     <div class="update-btn" style="border-color: ${item.style.text}; color: ${item.style.text};" onclick="apneModal('${item.id}','${item.escapedName}', ${item.brukLat}, ${item.brukLon})">OPPDATER</div>
-                    <a class="nav-btn" style="border-color: ${item.style.text}; color: ${item.style.text};" href="https://www.google.com/maps/dir/?api=1&destination=${item.brukLat},${item.brukLon}" target="_blank">KJØR HIT</a>
+                    <a class="nav-btn" style="border-color: ${item.style.text}; color: ${item.style.text};" href="https://maps.google.com/?q=${item.brukLat},${item.brukLon}" target="_blank">KJØR HIT</a>
                     <div class="hist-btn" style="border-color: ${item.style.text}; color: ${item.style.text};" onclick="visHistorikk('${item.id}')">⌛ HISTORIKK</div>
                 </div>
                 <div id="hist-${item.id}" class="history-panel"></div>
@@ -1064,7 +1075,7 @@
             const d = await res.json(); 
             if(d.length>0) { 
                 sisteLand = d[0].address && d[0].address.country_code ? d[0].address.country_code : 'no'; 
-                hentStasjoner(parseFloat(d[0].lat), parseFloat(d[0].lon)); 
+                window.hentStasjoner(parseFloat(d[0].lat), parseFloat(d[0].lon)); 
             }
             else { document.getElementById('station-list').innerHTML = "<p style='text-align:center; color:var(--danger);'>Kunne ikke finne stedet.</p>"; }
         } catch (e) { document.getElementById('station-list').innerHTML = "<p style='text-align:center; color:var(--danger);'>Nettverksfeil.</p>"; }
@@ -1082,13 +1093,13 @@
                     const revData = await revRes.json();
                     sisteLand = revData.address && revData.address.country_code ? revData.address.country_code : 'no';
                 } catch(e) { sisteLand = 'no'; }
-                hentStasjoner(sisteLat, sisteLon); 
+                window.hentStasjoner(sisteLat, sisteLon); 
             },
             function(e) { document.getElementById('station-list').innerHTML = "<p style='text-align:center; color:var(--danger);'>GPS-feil.</p>"; }
         );
     };
 
-    async function hentStasjoner(lat, lon) { 
+    window.hentStasjoner = async function(lat, lon) { 
         sisteLat=lat; sisteLon=lon; const r=document.getElementById('radius').value*1000; 
         document.getElementById('station-list').innerHTML = "<p class='loading-msg'>📡 Henter data (" + r/1000 + " km)...</p>";
         try {
