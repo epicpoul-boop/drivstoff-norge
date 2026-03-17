@@ -135,6 +135,11 @@
         .admin-btn:hover { background: #3f3f4e; }
         .danger-btn { border-color: rgba(255, 68, 68, 0.5); color: #ff6666; }
         .danger-btn:hover { background: rgba(255, 68, 68, 0.15); }
+        
+        /* Design for det nye endre navn-feltet */
+        #admin-rename-div { display: none; margin-top: 12px; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); }
+        #input-new-station-name { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.4); color: white; box-sizing: border-box; font-size: 14px; }
+        #delete-tip { display: none; font-size: 11.5px; color: var(--primary); margin-top: -5px; margin-bottom: 15px; text-align: center; font-weight: 700; background: rgba(255, 122, 0, 0.1); padding: 8px; border-radius: 6px; }
     </style>
 </head>
 <body>
@@ -232,7 +237,8 @@
     <div class="modal-content">
         <h3 id="modal-station-name" style="margin-top:0">Oppdater pris</h3>
         <p id="modal-error"></p>
-        <p style="font-size:11px; color:var(--text-muted); margin-top:-5px; margin-bottom:15px; text-align:center;">Tips: Skriv et bindestrek (-) for å fjerne en feil pris.</p>
+        
+        <p id="delete-tip">Tips: Skriv tallet 0 for å slette prisen helt.</p>
         
         <div style="margin-bottom:12px">
             <label style="font-size:12px; color:var(--text-muted)">Kallenavn (Valgfritt)</label>
@@ -240,11 +246,11 @@
         </div>
         <div style="margin-bottom:12px">
             <label style="color: var(--diesel-color); font-size:12px">Diesel</label>
-            <input type="text" inputmode="decimal" id="input-diesel" oninput="this.value = this.value.replace(',', '.')">
+            <input type="text" inputmode="decimal" id="input-diesel" oninput="this.value = this.value.replace(',', '.'); sjekkSletteTips();">
         </div>
         <div style="margin-bottom:12px">
             <label style="color: var(--bensin-color); font-size:12px">Bensin 95</label>
-            <input type="text" inputmode="decimal" id="input-bensin" oninput="this.value = this.value.replace(',', '.')">
+            <input type="text" inputmode="decimal" id="input-bensin" oninput="this.value = this.value.replace(',', '.'); sjekkSletteTips();">
         </div>
         
         <div style="display:flex; gap: 10px; margin-bottom: 12px;">
@@ -254,12 +260,12 @@
         
         <div id="div-fd" style="display:none; margin-bottom:12px">
             <label style="color: var(--fd-color); font-size:12px">Farget Diesel (Avg.fri)</label>
-            <input type="text" inputmode="decimal" id="input-fd" oninput="this.value = this.value.replace(',', '.')">
+            <input type="text" inputmode="decimal" id="input-fd" oninput="this.value = this.value.replace(',', '.'); sjekkSletteTips();">
         </div>
         
         <div id="div-bensin98" style="display:none; margin-bottom:12px">
             <label style="color: var(--bensin98-color); font-size:12px">Bensin 98</label>
-            <input type="text" inputmode="decimal" id="input-bensin98" oninput="this.value = this.value.replace(',', '.')">
+            <input type="text" inputmode="decimal" id="input-bensin98" oninput="this.value = this.value.replace(',', '.'); sjekkSletteTips();">
         </div>
 
         <div style="display:flex; gap:10px">
@@ -270,9 +276,15 @@
         <div class="admin-section">
             <p class="admin-title">⚙️ Administrer stasjon</p>
             <div class="admin-row">
-                <button class="admin-btn" onclick="endreStasjonsNavn()">✏️ Endre navn</button>
+                <button class="admin-btn" onclick="visEndreNavnFelt()">✏️ Endre navn</button>
                 <button class="admin-btn" onclick="oppdaterStasjonsGps()">📍 Flytt GPS hit</button>
                 <button class="admin-btn danger-btn" onclick="slettStasjon()">🗑️ Slett stasjon</button>
+            </div>
+            
+            <div id="admin-rename-div">
+                <label style="font-size:11px; color:var(--text-muted); margin-bottom: 5px; display:block;">Nytt stasjonsnavn:</label>
+                <input type="text" id="input-new-station-name" placeholder="F.eks YX Kjørbekk">
+                <button style="padding: 10px; font-size: 13px;" onclick="lagreNyttNavn()">Lagre navn for alle brukere</button>
             </div>
         </div>
     </div>
@@ -282,10 +294,22 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
     import { getDatabase, ref, set, get, onValue, push } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
-    // --- 1. BULLETPROOF UI BINDINGS ---
+    // --- 1. BULLETPROOF UI BINDINGS & NYE FUNKSJONER ---
     window.toggleTopList = function() { const c = document.getElementById('top-list-content'); c.style.display = c.style.display==='block'?'none':'block'; setTimeout(sjekkScroll, 200); };
-    window.lukkModal = function() { document.getElementById('update-modal').style.display='none'; document.getElementById('modal-error').style.display='none'; };
+    window.lukkModal = function() { document.getElementById('update-modal').style.display='none'; document.getElementById('modal-error').style.display='none'; document.getElementById('admin-rename-div').style.display='none'; };
     window.oppdaterRadiusText = function() { document.getElementById('radius-val').innerText = document.getElementById('radius').value; };
+    
+    // Viser "Skriv 0 for å slette"-tipset hvis brukeren tømmer et felt
+    window.sjekkSletteTips = function() {
+        let d = document.getElementById('input-diesel').value;
+        let b = document.getElementById('input-bensin').value;
+        let b98 = document.getElementById('input-bensin98').value;
+        let fd = document.getElementById('input-fd').value;
+        let tip = document.getElementById('delete-tip');
+        
+        if (d === "" || b === "" || b98 === "" || fd === "") { tip.style.display = "block"; } else { tip.style.display = "none"; }
+    };
+
     window.apneModal = function(id, n, lat, lon) { 
         valgtStasjonId = id; valgtStasjonLat = lat; valgtStasjonLon = lon;
         document.getElementById('modal-station-name').innerText = n; 
@@ -299,8 +323,12 @@
         
         if (p.bensin98 && p.bensin98 !== "--") { document.getElementById('div-bensin98').style.display = 'block'; document.getElementById('btn-show-98').style.display = 'none'; } else { document.getElementById('div-bensin98').style.display = 'none'; document.getElementById('btn-show-98').style.display = 'block'; }
         if (p.fd && p.fd !== "--") { document.getElementById('div-fd').style.display = 'block'; document.getElementById('btn-show-fd').style.display = 'none'; } else { document.getElementById('div-fd').style.display = 'none'; document.getElementById('btn-show-fd').style.display = 'block'; }
+        
+        window.sjekkSletteTips(); // Sjekker om noen felter er tomme når modalen åpnes
+        document.getElementById('admin-rename-div').style.display = 'none'; // Skjuler rename-feltet som standard
         document.getElementById('update-modal').style.display = 'block'; 
     };
+
     window.vis98Felt = function() { document.getElementById('div-bensin98').style.display = 'block'; document.getElementById('btn-show-98').style.display = 'none'; };
     window.visFdFelt = function() { document.getElementById('div-fd').style.display = 'block'; document.getElementById('btn-show-fd').style.display = 'none'; };
     window.visInfoModal = () => document.getElementById('info-modal').style.display = 'block';
@@ -317,16 +345,23 @@
         }
     };
     
-    // OPPDATERT: Nå med "Er du sikker?" advarsel før den lar deg skrive nytt navn!
-    window.endreStasjonsNavn = async function() {
-        if (confirm("⚠️ ER DU SIKKER?\n\nVil du endre navnet på denne stasjonen for alle brukere i hele Norge?")) {
-            let currentNavn = document.getElementById('modal-station-name').innerText;
-            let nyttNavn = prompt("Skriv inn nytt navn for stasjonen:", currentNavn);
-            if (nyttNavn && nyttNavn.trim() !== "" && nyttNavn.trim() !== currentNavn) {
-                await set(ref(db, 'stasjon_navn/' + valgtStasjonId), sanitize(nyttNavn.trim()));
+    // NY, SKUDDSIKKER "ENDRE NAVN" FUNKSJON
+    window.visEndreNavnFelt = function() {
+        document.getElementById('admin-rename-div').style.display = 'block';
+        document.getElementById('input-new-station-name').value = document.getElementById('modal-station-name').innerText;
+    };
+
+    window.lagreNyttNavn = async function() {
+        let nyttNavn = document.getElementById('input-new-station-name').value.trim();
+        let currentNavn = document.getElementById('modal-station-name').innerText;
+        if (nyttNavn && nyttNavn !== currentNavn) {
+            if (confirm(`Er du helt sikker på at du vil bytte navn til:\n"${nyttNavn}"\n\nDette endres for alle brukere i Norge!`)) {
+                await set(ref(db, 'stasjon_navn/' + valgtStasjonId), sanitize(nyttNavn));
                 window.lukkModal();
-                alert("Stasjonsnavnet er endret! Det oppdateres på kartet nå.");
+                alert("Stasjonsnavnet er oppdatert! Det synes neste gang noen laster kartet.");
             }
+        } else {
+            alert("Du må skrive inn et nytt navn først.");
         }
     };
     
@@ -378,7 +413,6 @@
         return temp.innerHTML;
     }
 
-    // OPPDATERT: Deler nå det nye .no domenet!
     window.delAppen = async () => {
         const shareData = {
             title: 'Drivstoff Norge ⛽',
@@ -784,9 +818,9 @@
         container.innerHTML = html;
     }
 
-    // OPPDATERT: Godtar nå bindestrek ("-") som en gyldig slette-kommando
+    // OPPDATERT: Godtar nå "0" som en slette-kommando!
     function validerPris(pris) {
-        if (!pris || pris === "--" || pris === "-") return true; 
+        if (!pris || pris === "--" || pris === "0") return true; 
         let val = parseFloat(String(pris).replace(',', '.'));
         if (isNaN(val)) return false;
         return (val >= 10 && val <= 35); 
@@ -833,23 +867,23 @@
 
         let prev_d = oldData.diesel || "--"; let prev_b = oldData.bensin || "--"; let prev_b98 = oldData.bensin98 || "--"; let prev_fd = oldData.fd || "--";
 
-        // OPPDATERT: Logikk for å slette (skrive bindestrek) eller beholde gammel (la stå tom)
-        if (d === "-") d = "--";
+        // OPPDATERT: Hvis brukeren taster 0, slettes prisen til "--"
+        if (d === "0") d = "--";
         else if (!d) d = oldData.diesel || "--";
         else if (d !== oldData.diesel && oldData.diesel && oldData.diesel !== "--") prev_d = oldData.diesel;
         else prev_d = oldData.prev_diesel || "--";
 
-        if (b === "-") b = "--";
+        if (b === "0") b = "--";
         else if (!b) b = oldData.bensin || "--";
         else if (b !== oldData.bensin && oldData.bensin && oldData.bensin !== "--") prev_b = oldData.bensin;
         else prev_b = oldData.prev_bensin || "--";
 
-        if (b98 === "-") b98 = "--";
+        if (b98 === "0") b98 = "--";
         else if (!b98) b98 = oldData.bensin98 || "--";
         else if (b98 !== oldData.bensin98 && oldData.bensin98 && oldData.bensin98 !== "--") prev_b98 = oldData.bensin98;
         else prev_b98 = oldData.prev_bensin98 || "--";
 
-        if (fd === "-") fd = "--";
+        if (fd === "0") fd = "--";
         else if (!fd) fd = oldData.fd || "--";
         else if (fd !== oldData.fd && oldData.fd && oldData.fd !== "--") prev_fd = oldData.fd;
         else prev_fd = oldData.prev_fd || "--";
