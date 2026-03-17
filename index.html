@@ -136,10 +136,8 @@
         .danger-btn { border-color: rgba(255, 68, 68, 0.5); color: #ff6666; }
         .danger-btn:hover { background: rgba(255, 68, 68, 0.15); }
         
-        /* Design for det nye endre navn-feltet */
         #admin-rename-div { display: none; margin-top: 12px; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); }
         #input-new-station-name { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.4); color: white; box-sizing: border-box; font-size: 14px; }
-        #delete-tip { display: none; font-size: 11.5px; color: var(--primary); margin-top: -5px; margin-bottom: 15px; text-align: center; font-weight: 700; background: rgba(255, 122, 0, 0.1); padding: 8px; border-radius: 6px; }
     </style>
 </head>
 <body>
@@ -238,19 +236,18 @@
         <h3 id="modal-station-name" style="margin-top:0">Oppdater pris</h3>
         <p id="modal-error"></p>
         
-        <p id="delete-tip">Tips: Skriv tallet 0 for å slette prisen helt.</p>
-        
         <div style="margin-bottom:12px">
             <label style="font-size:12px; color:var(--text-muted)">Kallenavn (Valgfritt)</label>
             <input type="text" id="input-nickname" placeholder="La stå tom for å være Anonym">
         </div>
+        
         <div style="margin-bottom:12px">
             <label style="color: var(--diesel-color); font-size:12px">Diesel</label>
-            <input type="text" inputmode="decimal" id="input-diesel" oninput="this.value = this.value.replace(',', '.'); sjekkSletteTips();">
+            <input type="text" inputmode="decimal" id="input-diesel" placeholder="Skriv 0 for å slette" oninput="this.value = this.value.replace(',', '.')">
         </div>
         <div style="margin-bottom:12px">
             <label style="color: var(--bensin-color); font-size:12px">Bensin 95</label>
-            <input type="text" inputmode="decimal" id="input-bensin" oninput="this.value = this.value.replace(',', '.'); sjekkSletteTips();">
+            <input type="text" inputmode="decimal" id="input-bensin" placeholder="Skriv 0 for å slette" oninput="this.value = this.value.replace(',', '.')">
         </div>
         
         <div style="display:flex; gap: 10px; margin-bottom: 12px;">
@@ -260,12 +257,12 @@
         
         <div id="div-fd" style="display:none; margin-bottom:12px">
             <label style="color: var(--fd-color); font-size:12px">Farget Diesel (Avg.fri)</label>
-            <input type="text" inputmode="decimal" id="input-fd" oninput="this.value = this.value.replace(',', '.'); sjekkSletteTips();">
+            <input type="text" inputmode="decimal" id="input-fd" placeholder="Skriv 0 for å slette" oninput="this.value = this.value.replace(',', '.')">
         </div>
         
         <div id="div-bensin98" style="display:none; margin-bottom:12px">
             <label style="color: var(--bensin98-color); font-size:12px">Bensin 98</label>
-            <input type="text" inputmode="decimal" id="input-bensin98" oninput="this.value = this.value.replace(',', '.'); sjekkSletteTips();">
+            <input type="text" inputmode="decimal" id="input-bensin98" placeholder="Skriv 0 for å slette" oninput="this.value = this.value.replace(',', '.')">
         </div>
 
         <div style="display:flex; gap:10px">
@@ -299,17 +296,6 @@
     window.lukkModal = function() { document.getElementById('update-modal').style.display='none'; document.getElementById('modal-error').style.display='none'; document.getElementById('admin-rename-div').style.display='none'; };
     window.oppdaterRadiusText = function() { document.getElementById('radius-val').innerText = document.getElementById('radius').value; };
     
-    // Viser "Skriv 0 for å slette"-tipset hvis brukeren tømmer et felt
-    window.sjekkSletteTips = function() {
-        let d = document.getElementById('input-diesel').value;
-        let b = document.getElementById('input-bensin').value;
-        let b98 = document.getElementById('input-bensin98').value;
-        let fd = document.getElementById('input-fd').value;
-        let tip = document.getElementById('delete-tip');
-        
-        if (d === "" || b === "" || b98 === "" || fd === "") { tip.style.display = "block"; } else { tip.style.display = "none"; }
-    };
-
     window.apneModal = function(id, n, lat, lon) { 
         valgtStasjonId = id; valgtStasjonLat = lat; valgtStasjonLon = lon;
         document.getElementById('modal-station-name').innerText = n; 
@@ -324,8 +310,7 @@
         if (p.bensin98 && p.bensin98 !== "--") { document.getElementById('div-bensin98').style.display = 'block'; document.getElementById('btn-show-98').style.display = 'none'; } else { document.getElementById('div-bensin98').style.display = 'none'; document.getElementById('btn-show-98').style.display = 'block'; }
         if (p.fd && p.fd !== "--") { document.getElementById('div-fd').style.display = 'block'; document.getElementById('btn-show-fd').style.display = 'none'; } else { document.getElementById('div-fd').style.display = 'none'; document.getElementById('btn-show-fd').style.display = 'block'; }
         
-        window.sjekkSletteTips(); // Sjekker om noen felter er tomme når modalen åpnes
-        document.getElementById('admin-rename-div').style.display = 'none'; // Skjuler rename-feltet som standard
+        document.getElementById('admin-rename-div').style.display = 'none';
         document.getElementById('update-modal').style.display = 'block'; 
     };
 
@@ -337,28 +322,34 @@
     window.lukkLeggTilStasjonModal = () => document.getElementById('add-station-modal').style.display = 'none';
     window.blaNedover = () => { window.scrollBy({ top: window.innerHeight * 0.7, behavior: 'smooth' }); };
     
-    window.slettStasjon = async function() {
+    // OPPDATERT: Bruker sikrere Promises (.then/.catch) i stedet for await for å fange feil
+    window.slettStasjon = function() {
         if (confirm("⚠️ ER DU SIKKER?\n\nVil du slette denne stasjonen fra kartet for alle brukere? Bruk dette kun dersom stasjonen er permanent nedlagt eller ikke finnes.")) {
-            await set(ref(db, 'skjulte_stasjoner/' + valgtStasjonId), true);
-            lukkModal();
-            alert("Stasjonen er fjernet. Den blir borte neste gang kartet lastes inn.");
+            let safeId = String(valgtStasjonId).replace(/[\.\#\$\[\]\/]/g, "_"); 
+            set(ref(db, 'skjulte_stasjoner/' + safeId), true)
+            .then(() => {
+                window.lukkModal();
+                alert("Stasjonen er fjernet. Den blir borte neste gang kartet lastes inn.");
+            }).catch(e => alert("Noe gikk galt: " + e.message));
         }
     };
     
-    // NY, SKUDDSIKKER "ENDRE NAVN" FUNKSJON
     window.visEndreNavnFelt = function() {
         document.getElementById('admin-rename-div').style.display = 'block';
         document.getElementById('input-new-station-name').value = document.getElementById('modal-station-name').innerText;
     };
 
-    window.lagreNyttNavn = async function() {
+    window.lagreNyttNavn = function() {
         let nyttNavn = document.getElementById('input-new-station-name').value.trim();
         let currentNavn = document.getElementById('modal-station-name').innerText;
         if (nyttNavn && nyttNavn !== currentNavn) {
             if (confirm(`Er du helt sikker på at du vil bytte navn til:\n"${nyttNavn}"\n\nDette endres for alle brukere i Norge!`)) {
-                await set(ref(db, 'stasjon_navn/' + valgtStasjonId), sanitize(nyttNavn));
-                window.lukkModal();
-                alert("Stasjonsnavnet er oppdatert! Det synes neste gang noen laster kartet.");
+                let safeId = String(valgtStasjonId).replace(/[\.\#\$\[\]\/]/g, "_"); 
+                set(ref(db, 'stasjon_navn/' + safeId), sanitize(nyttNavn))
+                .then(() => {
+                    window.lukkModal();
+                    alert("Stasjonsnavnet er oppdatert! Det synes neste gang du søker eller laster kartet.");
+                }).catch(e => alert("Noe gikk galt: " + e.message));
             }
         } else {
             alert("Du må skrive inn et nytt navn først.");
@@ -367,10 +358,13 @@
     
     window.oppdaterStasjonsGps = function() {
         if (confirm("Vil du oppdatere stasjonens plassering til din NÅVÆRENDE posisjon?\n\nSørg for at du står fysisk på stasjonen nå!")) {
-            navigator.geolocation.getCurrentPosition(async function(p) {
-                await set(ref(db, 'stasjon_gps/' + valgtStasjonId), { lat: p.coords.latitude, lon: p.coords.longitude });
-                lukkModal();
-                alert("GPS-posisjonen for stasjonen er flyttet til der du står!");
+            navigator.geolocation.getCurrentPosition(function(p) {
+                let safeId = String(valgtStasjonId).replace(/[\.\#\$\[\]\/]/g, "_"); 
+                set(ref(db, 'stasjon_gps/' + safeId), { lat: p.coords.latitude, lon: p.coords.longitude })
+                .then(() => {
+                    window.lukkModal();
+                    alert("GPS-posisjonen for stasjonen er flyttet til der du står!");
+                }).catch(e => alert("Noe gikk galt: " + e.message));
             }, function(e) { alert("Kunne ikke hente posisjonen din. Sjekk at GPS er på."); });
         }
     };
@@ -454,28 +448,6 @@
         }
     }
     window.addEventListener('scroll', sjekkScroll); window.addEventListener('resize', sjekkScroll);
-
-    window.lagreNyStasjon = () => {
-        const btn = document.getElementById('btn-save-station');
-        const navn = sanitize(document.getElementById('new-station-name').value.trim());
-        if(!navn) { alert("Du må skrive inn et stasjonsnavn!"); return; }
-        
-        btn.innerText = "Henter posisjon...";
-        navigator.geolocation.getCurrentPosition(async function(p) {
-            const nyId = 'egen_' + Date.now();
-            await set(ref(db, 'egne_stasjoner/' + nyId), {
-                navn: navn, lat: p.coords.latitude, lon: p.coords.longitude, opprettetAv: myUid
-            });
-            btn.innerText = "Lagre med GPS";
-            document.getElementById('new-station-name').value = '';
-            window.lukkLeggTilStasjonModal();
-            alert("Stasjonen er lagt til kartet! Oppdaterer søket ditt nå.");
-            if(sisteLat && sisteLon) window.hentStasjoner(sisteLat, sisteLon);
-        }, function(e) {
-            btn.innerText = "Lagre med GPS";
-            alert("Kunne ikke hente GPS. Sjekk at du har gitt nettleseren lov til å se posisjonen din.");
-        });
-    }
 
     let valgtStasjonId = null; let valgtStasjonLat = null; let valgtStasjonLon = null; 
     let gjeldendeStasjoner = []; let sisteLat = null, sisteLon = null;
@@ -618,65 +590,21 @@
 
     function getBrandStyle(name) {
         const n = name.toLowerCase();
-        let styles = {
-            bg: 'linear-gradient(135deg, #3a3a4d 0%, #2b2b36 100%)', 
-            text: '#f0f0f0', 
-            border: 'transparent', 
-            char: '⛽'
-        };
+        let styles = { bg: 'linear-gradient(135deg, #3a3a4d 0%, #2b2b36 100%)', text: '#f0f0f0', border: 'transparent', char: '⛽' };
 
-        if (n.includes("yx")) { 
-            styles.bg = 'linear-gradient(135deg, #ff3a40 0%, #ed1c24 100%)'; 
-            styles.text = '#ffffff'; styles.border = '#0055b8'; styles.char = 'Y'; 
-        }
-        else if (n.includes("circle k")) { 
-            styles.bg = 'linear-gradient(135deg, #ff4d52 0%, #ed1c24 100%)'; 
-            styles.text = '#ffffff'; styles.border = '#ff9800'; styles.char = 'C'; 
-        }
-        else if (n.includes("uno-x") || n.includes("unox")) { 
-            styles.bg = 'linear-gradient(135deg, #ffcc33 0%, #e5a904 100%)'; 
-            styles.text = '#222222'; styles.border = '#ed1c24'; styles.char = 'U'; 
-        }
-        else if (n.includes("esso")) { 
-            styles.bg = 'linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%)'; 
-            styles.text = '#df1820'; styles.border = '#0055b8'; styles.char = 'E'; 
-        }
-        else if (n.includes("tanken")) { 
-            styles.bg = 'linear-gradient(135deg, #ff2026 0%, #ed1c24 100%)'; 
-            styles.text = '#ffffff'; styles.border = '#ffffff'; styles.char = 'T'; 
-        }
-        else if (n.includes("driv")) { 
-            styles.bg = 'linear-gradient(135deg, #ff3a40 0%, #ed1c24 100%)'; 
-            styles.text = '#ffffff'; styles.border = '#ed1c24'; styles.char = 'D'; 
-        }
-        else if (n.includes("st1")) { 
-            styles.bg = 'linear-gradient(135deg, #ffff33 0%, #ffe100 100%)'; 
-            styles.text = '#ed1c24'; styles.border = '#ffffff'; styles.char = 'S'; 
-        }
-        else if (n.includes("oljeleverandøren")) { 
-            styles.bg = 'linear-gradient(135deg, #4d4d4d 0%, #333333 100%)'; 
-            styles.text = '#ff9800'; styles.border = '#ffffff'; styles.char = 'O'; 
-        }
-        else if (n.includes("best")) { 
-            styles.bg = 'linear-gradient(135deg, #1a75ff 0%, #0055b8 100%)'; 
-            styles.text = '#ffffff'; styles.border = '#ff9800'; styles.char = 'B'; 
-        }
-        else if (n.includes("bunker oil") || n.includes("bunkeroil")) { 
-            styles.bg = 'linear-gradient(135deg, #ffffff 0%, #f9f9f9 100%)'; 
-            styles.text = '#0055b8'; styles.border = '#ed1c24'; styles.char = 'B'; 
-        }
-        else if (n.includes("haltbakk")) { 
-            styles.bg = 'linear-gradient(135deg, #222222 0%, #111111 100%)'; 
-            styles.text = '#4caf50'; styles.border = '#4caf50'; styles.char = 'H'; 
-        }
-        else if (n.includes("lpg")) { 
-            styles.bg = 'linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%)'; 
-            styles.text = '#4caf50'; styles.border = '#4caf50'; styles.char = 'L'; 
-        }
-        else if (n.includes("shell")) { 
-            styles.bg = 'linear-gradient(135deg, #ffe066 0%, #ffcc00 100%)'; 
-            styles.text = '#ed1c24'; styles.border = '#ed1c24'; styles.char = 'S'; 
-        }
+        if (n.includes("yx")) { styles.bg = 'linear-gradient(135deg, #ff3a40 0%, #ed1c24 100%)'; styles.text = '#ffffff'; styles.border = '#0055b8'; styles.char = 'Y'; }
+        else if (n.includes("circle k")) { styles.bg = 'linear-gradient(135deg, #ff4d52 0%, #ed1c24 100%)'; styles.text = '#ffffff'; styles.border = '#ff9800'; styles.char = 'C'; }
+        else if (n.includes("uno-x") || n.includes("unox")) { styles.bg = 'linear-gradient(135deg, #ffcc33 0%, #e5a904 100%)'; styles.text = '#222222'; styles.border = '#ed1c24'; styles.char = 'U'; }
+        else if (n.includes("esso")) { styles.bg = 'linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%)'; styles.text = '#df1820'; styles.border = '#0055b8'; styles.char = 'E'; }
+        else if (n.includes("tanken")) { styles.bg = 'linear-gradient(135deg, #ff2026 0%, #ed1c24 100%)'; styles.text = '#ffffff'; styles.border = '#ffffff'; styles.char = 'T'; }
+        else if (n.includes("driv")) { styles.bg = 'linear-gradient(135deg, #ff3a40 0%, #ed1c24 100%)'; styles.text = '#ffffff'; styles.border = '#ed1c24'; styles.char = 'D'; }
+        else if (n.includes("st1")) { styles.bg = 'linear-gradient(135deg, #ffff33 0%, #ffe100 100%)'; styles.text = '#ed1c24'; styles.border = '#ffffff'; styles.char = 'S'; }
+        else if (n.includes("oljeleverandøren")) { styles.bg = 'linear-gradient(135deg, #4d4d4d 0%, #333333 100%)'; styles.text = '#ff9800'; styles.border = '#ffffff'; styles.char = 'O'; }
+        else if (n.includes("best")) { styles.bg = 'linear-gradient(135deg, #1a75ff 0%, #0055b8 100%)'; styles.text = '#ffffff'; styles.border = '#ff9800'; styles.char = 'B'; }
+        else if (n.includes("bunker oil") || n.includes("bunkeroil")) { styles.bg = 'linear-gradient(135deg, #ffffff 0%, #f9f9f9 100%)'; styles.text = '#0055b8'; styles.border = '#ed1c24'; styles.char = 'B'; }
+        else if (n.includes("haltbakk")) { styles.bg = 'linear-gradient(135deg, #222222 0%, #111111 100%)'; styles.text = '#4caf50'; styles.border = '#4caf50'; styles.char = 'H'; }
+        else if (n.includes("lpg")) { styles.bg = 'linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%)'; styles.text = '#4caf50'; styles.border = '#4caf50'; styles.char = 'L'; }
+        else if (n.includes("shell")) { styles.bg = 'linear-gradient(135deg, #ffe066 0%, #ffcc00 100%)'; styles.text = '#ed1c24'; styles.border = '#ed1c24'; styles.char = 'S'; }
 
         return styles;
     }
@@ -818,7 +746,7 @@
         container.innerHTML = html;
     }
 
-    // OPPDATERT: Godtar nå "0" som en slette-kommando!
+    // OPPDATERT: Sjekker for "0" for å slette priser
     function validerPris(pris) {
         if (!pris || pris === "--" || pris === "0") return true; 
         let val = parseFloat(String(pris).replace(',', '.'));
@@ -867,7 +795,7 @@
 
         let prev_d = oldData.diesel || "--"; let prev_b = oldData.bensin || "--"; let prev_b98 = oldData.bensin98 || "--"; let prev_fd = oldData.fd || "--";
 
-        // OPPDATERT: Hvis brukeren taster 0, slettes prisen til "--"
+        // OPPDATERT: Gjør om "0" til sletting av prisen
         if (d === "0") d = "--";
         else if (!d) d = oldData.diesel || "--";
         else if (d !== oldData.diesel && oldData.diesel && oldData.diesel !== "--") prev_d = oldData.diesel;
@@ -898,7 +826,11 @@
             timestamp: Date.now(), user: n, uid: myUid, verified: verified, navn: stasjonNavn, lat: valgtStasjonLat, lon: valgtStasjonLon, land: sisteLand 
         };
         
-        await set(currentRef, newData); push(ref(db, 'historikk/' + valgtStasjonId), newData); push(ref(db, 'alle_oppdateringer'), newData); 
+        let safeId = String(valgtStasjonId).replace(/[\.\#\$\[\]\/]/g, "_");
+        await set(ref(db, 'priser/' + safeId), newData); 
+        push(ref(db, 'historikk/' + safeId), newData); 
+        push(ref(db, 'alle_oppdateringer'), newData); 
+        
         window.lukkModal();
     };
 
@@ -906,7 +838,8 @@
         const p = document.getElementById('hist-' + id);
         if (p.style.display === 'block') { p.style.display = 'none'; return; }
         p.style.display = 'block'; p.innerText = "Henter...";
-        const snap = await get(ref(db, 'historikk/' + id)); const data = snap.val();
+        let safeId = String(id).replace(/[\.\#\$\[\]\/]/g, "_");
+        const snap = await get(ref(db, 'historikk/' + safeId)); const data = snap.val();
         if (!data) { p.innerText = "Ingen historikk."; return; }
         const h = Object.values(data).reverse().slice(1, 4);
         p.innerHTML = h.length ? h.map(i => `<div class="history-item"><span>D: ${i.diesel} | 95: ${i.bensin} ${i.bensin98 && i.bensin98 !== '--' ? '| 98: '+i.bensin98 : ''} ${i.fd && i.fd !== '--' ? '| FD: '+i.fd : ''}</span><span>${new Date(i.timestamp).toLocaleDateString()}</span></div>`).join('') : "Ingen tidligere data.";
@@ -918,7 +851,10 @@
         featuredContainer.innerHTML = ""; featuredContainer.style.display = 'none';
         document.getElementById('global-featured-container').style.display = 'none';
 
-        let gyldigeStasjoner = stasjoner.filter(s => !skjulteStasjoner[s.id]);
+        let gyldigeStasjoner = stasjoner.filter(s => {
+            let safeId = String(s.id).replace(/[\.\#\$\[\]\/]/g, "_");
+            return !skjulteStasjoner[safeId];
+        });
 
         if (gyldigeStasjoner.length === 0) { list.innerHTML = "<p style='text-align:center; color:var(--text-muted); margin-top:20px; font-weight:400;'>Ingen stasjoner funnet i dette området.</p>"; return; }
 
@@ -929,7 +865,7 @@
         let sumDLoc = 0, countDLoc = 0, sumBLoc = 0, countBLoc = 0;
 
         Object.values(skylagredePriser).forEach(p => {
-            if (skjulteStasjoner[p.id]) return; 
+            // OBS: p inneholder kanskje ikke id, men den ignoreres uansett pga filter over
             if (p.land && p.land !== 'no') return; 
             
             let d = parseFloat(p.diesel ? String(p.diesel).replace(',', '.') : NaN);
@@ -944,10 +880,6 @@
 
                 let pLat = p.lat;
                 let pLon = p.lon;
-                if (endredeGps[p.id]) {
-                    pLat = endredeGps[p.id].lat;
-                    pLon = endredeGps[p.id].lon;
-                }
 
                 if (pLat && pLon && lat && lon) {
                     let dist = regnUtAvstand(lat, lon, pLat, pLon);
@@ -970,17 +902,18 @@
 
         let processedStasjoner = gyldigeStasjoner.map((s, index) => {
             const id = s.id;
-            const p = skylagredePriser[id] || { diesel: "--", bensin: "--", bensin98: "--", fd: "--", timestamp: 0 };
+            let safeId = String(id).replace(/[\.\#\$\[\]\/]/g, "_");
+            const p = skylagredePriser[safeId] || { diesel: "--", bensin: "--", bensin98: "--", fd: "--", timestamp: 0 };
             
             let brukLat = s.lat;
             let brukLon = s.lon;
-            if (endredeGps[id]) {
-                brukLat = endredeGps[id].lat;
-                brukLon = endredeGps[id].lon;
+            if (endredeGps[safeId]) {
+                brukLat = endredeGps[safeId].lat;
+                brukLon = endredeGps[safeId].lon;
             }
             const dist = regnUtAvstand(lat, lon, brukLat, brukLon);
             
-            let bruktNavn = endredeNavn[id] || (s.tags && (s.tags.name || s.tags.brand)) || "Stasjon";
+            let bruktNavn = endredeNavn[safeId] || (s.tags && (s.tags.name || s.tags.brand)) || "Stasjon";
             const navn = sanitize(bruktNavn);
             const escapedName = navn.replace(/'/g, "\\'");
             const style = getBrandStyle(navn);
