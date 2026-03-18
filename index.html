@@ -14,9 +14,9 @@
     
     <style>
         :root {
-            --bg-color: #0a0a0c; /* Enda mørkere bakgrunn for å la flaggsløret poppe */
-            --card-bg: rgba(43, 43, 54, 0.85); /* Halvgjennomsiktig for glass-effekt */
-            --primary: #0066cc; /* Endret fra oransje til en solid, proff blåfarge */
+            --bg-color: #0a0a0c; 
+            --card-bg: rgba(43, 43, 54, 0.85); 
+            --primary: #0066cc; 
             --text-main: #f0f0f0;
             --text-muted: #a0a0a0;
             --diesel-color: #ff9800;
@@ -44,13 +44,11 @@
             z-index: 1;
         }
 
-        /* Det uskarpe Norske Flagg-sløret i bakgrunnen */
         body::before {
             content: '';
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             z-index: -1;
-            /* Vertikale striper: Rød - Hvit - Blå - Hvit - Rød */
             background: linear-gradient(to right,
                 #6b0b1a 0%, #6b0b1a 35%,
                 #ffffff 35%, #ffffff 40%,
@@ -58,18 +56,17 @@
                 #ffffff 60%, #ffffff 65%,
                 #6b0b1a 65%, #6b0b1a 100%
             );
-            filter: blur(70px); /* Ekstrem blur for å lage et slør */
-            opacity: 0.25; /* Mørkt og diskret */
-            transform: scale(1.2); /* Forhindrer hvite kanter fra blur-effekten */
+            filter: blur(70px); 
+            opacity: 0.25; 
+            transform: scale(1.2); 
         }
 
-        /* Ny, fancy overskrift */
         h2 { 
             text-align: center; 
             margin-bottom: 18px; 
             font-size: 24px; 
             font-weight: 800; 
-            font-family: 'Montserrat', sans-serif; /* Bruker den nye fonten */
+            font-family: 'Montserrat', sans-serif; 
             letter-spacing: 1.5px;
             color: #ffffff;
             text-transform: uppercase;
@@ -79,10 +76,9 @@
         .install-banner { display: none; background-color: var(--primary); color: white; padding: 12px; border-radius: var(--radius-md); margin-bottom: 20px; position: relative; text-align: center; }
         .install-arrow { position: absolute; top: -15px; right: 15px; font-size: 18px; }
 
-        /* Felles stil for Top 10-kortet og Søkepanelet for å samskjøre gråfargen */
         .leaderboard-card, .panel { 
             background: var(--card-bg); 
-            backdrop-filter: blur(12px); /* Glassmorphism-effekt over flaggsløret */
+            backdrop-filter: blur(12px); 
             -webkit-backdrop-filter: blur(12px);
             border-radius: var(--radius-md); 
             padding: 15px; 
@@ -123,17 +119,7 @@
         .loading-msg { text-align: center; color: var(--primary); font-weight: 700; margin-top: 20px; font-size: 14px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
         .error-msg { text-align: center; color: var(--danger); font-weight: 700; margin-top: 20px; font-size: 14px; line-height: 1.5; }
 
-        .station-card, .featured-card { 
-            border-radius: var(--radius-md); 
-            padding: 12px 15px; 
-            margin-bottom: 15px; 
-            color: white; 
-            position: relative; 
-            overflow: hidden; 
-            border: 3px solid transparent; 
-            box-shadow: var(--shadow-md); 
-            transition: var(--transition); 
-        }
+        .station-card, .featured-card { border-radius: var(--radius-md); padding: 12px 15px; margin-bottom: 15px; color: white; position: relative; overflow: hidden; border: 3px solid transparent; box-shadow: var(--shadow-md); transition: var(--transition); }
         
         .featured-header { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; opacity: 0.9; font-weight: 700; display: flex; align-items: center; z-index: 2; position: relative; }
         .featured-title { font-size: 15px; font-weight: 700; margin: 0 0 10px 0; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); display: flex; justify-content: space-between; align-items: center; z-index: 2; position: relative; }
@@ -245,9 +231,9 @@
 
         <div class="footer-text">
             <strong>Personvern:</strong> Vi sporer deg ikke. Posisjonen din brukes kun lokalt for å finne stasjoner. 
-            Vi lagrer kun kallenavnet ditt og en anonym ID for å sikre bidragene dine. Ingen reklame, ingen abonnement.
+            Appen bruker sikker, usynlig innlogging (Google Auth) i bakgrunnen for å beskytte dugnaden mot manipulasjon. Ingen reklame, ingen abonnement.
             <br><br>
-            <span style="color: var(--primary);">⚠️ Viktig om kallenavn:</span> Appen har ingen passord for å holde ting lynraskt og enkelt. Hvis du sletter nettleserdataen din, får du tilbake poengene og titlene dine ved å bare skrive inn nøyaktig samme kallenavn neste gang du oppdaterer en pris! Vi stoler på dugnadsånden, så vi håper ingen utnytter dette til å stjele andres kallenavn. 🤞
+            <span style="color: var(--primary);">⚠️ Viktig om kallenavn:</span> Appen har ingen passord for å holde ting lynraskt og enkelt. Kallenavnet ditt er nå trygt knyttet til enheten din!
         </div>
         
         <a class="appstore-link" onclick="visInfoModal()">Hvorfor er ikke appen i App Store?</a>
@@ -342,8 +328,10 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
     import { getDatabase, ref, set, get, onValue, push } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+    
+    // NYTT: Importerer Auth fra Firebase
+    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
-    // --- 1. BULLETPROOF UI BINDINGS & NYE FUNKSJONER ---
     window.toggleTopList = function() { const c = document.getElementById('top-list-content'); c.style.display = c.style.display==='block'?'none':'block'; setTimeout(sjekkScroll, 200); };
     window.lukkModal = function() { document.getElementById('update-modal').style.display='none'; document.getElementById('modal-error').style.display='none'; document.getElementById('admin-rename-div').style.display='none'; };
     window.oppdaterRadiusText = function() { document.getElementById('radius-val').innerText = document.getElementById('radius').value; };
@@ -433,9 +421,21 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
+    
+    // NYTT: Initialiserer Usynlig Innlogging
+    const auth = getAuth(app);
+    let myUid = null; 
 
-    let myUid = localStorage.getItem('drivstoff_uid') || ('u-' + Math.random().toString(36).substr(2, 9));
-    localStorage.setItem('drivstoff_uid', myUid);
+    // Logger inn automatisk i bakgrunnen
+    signInAnonymously(auth).catch((error) => {
+        console.error("Kunne ikke koble til sikkerhetsserver:", error.message);
+    });
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            myUid = user.uid; // Dette er nå den skuddsikre Google-IDen!
+        }
+    });
 
     const ua = navigator.userAgent || navigator.vendor || window.opera;
     const isFacebookApp = (ua.indexOf("FBAN") > -1) || (ua.indexOf("FBAV") > -1) || (ua.indexOf("Instagram") > -1);
@@ -801,10 +801,15 @@
         if (!pris || pris === "--" || pris === "0") return true; 
         let val = parseFloat(String(pris).replace(',', '.'));
         if (isNaN(val)) return false;
-        return (val >= 10 && val <= 35); 
+        return (val >= 14 && val <= 35); // OPPDATERT: Nekter nå alt under 14 kr
     }
 
     window.lagrePris = async function() {
+        if (!myUid) {
+            document.getElementById('modal-error').innerText = "Venter på sikker tilkobling... Prøv igjen om 1 sekund.";
+            document.getElementById('modal-error').style.display = "block"; return;
+        }
+
         let d = document.getElementById('input-diesel').value.trim();
         let b = document.getElementById('input-bensin').value.trim();
         let b98 = document.getElementById('input-bensin98').value.trim();
@@ -816,7 +821,7 @@
         if (!d && !b && !b98 && !fd) { modalError.innerText = "Du må fylle inn minst én pris!"; modalError.style.display = "block"; return; }
 
         if (!validerPris(d) || !validerPris(b) || !validerPris(b98) || !validerPris(fd)) {
-            modalError.innerHTML = "⚠️ <b>Urealistisk pris!</b><br>Prisen må være mellom 10.00 og 35.00 kr.";
+            modalError.innerHTML = "⚠️ <b>Urealistisk pris!</b><br>Prisen må være mellom 14.00 og 35.00 kr.";
             modalError.style.display = "block"; return;
         }
 
@@ -833,7 +838,6 @@
             if (nameSnap.exists() && nameSnap.val() !== myUid) {
                 const bekreft = confirm(`Kallenavnet '${n}' er allerede i bruk av noen andre.\n\nEr dette deg? Trykk OK for å hente tilbake profilen din.\nTrykk Avbryt for å velge et annet navn.`);
                 if (!bekreft) return; 
-                myUid = nameSnap.val(); localStorage.setItem('drivstoff_uid', myUid);
             } else if (!nameSnap.exists()) { 
                 await set(nameRef, myUid); 
             }
