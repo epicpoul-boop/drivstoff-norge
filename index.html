@@ -107,8 +107,8 @@
 
         #global-featured-container, #featured-station-container { display: none; margin-bottom: 20px; }
         
-        input[type=text] { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background-color: rgba(0,0,0,0.3); color: white; box-sizing: border-box; font-size: 15px; outline: none; transition: var(--transition); }
-        input[type=text]:focus { border-color: var(--primary); background-color: rgba(0,0,0,0.4); }
+        input[type=text], input[type=password], input[type=email] { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background-color: rgba(0,0,0,0.3); color: white; box-sizing: border-box; font-size: 15px; outline: none; transition: var(--transition); }
+        input[type=text]:focus, input[type=password]:focus, input[type=email]:focus { border-color: var(--primary); background-color: rgba(0,0,0,0.4); }
         input[type=range] { width: 100%; accent-color: var(--primary); margin-bottom: 10px; }
         button { width: 100%; padding: 14px; background-color: var(--primary); color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 15px; transition: var(--transition); }
         button:active { opacity: 0.8; transform: scale(0.98); }
@@ -175,7 +175,10 @@
         .danger-btn:hover { background: rgba(255, 68, 68, 0.15); }
         
         #admin-rename-div { display: none; margin-top: 12px; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); }
-        #input-new-station-name { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.4); color: white; box-sizing: border-box; font-size: 14px; }
+        
+        /* HEMMELIG ADMIN PANEL STYLING */
+        #skjult-admin-panel { display: none; background: linear-gradient(135deg, #1a1a24 0%, #0a0a0c 100%); border: 2px solid var(--gold); border-radius: var(--radius-md); padding: 15px; margin-bottom: 20px; box-shadow: 0 0 15px rgba(255, 215, 0, 0.2); }
+        .admin-header { color: var(--gold); font-weight: 800; text-transform: uppercase; font-size: 16px; margin-top: 0; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
     </style>
 </head>
 <body>
@@ -186,7 +189,13 @@
         <span id="banner-arrow" class="install-arrow">⬆️</span>
     </div>
 
-    <h2>DRIVSTOFF NORGE</h2>
+    <h2 id="app-tittel" style="user-select: none; -webkit-user-select: none; cursor: pointer;">DRIVSTOFF NORGE</h2>
+
+    <div id="skjult-admin-panel">
+        <h3 class="admin-header">👑 Admin Sentral</h3>
+        <p style="font-size: 12px; color: var(--text-muted); margin-top: 0;">Velkommen, Sjef. Her kommer snart modulene for å godkjenne navnesøknader.</p>
+        <button style="background: var(--danger); padding: 10px; font-size: 12px;" onclick="loggUtAdmin()">🔒 Logg ut Admin</button>
+    </div>
 
     <div id="global-featured-container"></div>
     <div id="featured-station-container"></div>
@@ -328,9 +337,8 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
     import { getDatabase, ref, set, get, onValue, push } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
-    
-    // NYTT: Importerer Auth fra Firebase
-    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+    // OPPDATERT: Inkluderer signInWithEmailAndPassword og signOut for admin-innlogging
+    import { getAuth, signInAnonymously, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
     window.toggleTopList = function() { const c = document.getElementById('top-list-content'); c.style.display = c.style.display==='block'?'none':'block'; setTimeout(sjekkScroll, 200); };
     window.lukkModal = function() { document.getElementById('update-modal').style.display='none'; document.getElementById('modal-error').style.display='none'; document.getElementById('admin-rename-div').style.display='none'; };
@@ -408,7 +416,7 @@
         }
     };
 
-    // --- 2. LOGIKK OG FIREBASE ---
+    // --- FIREBASE CONFIG ---
     const firebaseConfig = {
       apiKey: "AIzaSyBlEIj2yxM-mJdBPw7zgDsirF9yAipdPkw",
       authDomain: "drivstoff-norge-caeaa.firebaseapp.com",
@@ -421,19 +429,63 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
-    
-    // NYTT: Initialiserer Usynlig Innlogging
     const auth = getAuth(app);
     let myUid = null; 
 
-    // Logger inn automatisk i bakgrunnen
-    signInAnonymously(auth).catch((error) => {
-        console.error("Kunne ikke koble til sikkerhetsserver:", error.message);
-    });
+    // --- HEMMELIG ADMIN INNLOGGING (FORT KNOX) ---
+    const adminUid = 'Y9G9KDuAGgW9qWzMMWbIj7yyHwR2'; // DIN NØKKEL ER NÅ KODET INN!
+    const appTittel = document.getElementById('app-tittel');
+    let trykkTimer;
+
+    appTittel.addEventListener('touchstart', (e) => { trykkTimer = setTimeout(apneHemmeligInnlogging, 3000); });
+    appTittel.addEventListener('mousedown', (e) => { trykkTimer = setTimeout(apneHemmeligInnlogging, 3000); });
+    appTittel.addEventListener('touchend', () => clearTimeout(trykkTimer));
+    appTittel.addEventListener('mouseup', () => clearTimeout(trykkTimer));
+    appTittel.addEventListener('touchmove', () => clearTimeout(trykkTimer)); 
+
+    function apneHemmeligInnlogging() {
+        if (myUid === adminUid) {
+            alert("😎 Velkommen tilbake, Sjef!");
+            document.getElementById('skjult-admin-panel').style.display = 'block';
+            return;
+        }
+
+        const email = prompt("🕵️‍♂️ VIP-Inngang. Skriv inn Admin E-post:");
+        if (!email) return;
+        const passord = prompt("🔑 Skriv inn passord:");
+        if (!passord) return;
+
+        signInWithEmailAndPassword(auth, email, passord)
+            .then((userCredential) => {
+                alert("✅ Logget inn som Administrator!");
+                myUid = userCredential.user.uid;
+                document.getElementById('skjult-admin-panel').style.display = 'block';
+            })
+            .catch((error) => {
+                alert("❌ Feil e-post eller passord.");
+                console.error("Innloggingsfeil:", error.message);
+            });
+    }
+
+    window.loggUtAdmin = function() {
+        signOut(auth).then(() => {
+            document.getElementById('skjult-admin-panel').style.display = 'none';
+            alert("Låst. Du er nå logget ut av Admin.");
+            // Logg inn anonymt igjen for å kunne bruke appen vanlig
+            signInAnonymously(auth).catch((error) => console.error("Anonym auth feilet", error));
+        });
+    }
+
+    // Logger inn automatisk i bakgrunnen for vanlige brukere
+    signInAnonymously(auth).catch((error) => { console.error("Kunne ikke koble til sikkerhetsserver:", error.message); });
 
     onAuthStateChanged(auth, (user) => {
         if (user) {
-            myUid = user.uid; // Dette er nå den skuddsikre Google-IDen!
+            myUid = user.uid;
+            if (myUid === adminUid) {
+                // Viser admin-panelet hvis du allerede var innlogget fra forrige gang
+                document.getElementById('skjult-admin-panel').style.display = 'block';
+            }
         }
     });
 
@@ -521,11 +573,11 @@
             let b = parseFloat(p.bensin ? String(p.bensin).replace(',', '.') : NaN);
 
             if (p.timestamp >= startOfDay) {
-                if (!isNaN(d) && d >= 10 && d <= 35) { sumDToday += d; countDToday++; }
-                if (!isNaN(b) && b >= 10 && b <= 35) { sumBToday += b; countBToday++; }
+                if (!isNaN(d) && d >= 14 && d <= 35) { sumDToday += d; countDToday++; }
+                if (!isNaN(b) && b >= 14 && b <= 35) { sumBToday += b; countBToday++; }
             } else if (p.timestamp >= startOfYesterday) {
-                if (!isNaN(d) && d >= 10 && d <= 35) { sumDYes += d; countDYes++; }
-                if (!isNaN(b) && b >= 10 && b <= 35) { sumBYes += b; countBYes++; }
+                if (!isNaN(d) && d >= 14 && d <= 35) { sumDYes += d; countDYes++; }
+                if (!isNaN(b) && b >= 14 && b <= 35) { sumBYes += b; countBYes++; }
             }
         });
 
@@ -730,7 +782,7 @@
                 let d = parseFloat(p.diesel ? String(p.diesel).replace(',', '.') : NaN);
                 let b = parseFloat(p.bensin ? String(p.bensin).replace(',', '.') : NaN);
 
-                if (!isNaN(d) && !isNaN(b) && d >= 10 && b >= 10) {
+                if (!isNaN(d) && !isNaN(b) && d >= 14 && b >= 14) {
                     let avg = (d + b) / 2;
                     
                     if (avg < billigsteAvg) {
@@ -797,11 +849,12 @@
         container.innerHTML = html;
     }
 
+    // OPPDATERT: Nekter alt under 14 kr
     function validerPris(pris) {
         if (!pris || pris === "--" || pris === "0") return true; 
         let val = parseFloat(String(pris).replace(',', '.'));
         if (isNaN(val)) return false;
-        return (val >= 14 && val <= 35); // OPPDATERT: Nekter nå alt under 14 kr
+        return (val >= 14 && val <= 35); 
     }
 
     window.lagrePris = async function() {
@@ -835,8 +888,9 @@
             const nameRef = ref(db, 'users/' + n.toLowerCase());
             const nameSnap = await get(nameRef);
             
+            // Hvis navnet eksisterer og eieren IKKE er deg
             if (nameSnap.exists() && nameSnap.val() !== myUid) {
-                const bekreft = confirm(`Kallenavnet '${n}' er allerede i bruk av noen andre.\n\nEr dette deg? Trykk OK for å hente tilbake profilen din.\nTrykk Avbryt for å velge et annet navn.`);
+                const bekreft = confirm(`Kallenavnet '${n}' er allerede i bruk av noen andre.\n\nEr dette deg og du har fått ny telefon? (Vi bygger søknadsprosessen snart)`);
                 if (!bekreft) return; 
             } else if (!nameSnap.exists()) { 
                 await set(nameRef, myUid); 
@@ -923,8 +977,8 @@
             let d = parseFloat(p.diesel ? String(p.diesel).replace(',', '.') : NaN);
             let b = parseFloat(p.bensin ? String(p.bensin).replace(',', '.') : NaN);
             
-            let validD = !isNaN(d) && d >= 10 && d <= 35;
-            let validB = !isNaN(b) && b >= 10 && b <= 35;
+            let validD = !isNaN(d) && d >= 14 && d <= 35;
+            let validB = !isNaN(b) && b >= 14 && b <= 35;
 
             if (p.timestamp >= startOfYesterday) {
                 if (validD) { sumDNat += d; countDNat++; }
