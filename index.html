@@ -73,18 +73,32 @@
             text-shadow: 0 4px 10px rgba(0,0,0,0.5);
         }
 
-        .install-banner { display: none; background-color: var(--primary); color: white; padding: 12px; border-radius: var(--radius-md); margin-bottom: 20px; position: relative; text-align: center; }
-        .install-arrow { position: absolute; top: -15px; right: 15px; font-size: 18px; }
-
-        .leaderboard-card, .panel { 
-            background: var(--card-bg); 
+        /* --- OPPDATERT: Premium Install Banner --- */
+        .install-banner { 
+            display: none; 
+            background: rgba(0, 102, 204, 0.15); 
             backdrop-filter: blur(12px); 
             -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 162, 255, 0.3);
+            color: #e0f0ff; 
+            padding: 12px; 
+            border-radius: var(--radius-md); 
+            margin-bottom: 20px; 
+            position: relative; 
+            text-align: center; 
+        }
+
+        /* --- OPPDATERT: Paneler og Scoreboard i Frostet Glass --- */
+        .leaderboard-card, .panel { 
+            background: linear-gradient(135deg, rgba(40, 40, 55, 0.4) 0%, rgba(20, 20, 28, 0.6) 100%);
+            backdrop-filter: blur(16px); 
+            -webkit-backdrop-filter: blur(16px);
             border-radius: var(--radius-md); 
             padding: 15px; 
             margin-bottom: 20px; 
             border: 1px solid rgba(255, 255, 255, 0.08); 
             box-shadow: var(--shadow-md); 
+            transition: var(--transition);
         }
 
         .leader-section { margin-bottom: 12px; }
@@ -101,25 +115,80 @@
         .user-title { font-size: 11px; color: var(--primary); opacity: 0.9; margin-left: 5px; font-weight: normal; }
         
         .my-rank-item { border-top: 2px dashed rgba(255,255,255,0.1); margin-top: 5px; padding-top: 10px; background: rgba(0, 102, 204, 0.1); border-radius: 6px; padding: 8px; font-weight: bold; }
-        
-        .share-app-btn { width: 100%; background: rgba(74, 144, 226, 0.15); border: 1px solid var(--share-color); color: var(--share-color); padding: 15px; border-radius: var(--radius-md); font-size: 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 20px; transition: var(--transition); }
-        .share-app-btn:active { background: rgba(74, 144, 226, 0.25); }
 
         #global-featured-container, #featured-station-container { display: none; margin-bottom: 20px; }
-        
-        input[type=text], input[type=password], input[type=email] { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background-color: rgba(0,0,0,0.3); color: white; box-sizing: border-box; font-size: 15px; outline: none; transition: var(--transition); }
-        input[type=text]:focus, input[type=password]:focus, input[type=email]:focus { border-color: var(--primary); background-color: rgba(0,0,0,0.4); }
-        input[type=range] { width: 100%; accent-color: var(--primary); margin-bottom: 10px; }
-        button { width: 100%; padding: 14px; background-color: var(--primary); color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 15px; transition: var(--transition); }
-        button:active { opacity: 0.8; transform: scale(0.98); }
-        
-        .gps-btn { background-color: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text-main); margin-top: 10px; }
-        .gps-btn:active { background-color: rgba(255,255,255,0.1); }
-        
-        .loading-msg { text-align: center; color: var(--primary); font-weight: 700; margin-top: 20px; font-size: 14px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
-        .error-msg { text-align: center; color: var(--danger); font-weight: 700; margin-top: 20px; font-size: 14px; line-height: 1.5; }
 
-        .station-card, .featured-card { border-radius: var(--radius-md); padding: 12px 15px; margin-bottom: 15px; color: white; position: relative; overflow: hidden; border: 3px solid transparent; box-shadow: var(--shadow-md); transition: var(--transition); }
+        /* --- OPPDATERT: Knapper og Input-felt --- */
+        input[type=text], input[type=search], input[type=password], input[type=email] { 
+            width: 100%; padding: 12px; border-radius: 8px; 
+            border: 1px solid rgba(255,255,255,0.1); 
+            background-color: rgba(0,0,0,0.2); 
+            color: white; box-sizing: border-box; font-size: 15px; outline: none; transition: var(--transition); 
+            -webkit-appearance: none; /* Fjerner standard Apple-styling på søkefelt */
+        }
+        input[type=text]:focus, input[type=search]:focus, input[type=password]:focus, input[type=email]:focus { 
+            border-color: rgba(0, 162, 255, 0.5); background-color: rgba(0,0,0,0.4); 
+        }
+
+        button { 
+            width: 100%; padding: 12px; 
+            background: rgba(0, 102, 204, 0.25); 
+            border: 1px solid rgba(0, 162, 255, 0.3); 
+            color: white; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 14px; transition: var(--transition); 
+        }
+        button:active { background: rgba(0, 102, 204, 0.4); transform: scale(0.98); }
+
+        /* Animerte piler for utvidelse */
+        .expand-icon { font-size: 12px; color: var(--text-muted); display: inline-block; transition: transform 0.3s ease; }
+
+        /* --- FARGET GLASS-DESIGN --- */
+        .station-card, .featured-card { 
+            /* Vi fjerner den låste bakgrunnsfargen her, fordi Javascriptet nå skal bestemme fargen per kort! */
+            backdrop-filter: blur(16px); 
+            -webkit-backdrop-filter: blur(16px);
+            
+            border: 1px solid rgba(255, 255, 255, 0.1) !important; 
+            border-radius: 16px; 
+            padding: 16px; 
+            margin-bottom: 16px; 
+            color: #ffffff !important; 
+            position: relative; 
+            overflow: hidden; 
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); 
+            transition: all 0.2s ease; 
+        }
+
+        /* Litt mykere trykke-effekt */
+        .station-card:active { transform: scale(0.98); opacity: 0.8; }
+
+        /* Linjen øverst i kortet med logo og navn */
+        .card-header-row { display: flex; align-items: center; margin-bottom: 12px; }
+        
+        /* Den nye "Logoen" */
+        .brand-avatar {
+            width: 36px; height: 36px; min-width: 36px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 16px;
+            margin-right: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        /* Fjerner den gamle svake bakgrunnsbokstaven */
+        .f-icon-bg { display: none; }
+        
+        .featured-title { font-size: 16px; font-weight: 700; margin: 0; flex: 1; line-height: 1.2; text-shadow: none; }
+        .featured-dist { font-size: 12px; font-weight: 600; opacity: 0.7; margin-left: 10px; white-space: nowrap; }
+        
+        /* Pene, mørke prisbokser */
+        .f-price-box { 
+            background: rgba(0,0,0,0.4); 
+            padding: 8px 10px; 
+            border-radius: 8px; 
+            border: 1px solid rgba(255,255,255,0.05); 
+            display: flex; align-items: baseline; gap: 6px; 
+        }
         
         .featured-header { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; opacity: 0.9; font-weight: 700; display: flex; align-items: center; z-index: 2; position: relative; }
         .featured-title { font-size: 15px; font-weight: 700; margin: 0 0 10px 0; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); display: flex; justify-content: space-between; align-items: center; z-index: 2; position: relative; }
@@ -148,10 +217,26 @@
         #add-station-container { display: none; text-align: center; margin-bottom: 30px; margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; }
         .btn-add-station { background-color: transparent; border: 1px dashed var(--primary); color: var(--primary); padding: 12px; border-radius: var(--radius-md); font-size: 13px; display: inline-block; cursor: pointer; width: 100%; font-weight: 600;}
 
-        .footer { margin-top: 10px; text-align: center; padding: 25px 20px; border-top: 1px solid rgba(255,255,255,0.05); }
-        .footer-text { font-size: 12px; color: var(--text-muted); line-height: 1.6; margin-bottom: 15px; font-weight: 400; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
-        .feedback-btn { background: transparent; border: 1px solid var(--share-color); color: var(--share-color); padding: 12px 20px; border-radius: 8px; font-size: 13px; display: inline-block; text-decoration: none; margin-top: 5px; margin-bottom: 15px; font-weight: 600;}
-        .appstore-link { display: inline-block; color: var(--primary); text-decoration: underline; cursor: pointer; font-weight: 700; font-size: 13px; }
+        /* --- OPPDATERT: Footer og Info-boks --- */
+        .footer { margin-top: 20px; text-align: center; padding-bottom: 20px; }
+        
+        .footer-buttons { display: flex; gap: 10px; margin-bottom: 20px; }
+        .footer-btn { flex: 1; padding: 14px 10px; border-radius: 12px; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; transition: var(--transition); text-decoration: none; border: 1px solid rgba(255,255,255,0.1); box-sizing: border-box; }
+        
+        .btn-share { background: rgba(0, 102, 204, 0.15); color: #4a90e2; border-color: rgba(74, 144, 226, 0.3); }
+        .btn-share:active { background: rgba(0, 102, 204, 0.25); transform: scale(0.98); }
+        
+        .btn-feedback { background: rgba(255, 255, 255, 0.05); color: var(--text-main); }
+        .btn-feedback:active { background: rgba(255, 255, 255, 0.1); transform: scale(0.98); }
+        
+        .footer-info-box { background: rgba(30, 30, 42, 0.4); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 18px; text-align: left; margin-bottom: 25px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.2); }
+        .footer-text { font-size: 11px; color: rgba(255,255,255,0.5); line-height: 1.6; margin: 0 0 12px 0; }
+        .footer-text strong { color: rgba(255,255,255,0.8); }
+        
+        .warning-text { display: flex; gap: 8px; font-size: 11px; color: rgba(255, 152, 0, 0.9); background: rgba(255, 152, 0, 0.1); padding: 10px; border-radius: 8px; border: 1px solid rgba(255, 152, 0, 0.2); line-height: 1.4; }
+        
+        .appstore-link { display: inline-block; color: rgba(255,255,255,0.4); text-decoration: none; cursor: pointer; font-weight: 600; font-size: 12px; border-bottom: 1px dashed rgba(255,255,255,0.2); padding-bottom: 2px; transition: var(--transition); }
+        .appstore-link:active { color: var(--text-main); border-bottom-color: var(--text-main); }
 
         #info-modal, #add-station-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); z-index: 2000; overflow-y: auto; backdrop-filter: blur(5px); }
         .info-content { position: relative; margin: 40px auto; background-color: rgba(43, 43, 54, 0.95); padding: 25px; border-radius: var(--radius-md); width: 90%; max-width: 350px; box-sizing: border-box; line-height: 1.5; font-size: 14px; box-shadow: var(--shadow-md); border: 1px solid rgba(255,255,255,0.1); }
@@ -185,8 +270,8 @@
 
 <div class="container">
     <div id="install-banner" class="install-banner">
-        <span id="banner-text">Legg til på startskjermen for full app-opplevelse</span>
-        <span id="banner-arrow" class="install-arrow">⬆️</span>
+        <span id="banner-text">Legg til på startskjermen for full app-opplevelse. Trykk på <b>⋮</b> øverst til høyre og velg "Legg til på startskjermen". </span>
+        <span id="banner-arrow" class="install-arrow">↑</span>
     </div>
 
     <h2 id="app-tittel" style="user-select: none; -webkit-user-select: none; cursor: pointer;">DRIVSTOFF NORGE</h2>
@@ -200,26 +285,40 @@
     <div id="global-featured-container"></div>
     <div id="featured-station-container"></div>
 
-    <div class="leaderboard-card">
-        <div class="leader-section">
-            <span class="leader-title">Dagens bidragsyter 🏆 <span id="cd-day" class="countdown"></span></span>
-            <span id="best-day" class="leader-name gold-txt">Laster...</span>
+    <div class="leaderboard-card" style="text-align: center;">
+        <div onclick="toggleLeaderboard()" style="cursor: pointer;">
+            <div class="leader-section" style="margin-bottom: 12px;">
+                <div class="leader-title" style="margin-bottom: 5px;">Dagens bidragsyter 🏆 <span id="cd-day" class="countdown" style="display: none;"></span></div>
+                <div id="best-day" class="leader-name gold-txt" style="font-size: 22px; margin-bottom: 5px; text-shadow: 0 2px 5px rgba(0,0,0,0.5);">Laster...</div>
+            </div>
+            
+            <div class="leader-section" style="margin-bottom: 15px;">
+                <span class="leader-title">Ukens bidragsyter 🥇 <span id="cd-week" class="countdown" style="display: none;"></span></span>
+                <span id="best-week" class="leader-name silver-txt" style="font-size: 18px;">Laster...</span>
+            </div>
+
+            <div style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--text-main); background: rgba(255,255,255,0.08); padding: 6px 16px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); transition: var(--transition);">
+                Se Topp 10 <span class="expand-icon" id="leader-chevron">▼</span>
+            </div>
         </div>
-        <div class="leader-section" style="margin-bottom: 0;">
-            <span class="leader-title">Ukens bidragsyter 🥇 <span id="cd-week" class="countdown"></span></span>
-            <span id="best-week" class="leader-name gold-txt">Laster...</span>
+
+        <div id="leaderboard-expanded" style="display: none; margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; text-align: left;">
+            <div class="leader-title" style="margin-bottom: 10px; text-align: center;">Topp 10 - All Time</div>
+            <div id="top-list-items"></div>
         </div>
-        
-        <button class="top-list-btn" onclick="toggleTopList()">Se Topp 10</button>
-        <div id="top-list-content"><div id="top-list-items"></div></div>
     </div>
     
-    <div class="panel">
-        <label style="font-weight:600; margin-bottom:8px; display:block;">Søk innenfor: <span id="radius-val" style="color:var(--primary)">10</span> km</label>
-        <input type="range" id="radius" min="1" max="50" value="10" oninput="oppdaterRadiusText()">
-        <input type="text" id="stedsnavn" placeholder="Skriv by eller sted...">
-        <button onclick="sokPaaSted()">Søk på sted</button>
-        <button class="gps-btn" onclick="startGpsSok()">📍 Bruk min posisjon</button>
+    <div class="panel" style="padding: 15px;">
+        <div style="display: flex; gap: 8px; margin-bottom: 15px;">
+            <input type="search" id="stedsnavn" placeholder="Søk by eller sted..." style="margin-bottom: 0; flex: 1;" onkeypress="if(event.key === 'Enter') sokPaaSted()">
+            
+            <button class="gps-btn" onclick="startGpsSok()" style="margin-top: 0; width: auto; padding: 0 16px; border-color: rgba(76, 175, 80, 0.3); color: #4caf50; background: rgba(76, 175, 80, 0.1); white-space: nowrap;">📍 Min posisjon</button>
+        </div>
+        
+        <div style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px;">
+            <input type="range" id="radius" min="1" max="50" value="10" oninput="document.getElementById('radius-val').innerText = this.value" style="margin-bottom: 8px;">
+            <label style="font-weight:600; display:block; font-size: 12px; color: var(--text-muted); text-align: center;">Søkeradius: <span id="radius-val" style="color:var(--text-main)">10</span> km</label>
+        </div>
     </div>
 
     <div id="station-list"></div>
@@ -232,24 +331,25 @@
     <div id="extremes-container" style="display: none; margin-bottom: 30px;"></div>
 
     <div class="footer">
-        <button class="share-app-btn" onclick="delAppen()">📢 Hjelp dugnaden – Inviter en venn</button>
-        
-        <a href="mailto:thaldling@gmail.com?subject=Tilbakemelding%20Drivstoff%20Norge" class="feedback-btn">
-            ✉️ Send tilbakemelding
-        </a>
+        <div class="footer-buttons">
+            <button class="footer-btn btn-share" onclick="delAppen()">📢 Del appen</button>
+            <a href="mailto:thaldling@gmail.com?subject=Tilbakemelding%20Drivstoff%20Norge" class="footer-btn btn-feedback">✉️ Tilbakemelding</a>
+        </div>
 
-        <div class="footer-text">
-            <strong>Personvern:</strong> Vi sporer deg ikke. Posisjonen din brukes kun lokalt for å finne stasjoner. 
-            Appen bruker sikker, usynlig innlogging (Google Auth) i bakgrunnen for å beskytte dugnaden mot manipulasjon. Ingen reklame, ingen abonnement.
-            <br><br>
-            <span style="color: var(--primary);">⚠️ Viktig om kallenavn:</span> Appen har ingen passord for å holde ting lynraskt og enkelt. Kallenavnet ditt er nå trygt knyttet til enheten din!
+        <div class="footer-info-box">
+            <p class="footer-text">
+                <strong>🔒 Personvern:</strong> Vi sporer deg ikke. Posisjonen din brukes kun lokalt for å finne stasjoner. Appen bruker sikker, anonym innlogging i bakgrunnen for å beskytte dugnaden. Ingen reklame, ingen abonnement.
+            </p>
+            <div class="warning-text">
+                <span>⚠️</span>
+                <span><strong>Kallenavn:</strong> Appen har ingen passord for å holde ting lynraskt. Kallenavnet ditt er trygt knyttet til akkurat denne enheten!</span>
+            </div>
         </div>
         
         <a class="appstore-link" onclick="visInfoModal()">Hvorfor er ikke appen i App Store?</a>
     </div>
-</div>
 
-<button id="scroll-down-btn" onclick="blaNedover()">⬇️</button>
+<button id="scroll-down-btn" onclick="blaNedover()">👇</button>
 
 <div id="info-modal" onclick="if(event.target==this) lukkInfoModal()">
     <div class="info-content">
@@ -278,7 +378,7 @@
     </div>
 </div>
 
-<div id="update-modal">
+<div id="update-modal" onclick="if(event.target==this) lukkModal()">
     <div class="modal-content">
         <h3 id="modal-station-name" style="margin-top:0">Oppdater pris</h3>
         <p id="modal-error"></p>
@@ -340,10 +440,47 @@
     // OPPDATERT: Inkluderer signInWithEmailAndPassword og signOut for admin-innlogging
     import { getAuth, signInAnonymously, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
-    window.toggleTopList = function() { const c = document.getElementById('top-list-content'); c.style.display = c.style.display==='block'?'none':'block'; setTimeout(sjekkScroll, 200); };
-    window.lukkModal = function() { document.getElementById('update-modal').style.display='none'; document.getElementById('modal-error').style.display='none'; document.getElementById('admin-rename-div').style.display='none'; };
-    window.oppdaterRadiusText = function() { document.getElementById('radius-val').innerText = document.getElementById('radius').value; };
-    
+window.toggleLeaderboard = function() {
+        const exp = document.getElementById('leaderboard-expanded');
+        const chev = document.getElementById('leader-chevron');
+        const cdDay = document.getElementById('cd-day');
+        const cdWeek = document.getElementById('cd-week');
+
+        if(exp.style.display === 'none') {
+            exp.style.display = 'block';
+            chev.style.transform = 'rotate(180deg)';
+            // Viser nedtellingene når menyen åpnes
+            cdDay.style.display = 'inline';
+            cdWeek.style.display = 'inline';
+        } else {
+            exp.style.display = 'none';
+            chev.style.transform = 'rotate(0deg)';
+            // Skjuler nedtellingene igjen
+            cdDay.style.display = 'none';
+            cdWeek.style.display = 'none';
+        }
+        setTimeout(sjekkScroll, 200);
+    };
+
+    // --- MAGISKE HJELPEFUNKSJONER ER TILBAKE ---
+    window.lukkModal = function() { 
+        document.getElementById('update-modal').style.display='none'; 
+        document.getElementById('modal-error').style.display='none'; 
+        document.getElementById('admin-rename-div').style.display='none'; 
+    };
+
+    window.toggleCard = function(id) {
+        const actions = document.getElementById('actions-' + id);
+        const hist = document.getElementById('hist-' + id);
+        if (actions) {
+            // Bytter mellom å vise og skjule knappene
+            actions.style.display = (actions.style.display === 'none') ? 'flex' : 'none';
+            // Skjuler også historikken automatisk hvis du klapper sammen kortet
+            if (actions.style.display === 'none' && hist) hist.style.display = 'none';
+        }
+    };
+    // -------------------------------------------
+
     window.apneModal = function(id, n, lat, lon) { 
         valgtStasjonId = id; valgtStasjonLat = lat; valgtStasjonLon = lon;
         document.getElementById('modal-station-name').innerText = n; 
@@ -693,27 +830,38 @@
 
     function getBrandStyle(name) {
         const n = name.toLowerCase();
-        let styles = { bg: 'linear-gradient(135deg, #3a3a4d 0%, #2b2b36 100%)', text: '#f0f0f0', border: 'transparent', char: '⛽' };
+        let color = '#888888'; let text = '#ffffff'; let char = '⛽'; 
+        let logo = ''; 
+        
+        // Standard rent, mørkt glass for ukjente stasjoner
+        let glassBg = 'linear-gradient(135deg, rgba(60, 60, 75, 0.2) 0%, rgba(25, 25, 35, 0.7) 100%)';
 
-        if (n.includes("yx")) { styles.bg = 'linear-gradient(135deg, #ff3a40 0%, #ed1c24 100%)'; styles.text = '#ffffff'; styles.border = '#0055b8'; styles.char = 'Y'; }
-        else if (n.includes("circle k")) { styles.bg = 'linear-gradient(135deg, #ff4d52 0%, #ed1c24 100%)'; styles.text = '#ffffff'; styles.border = '#ff9800'; styles.char = 'C'; }
-        else if (n.includes("uno-x") || n.includes("unox")) { styles.bg = 'linear-gradient(135deg, #ffcc33 0%, #e5a904 100%)'; styles.text = '#222222'; styles.border = '#ed1c24'; styles.char = 'U'; }
-        else if (n.includes("esso")) { styles.bg = 'linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%)'; styles.text = '#df1820'; styles.border = '#0055b8'; styles.char = 'E'; }
-        else if (n.includes("tanken")) { styles.bg = 'linear-gradient(135deg, #ff2026 0%, #ed1c24 100%)'; styles.text = '#ffffff'; styles.border = '#ffffff'; styles.char = 'T'; }
-        else if (n.includes("driv")) { styles.bg = 'linear-gradient(135deg, #ff3a40 0%, #ed1c24 100%)'; styles.text = '#ffffff'; styles.border = '#ed1c24'; styles.char = 'D'; }
-        else if (n.includes("st1")) { styles.bg = 'linear-gradient(135deg, #ffff33 0%, #ffe100 100%)'; styles.text = '#ed1c24'; styles.border = '#ffffff'; styles.char = 'S'; }
-        else if (n.includes("oljeleverandøren")) { styles.bg = 'linear-gradient(135deg, #4d4d4d 0%, #333333 100%)'; styles.text = '#ff9800'; styles.border = '#ffffff'; styles.char = 'O'; }
-        else if (n.includes("best")) { styles.bg = 'linear-gradient(135deg, #1a75ff 0%, #0055b8 100%)'; styles.text = '#ffffff'; styles.border = '#ff9800'; styles.char = 'B'; }
-        else if (n.includes("bunker oil") || n.includes("bunkeroil")) { styles.bg = 'linear-gradient(135deg, #ffffff 0%, #f9f9f9 100%)'; styles.text = '#0055b8'; styles.border = '#ed1c24'; styles.char = 'B'; }
-        else if (n.includes("haltbakk")) { styles.bg = 'linear-gradient(135deg, #222222 0%, #111111 100%)'; styles.text = '#4caf50'; styles.border = '#4caf50'; styles.char = 'H'; }
-        else if (n.includes("lpg")) { styles.bg = 'linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%)'; styles.text = '#4caf50'; styles.border = '#4caf50'; styles.char = 'L'; }
-        else if (n.includes("shell")) { styles.bg = 'linear-gradient(135deg, #ffe066 0%, #ffcc00 100%)'; styles.text = '#ed1c24'; styles.border = '#ed1c24'; styles.char = 'S'; }
+        // Magi-funksjonen som lager "Glow"-effekten uten at det blir brunt
+        // Den fader fra 15% merkevarefarge øverst til venstre, til rent mørkt glass nederst
+        const makeGlass = (r, g, b) => `linear-gradient(135deg, rgba(${r}, ${g}, ${b}, 0.15) 0%, rgba(25, 25, 32, 0.7) 100%)`;
 
-        return styles;
+        if (n.includes("circle k")) { color = '#ff9800'; char = 'C'; logo = 'logos/circlek.png'; glassBg = makeGlass(255, 152, 0); }
+        else if (n.includes("yx")) { color = '#ed1c24'; char = 'Y'; logo = 'logos/yx.png'; glassBg = makeGlass(237, 28, 36); }
+        else if (n.includes("uno-x") || n.includes("unox")) { color = '#ffcc33'; text = '#222'; char = 'U'; logo = 'logos/unox.png'; glassBg = makeGlass(255, 204, 51); }
+        else if (n.includes("esso")) { color = '#0055b8'; char = 'E'; logo = 'logos/esso.png'; glassBg = makeGlass(0, 85, 184); }
+        
+        // OPPDATERT: Disse tre har nå .jpg som filendelse!
+        else if (n.includes("st1")) { color = '#ffe100'; text = '#222'; char = 'S'; logo = 'logos/st1.jpg'; glassBg = makeGlass(255, 225, 0); }
+        else if (n.includes("best")) { color = '#1a75ff'; char = 'B'; logo = 'logos/best.jpg'; glassBg = makeGlass(26, 117, 255); }
+        else if (n.includes("bunker")) { color = '#0055b8'; char = 'B'; logo = 'logos/bunkeroil.jpg'; glassBg = makeGlass(0, 85, 184); }
+        
+        else if (n.includes("tanken")) { color = '#ff2026'; char = 'T'; logo = 'logos/tanken.png'; glassBg = makeGlass(255, 32, 38); }
+        else if (n.includes("driv")) { color = '#ff3a40'; char = 'D'; logo = 'logos/driv.png'; glassBg = makeGlass(255, 58, 64); }
+        else if (n.includes("automat 1") || n.includes("automat1")) { color = '#ed1c24'; char = 'A'; logo = 'logos/automat1.png'; glassBg = makeGlass(237, 28, 36); }
+        else if (n.includes("haltbakk")) { color = '#4caf50'; char = 'H'; logo = 'logos/haltbakke.png'; glassBg = makeGlass(76, 175, 80); }
+        else if (n.includes("joker")) { color = '#4caf50'; char = 'J'; logo = 'logos/joker.png'; glassBg = makeGlass(76, 175, 80); }
+        else if (n.includes("lpg")) { color = '#00bcd4'; char = 'L'; logo = 'logos/lpg.png'; glassBg = makeGlass(0, 188, 212); }
+        else if (n.includes("olje")) { color = '#ff9800'; char = 'O'; logo = 'logos/oljel.png'; glassBg = makeGlass(255, 152, 0); }
+
+        return { color: color, text: text, char: char, logo: logo, glassBg: glassBg };
     }
 
     function visGlobalSisteOppdatering() {
-        if (gjeldendeStasjoner.length > 0) return;
         let nyesteTid = 0; let nyesteData = null;
 
         for (const id in skylagredePriser) {
@@ -735,29 +883,35 @@
 
             let bruktNavn = endredeNavn[nyesteData.id] || nyesteData.navn;
             const style = getBrandStyle(bruktNavn);
-            let flag = getFlag(nyesteData.land || 'no'); 
-            
             let safeNavn = sanitize(bruktNavn);
             let safeUser = sanitize(nyesteData.user);
 
-            let b98Html = (nyesteData.bensin98 && nyesteData.bensin98 !== "--") ? `<div class="f-price-box" style="border-color:${style.border}"><span class="f-lbl">98</span><span class="f-val">${nyesteData.bensin98} ${getTrendHtml(nyesteData.bensin98, nyesteData.prev_bensin98)}</span></div>` : '';
-            let fdHtml = (nyesteData.fd && nyesteData.fd !== "--") ? `<div class="f-price-box" style="border-color:${style.border}"><span class="f-lbl">FD</span><span class="f-val">${nyesteData.fd} ${getTrendHtml(nyesteData.fd, nyesteData.prev_fd)}</span></div>` : '';
+            let b98Html = (nyesteData.bensin98 && nyesteData.bensin98 !== "--") ? `<div class="f-price-box"><span class="f-lbl" style="color:var(--bensin98-color);">98</span><span class="f-val">${nyesteData.bensin98} ${getTrendHtml(nyesteData.bensin98, nyesteData.prev_bensin98)}</span></div>` : '';
+            let fdHtml = (nyesteData.fd && nyesteData.fd !== "--") ? `<div class="f-price-box"><span class="f-lbl" style="color:var(--fd-color);">FD</span><span class="f-val">${nyesteData.fd} ${getTrendHtml(nyesteData.fd, nyesteData.prev_fd)}</span></div>` : '';
 
-            let finalBorder = style.border === 'transparent' ? 'rgba(255,255,255,0.1)' : style.border;
+            // Henter den nye logo-sirkelen
+            let avatarInnhold = style.logo ? `<img src="${style.logo}" style="width: 100%; height: 100%; object-fit: contain; border-radius: 50%;" alt="Logo">` : style.char;
+            let avatarBg = style.logo ? '#ffffff' : style.color;
 
             globalContainer.style.display = 'block';
             globalContainer.innerHTML = `
-                <div class="featured-card" style="background: ${style.bg}; color: ${style.text}; border: 3px solid ${finalBorder};">
-                    <div class="f-icon-bg">${style.char}</div>
-                    <div class="featured-header">⚡ NYESTE OPPDATERING I NORGE</div>
-                    <div class="featured-title">${safeNavn} ${flag} <span style="margin-left:auto;">${distStr}</span></div>
-                    <div class="featured-prices">
-                        <div class="f-price-box" style="border-color:${style.border}"><span class="f-lbl">D</span><span class="f-val">${nyesteData.diesel} ${getTrendHtml(nyesteData.diesel, nyesteData.prev_diesel)}</span></div>
-                        <div class="f-price-box" style="border-color:${style.border}"><span class="f-lbl">95</span><span class="f-val">${nyesteData.bensin} ${getTrendHtml(nyesteData.bensin, nyesteData.prev_bensin)}</span></div>
-                        ${b98Html}
-                        ${fdHtml}
+                <div class="featured-header" style="margin-bottom: 10px; color: var(--primary);">⚡ NYESTE OPPDATERING I NORGE</div>
+                <div class="featured-card" style="background: ${style.glassBg}; border-left: 4px solid ${style.color}; cursor: pointer;" onclick="apneModal('${nyesteData.id}','${safeNavn.replace(/'/g, "\\'")}', ${sLat}, ${sLon})">
+                    
+                    <div class="card-header-row">
+                        <div class="brand-avatar" style="background-color: ${avatarBg}; color: ${style.text}; overflow: hidden; padding: ${style.logo ? '2px' : '0'};">
+                            ${avatarInnhold}
+                        </div>
+                        <div class="featured-title">${safeNavn}</div>
+                        ${distStr}
                     </div>
-                    <div class="f-user">${formaterTid(nyesteData.timestamp, safeUser)}</div>
+                    
+                    <div class="featured-prices" style="align-items: center;">
+                        <div class="f-price-box"><span class="f-lbl" style="color:var(--diesel-color);">D</span><span class="f-val">${nyesteData.diesel} ${getTrendHtml(nyesteData.diesel, nyesteData.prev_diesel)}</span></div>
+                        <div class="f-price-box"><span class="f-lbl" style="color:var(--bensin-color);">95</span><span class="f-val">${nyesteData.bensin} ${getTrendHtml(nyesteData.bensin, nyesteData.prev_bensin)}</span></div>
+                        ${b98Html} ${fdHtml}
+                        <div class="time-ago" style="color: inherit; opacity: 0.85; margin-left: auto; display: flex; align-items: center; text-align: right;">${formaterTid(nyesteData.timestamp, safeUser)}</div>
+                    </div>
                 </div>
             `;
         } else { globalContainer.style.display = 'none'; }
@@ -767,10 +921,8 @@
         let naa = Date.now();
         let grense = naa - (24 * 60 * 60 * 1000); 
         
-        let billigsteAvg = Infinity;
-        let dyresteAvg = 0;
-        let billigsteData = null;
-        let dyresteData = null;
+        let billigsteAvg = Infinity; let dyresteAvg = 0;
+        let billigsteData = null; let dyresteData = null;
 
         for (const id in skylagredePriser) {
             if (skjulteStasjoner[id]) continue;
@@ -784,15 +936,8 @@
 
                 if (!isNaN(d) && !isNaN(b) && d >= 14 && b >= 14) {
                     let avg = (d + b) / 2;
-                    
-                    if (avg < billigsteAvg) {
-                        billigsteAvg = avg;
-                        billigsteData = { ...p, id: id };
-                    }
-                    if (avg > dyresteAvg && avg <= 35) {
-                        dyresteAvg = avg;
-                        dyresteData = { ...p, id: id };
-                    }
+                    if (avg < billigsteAvg) { billigsteAvg = avg; billigsteData = { ...p, id: id }; }
+                    if (avg > dyresteAvg && avg <= 35) { dyresteAvg = avg; dyresteData = { ...p, id: id }; }
                 }
             }
         }
@@ -801,9 +946,9 @@
         container.style.display = 'block'; 
 
         const renderPlaceholder = (title, icon, color) => `
-            <div class="featured-card" style="background: transparent; border: 1px dashed ${color}; margin-bottom: 10px; color: var(--text-muted); box-shadow: none;">
-                <div class="featured-header">${icon} ${title}</div>
-                <div style="text-align:center; padding: 25px; font-size: 13px; font-weight: 400;">Venter på dagens oppdateringer...</div>
+            <div class="featured-header" style="margin-bottom: 10px; margin-top: 15px;">${icon} ${title}</div>
+            <div class="featured-card" style="background: rgba(0,0,0,0.2); border: 1px dashed ${color}; border-left: 4px solid ${color};">
+                <div style="text-align:center; padding: 15px; font-size: 13px; font-weight: 400; color: var(--text-muted);">Venter på dagens oppdateringer...</div>
             </div>
         `;
 
@@ -813,27 +958,35 @@
             let safeNavn = sanitize(bruktNavn);
             let safeUser = sanitize(data.user);
 
-            let b98Html = (data.bensin98 && data.bensin98 !== "--") ? `<div class="f-price-box" style="border-color:${style.border}"><span class="f-lbl">98</span><span class="f-val">${data.bensin98} ${getTrendHtml(data.bensin98, data.prev_bensin98)}</span></div>` : '';
-            let fdHtml = (data.fd && data.fd !== "--") ? `<div class="f-price-box" style="border-color:${style.border}"><span class="f-lbl">FD</span><span class="f-val">${data.fd} ${getTrendHtml(data.fd, data.prev_fd)}</span></div>` : '';
+            let b98Html = (data.bensin98 && data.bensin98 !== "--") ? `<div class="f-price-box"><span class="f-lbl" style="color:var(--bensin98-color);">98</span><span class="f-val">${data.bensin98} ${getTrendHtml(data.bensin98, data.prev_bensin98)}</span></div>` : '';
+            let fdHtml = (data.fd && data.fd !== "--") ? `<div class="f-price-box"><span class="f-lbl" style="color:var(--fd-color);">FD</span><span class="f-val">${data.fd} ${getTrendHtml(data.fd, data.prev_fd)}</span></div>` : '';
 
-            let finalBorder = style.border === 'transparent' ? fallbackBorderColor : style.border;
+            let avatarInnhold = style.logo ? `<img src="${style.logo}" style="width: 100%; height: 100%; object-fit: contain; border-radius: 50%;" alt="Logo">` : style.char;
+            let avatarBg = style.logo ? '#ffffff' : style.color;
 
+            // Her har vi lagt til Glassmorphism, Logo-sirkel og klikkbarhet for å oppdatere direkte!
             return `
-            <div class="featured-card" style="background: ${style.bg}; color: ${style.text}; margin-bottom: 15px; border: 3px solid ${finalBorder};">
-                <div class="f-icon-bg">${style.char}</div>
-                <div class="featured-header">${icon} ${title}</div>
-                <div class="featured-title">${safeNavn}</div>
-                <div class="featured-prices">
-                    <div class="f-price-box" style="border-color:${style.border}"><span class="f-lbl">D</span><span class="f-val">${data.diesel} ${getTrendHtml(data.diesel, data.prev_diesel)}</span></div>
-                    <div class="f-price-box" style="border-color:${style.border}"><span class="f-lbl">95</span><span class="f-val">${data.bensin} ${getTrendHtml(data.bensin, data.prev_bensin)}</span></div>
-                    ${b98Html}
-                    ${fdHtml}
+            <div class="featured-header" style="margin-bottom: 10px; margin-top: 15px;">${icon} ${title}</div>
+            <div class="featured-card" style="background: ${style.glassBg}; border-left: 4px solid ${style.color}; cursor: pointer;" onclick="apneModal('${data.id}','${safeNavn.replace(/'/g, "\\'")}', ${data.lat || 0}, ${data.lon || 0})">
+                
+                <div class="card-header-row">
+                    <div class="brand-avatar" style="background-color: ${avatarBg}; color: ${style.text}; overflow: hidden; padding: ${style.logo ? '2px' : '0'};">
+                        ${avatarInnhold}
+                    </div>
+                    <div class="featured-title">${safeNavn}</div>
                 </div>
-                <div class="f-user">${formaterTid(data.timestamp, safeUser)}</div>
+                
+                <div class="featured-prices" style="align-items: center;">
+                    <div class="f-price-box"><span class="f-lbl" style="color:var(--diesel-color);">D</span><span class="f-val">${data.diesel} ${getTrendHtml(data.diesel, data.prev_diesel)}</span></div>
+                    <div class="f-price-box"><span class="f-lbl" style="color:var(--bensin-color);">95</span><span class="f-val">${data.bensin} ${getTrendHtml(data.bensin, data.prev_bensin)}</span></div>
+                    ${b98Html} ${fdHtml}
+                    <div class="time-ago" style="color: inherit; opacity: 0.85; margin-left: auto; display: flex; align-items: center; text-align: right;">${formaterTid(data.timestamp, safeUser)}</div>
+                </div>
             </div>`;
         };
 
-        let html = '<h3 style="font-size: 13px; text-transform: uppercase; color: var(--text-muted); margin-top: 25px; margin-bottom: 12px; text-align: center; font-weight: 600; letter-spacing: 0.5px; text-shadow: 0 1px 2px rgba(0,0,0,0.8);">🇳🇴 Norges Ytterpunkter (Siste 24t)</h3>';
+        // Byttet ut det "ødelagte" flagget med en trygg kartnål
+        let html = '<h3 style="font-size: 13px; text-transform: uppercase; color: var(--text-muted); margin-top: 25px; margin-bottom: 5px; text-align: center; font-weight: 600; letter-spacing: 0.5px; text-shadow: 0 1px 2px rgba(0,0,0,0.8);">📍 Norges Ytterpunkter (Siste 24t)</h3>';
         
         let billigsteId = billigsteData ? billigsteData.id : null;
 
@@ -987,7 +1140,6 @@
         const list = document.getElementById('station-list'); list.innerHTML = "";
         const featuredContainer = document.getElementById('featured-station-container');
         featuredContainer.innerHTML = ""; featuredContainer.style.display = 'none';
-        document.getElementById('global-featured-container').style.display = 'none';
 
         let gyldigeStasjoner = stasjoner.filter(s => {
             let safeId = String(s.id).replace(/[\.\#\$\[\]\/]/g, "_");
@@ -1101,49 +1253,69 @@
         });
 
         let foundLocalKupp = false;
-
         processedStasjoner.forEach((item, index) => {
             let b98Html = (item.displayB98 !== "--") ? `<div class="f-price-box" style="border-color:${item.style.border}"><span class="f-lbl">98</span><span class="f-val">${item.displayB98} ${item.trendB98}</span></div>` : '';
             let fdHtml = (item.displayFd !== "--") ? `<div class="f-price-box" style="border-color:${item.style.border}"><span class="f-lbl">FD</span><span class="f-val">${item.displayFd} ${item.trendFd}</span></div>` : '';
             
+            // NYHET: Formaterer "time-ago" teksten slik at den bruker flexbox (margin-left: auto) for å legge seg pent til høyre for prisene
             if (!foundLocalKupp && !item.isAuto && item.displayD !== "--" && item.displayD !== "999") {
-                let safeUser = sanitize(item.p.user);
-                let rawTimeText = formaterTid(item.p.timestamp, safeUser).replace("Sist: ", "");
-                item.timeAgoHtml = `<div class="time-ago" style="color: var(--gold); font-weight: 700; font-size: 11px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">🏆 BILLIGSTE LOKALE! • Sist oppdatert ${rawTimeText}</div>`;
+                let safeUser = sanitize(item.p.user); let rawTimeText = formaterTid(item.p.timestamp, safeUser).replace("Sist: ", "");
+                item.timeAgoHtml = `<div class="time-ago" style="color: var(--gold); font-weight: 700; font-size: 10px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); margin-left: auto; display: flex; align-items: center; text-align: right;">🏆 LOKALT KUPP! • ${rawTimeText}</div>`;
                 foundLocalKupp = true;
+            } else if (item.isAuto) {
+                item.timeAgoHtml = `<div class="time-ago" style="color: inherit; opacity: 0.7; margin-left: auto; display: flex; align-items: center; text-align: right;">🤖 ${avgTypeStr}</div>`;
+            } else {
+                let safeUser = sanitize(item.p.user);
+                item.timeAgoHtml = `<div class="time-ago" style="color: inherit; opacity: 0.85; margin-left: auto; display: flex; align-items: center; text-align: right;">${formaterTid(item.p.timestamp, safeUser)}</div>`;
             }
 
             let finalBorder = item.style.border === 'transparent' ? 'rgba(255,255,255,0.1)' : item.style.border;
 
-            const card = document.createElement('div'); 
-            card.className = `station-card`;
-            card.style.background = item.style.bg;
-            card.style.color = item.style.text;
-            card.style.borderColor = finalBorder;
+            let avatarInnhold = item.style.logo 
+                ? `<img src="${item.style.logo}" style="width: 100%; height: 100%; object-fit: contain; border-radius: 50%;" alt="Logo">` 
+                : item.style.char;
+            
+            // Hvis vi har logo, gjør vi bakgrunnen hvit for at logoen skal "poppe", ellers bruker vi fargen
+            let avatarBg = item.style.logo ? '#ffffff' : item.style.color;
+
+            // Setter glass-bakgrunn og farget venstre-kant
+            const card = document.createElement('div'); card.className = `station-card`;
+            card.style.background = item.style.glassBg; 
+            card.style.borderLeft = `4px solid ${item.style.color}`;
+            
+            card.style.cursor = 'pointer'; 
+            card.setAttribute('onclick', `toggleCard('${item.id}')`);
 
             card.innerHTML = `
-                <div class="f-icon-bg">${item.style.char}</div>
-                <div class="featured-title" style="font-size:16px; margin-bottom:10px;">
-                    ${item.navn} ${item.flag}
-                    <span class="featured-dist">📍 ${item.dist.toFixed(1)} km</span>
-                </div>
-                <div class="featured-prices">
-                    <div class="f-price-box" style="border-color:${item.style.border}">
-                        <span class="f-lbl">D</span><span class="f-val">${item.displayD} ${item.trendD}</span>
+                <div class="card-header-row">
+                    <div class="brand-avatar" style="background-color: ${avatarBg}; color: ${item.style.text}; overflow: hidden; padding: ${item.style.logo ? '2px' : '0'};">
+                        ${avatarInnhold}
                     </div>
-                    <div class="f-price-box" style="border-color:${item.style.border}">
-                        <span class="f-lbl">95</span><span class="f-val">${item.displayB} ${item.trendB}</span>
+                    <div class="featured-title">
+                        ${item.navn} ${item.flag}
                     </div>
-                    ${b98Html}
-                    ${fdHtml}
+                    <div class="featured-dist">📍 ${item.dist.toFixed(1)} km</div>
                 </div>
-                <div class="action-buttons">
-                    <div class="update-btn" style="border-color: ${item.style.text}; color: ${item.style.text};" onclick="apneModal('${item.id}','${item.escapedName}', ${item.brukLat}, ${item.brukLon})">OPPDATER</div>
-                    <a class="nav-btn" style="border-color: ${item.style.text}; color: ${item.style.text};" href="https://maps.google.com/?q=${item.brukLat},${item.brukLon}" target="_blank">KJØR HIT</a>
-                    <div class="hist-btn" style="border-color: ${item.style.text}; color: ${item.style.text};" onclick="visHistorikk('${item.id}')">⌛ HISTORIKK</div>
+                
+                <div class="featured-prices" style="align-items: center;">
+                    <div class="f-price-box">
+                        <span class="f-lbl" style="color:var(--diesel-color);">D</span>
+                        <span class="f-val">${item.displayD} ${item.trendD}</span>
+                    </div>
+                    <div class="f-price-box">
+                        <span class="f-lbl" style="color:var(--bensin-color);">95</span>
+                        <span class="f-val">${item.displayB} ${item.trendB}</span>
+                    </div>
+                    ${b98Html} ${fdHtml}
+                    ${item.timeAgoHtml}
                 </div>
-                <div id="hist-${item.id}" class="history-panel"></div>
-                ${item.timeAgoHtml}
+                
+                <div id="actions-${item.id}" class="action-buttons" style="display: none; border-top: 1px solid rgba(255,255,255,0.05); margin-top: 16px; padding-top: 12px;" onclick="event.stopPropagation()">
+                    <div class="update-btn" style="border: 1px solid rgba(255,255,255,0.2); color: white;" onclick="apneModal('${item.id}','${item.escapedName}', ${item.brukLat}, ${item.brukLon})">OPPDATER</div>
+                    <a class="nav-btn" style="border: 1px solid rgba(255,255,255,0.2); color: white;" href="https://maps.google.com/?q=${item.brukLat},${item.brukLon}" target="_blank">KJØR HIT</a>
+                    <div class="hist-btn" style="border: 1px solid rgba(255,255,255,0.2); color: white;" onclick="visHistorikk('${item.id}')">⌛ HISTORIKK</div>
+                </div>
+                <div id="hist-${item.id}" class="history-panel" onclick="event.stopPropagation()"></div>
             `;
             list.appendChild(card);
         });
@@ -1183,8 +1355,11 @@
         const s = document.getElementById('stedsnavn').value; 
         if(!s) return;
         document.getElementById('station-list').innerHTML = "<p class='loading-msg'>🔍 Henter stasjoner for " + s + "...</p>";
-        document.getElementById('featured-station-container').style.display = 'none'; document.getElementById('global-featured-container').style.display = 'none'; document.getElementById('add-station-container').style.display = 'none';
-        document.getElementById('extremes-container').style.display = 'none'; 
+        
+        // Vi skjuler KUN det lokale featured-kortet og legg-til knappen mens vi laster
+        document.getElementById('featured-station-container').style.display = 'none'; 
+        document.getElementById('add-station-container').style.display = 'none';
+        
         try {
             const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(s)}&countrycodes=no,se,dk&format=json&addressdetails=1&limit=1`); 
             const d = await res.json(); 
@@ -1198,8 +1373,11 @@
 
     window.startGpsSok = function() {
         document.getElementById('station-list').innerHTML = "<p class='loading-msg'>📍 Finner din posisjon...</p>";
-        document.getElementById('featured-station-container').style.display = 'none'; document.getElementById('global-featured-container').style.display = 'none'; document.getElementById('add-station-container').style.display = 'none';
-        document.getElementById('extremes-container').style.display = 'none'; 
+        
+        // Vi skjuler KUN det lokale featured-kortet og legg-til knappen mens vi laster
+        document.getElementById('featured-station-container').style.display = 'none'; 
+        document.getElementById('add-station-container').style.display = 'none';
+        
         navigator.geolocation.getCurrentPosition(
             async function(p) { 
                 sisteLat = p.coords.latitude; sisteLon = p.coords.longitude; 
@@ -1214,30 +1392,80 @@
         );
     };
 
-    window.hentStasjoner = async function(lat, lon) { 
-        sisteLat=lat; sisteLon=lon; const r=document.getElementById('radius').value*1000; 
-        document.getElementById('station-list').innerHTML = "<p class='loading-msg'>📡 Henter data (" + r/1000 + " km)...</p>";
-        try {
-            const res = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(`[out:json];node["amenity"="fuel"](around:${r},${lat},${lon});out;`)}`); 
-            const data = await res.json(); 
-            gjeldendeStasjoner = data.elements || []; 
+    window.hentStasjoner = async function(lat, lon, retryCount = 0) { 
+            sisteLat=lat; sisteLon=lon; const r=document.getElementById('radius').value*1000; 
             
-            for (const key in egneStasjoner) {
-                const cs = egneStasjoner[key];
-                if (cs.lat && cs.lon) {
-                    const dist = regnUtAvstand(lat, lon, cs.lat, cs.lon);
-                    if (dist <= r/1000) {
-                        gjeldendeStasjoner.push({ id: key, lat: cs.lat, lon: cs.lon, tags: { name: cs.navn, brand: cs.navn } });
+            // --- NYTT: Lagrer siste posisjon i telefonens minne ---
+            localStorage.setItem('drivstoff_siste_lat', lat);
+            localStorage.setItem('drivstoff_siste_lon', lon);
+            // ------------------------------------------------------
+
+            // Viser vanlig lastemelding første gang
+            if (retryCount === 0) {
+                document.getElementById('station-list').innerHTML = "<p class='loading-msg'>📡 Henter data (" + r/1000 + " km)...</p>";
+            }
+
+            // Liste over flere gratis reserve-servere vi kan bytte på
+            const endpoints = [
+                "https://overpass-api.de/api/interpreter",
+                "https://overpass.kumi.systems/api/interpreter",
+                "https://lz4.overpass-api.de/api/interpreter"
+            ];
+            
+            // Velger server basert på hvilket forsøk vi er på
+            const server = endpoints[retryCount % endpoints.length];
+
+            try {
+                const res = await fetch(`${server}?data=${encodeURIComponent(`[out:json];node["amenity"="fuel"](around:${r},${lat},${lon});out;`)}`); 
+                
+                // Hvis serveren svarer med en feil (f.eks "Too Many Requests"), tving frem en feilmelding for å trigge ny prøving
+                if (!res.ok) throw new Error("Server overbelastet");
+
+                const data = await res.json(); 
+                gjeldendeStasjoner = data.elements || []; 
+                
+                for (const key in egneStasjoner) {
+                    const cs = egneStasjoner[key];
+                    if (cs.lat && cs.lon) {
+                        const dist = regnUtAvstand(lat, lon, cs.lat, cs.lon);
+                        if (dist <= r/1000) {
+                            gjeldendeStasjoner.push({ id: key, lat: cs.lat, lon: cs.lon, tags: { name: cs.navn, brand: cs.navn } });
+                        }
                     }
                 }
+                visStasjoner(gjeldendeStasjoner, lat, lon);
+                visDagensEkstremer(); 
+            } catch (e) { 
+                // HVIS FEIL: Prøv automatisk igjen inntil 2 ekstra ganger med reserve-serverne!
+                if (retryCount < 2) {
+                    document.getElementById('station-list').innerHTML = `<p class='loading-msg' style='color:var(--diesel-color); text-shadow:none;'>⚠️ Kart-server opptatt, bytter til reserve (${retryCount + 1}/2)...</p>`;
+                    setTimeout(() => window.hentStasjoner(lat, lon, retryCount + 1), 1000); // Venter 1 sekund og prøver igjen automatisk
+                } else {
+                    // Hvis den feiler 3 ganger på rad, gi en god forklaring til brukeren.
+                    document.getElementById('station-list').innerHTML = "<p style='text-align:center; color:var(--danger); text-shadow: 0 1px 2px rgba(0,0,0,0.8);'><b>Dårlig forbindelse til kartet.</b><br>Dugnadskartet er midlertidig overbelastet av for mange brukere globalt. Prøv igjen om et halvt minutt!</p>"; 
+                }
             }
-            visStasjoner(gjeldendeStasjoner, lat, lon);
-            visDagensEkstremer(); 
-        } catch (e) { document.getElementById('station-list').innerHTML = "<p style='text-align:center; color:var(--danger); text-shadow: 0 1px 2px rgba(0,0,0,0.8);'>Kartfeil. Prøv igjen.</p>"; }
-    }
+        }
 
     function formaterTid(ts, u) { if(!ts) return "Aldri"; const d = Math.floor((Date.now()-ts)/1000); let txt = d<60?"nå":d<3600?Math.floor(d/60)+"m":d<86400?Math.floor(d/3600)+"t":Math.floor(d/86400)+"d"; return `Sist: ${txt} siden av ${u}`; }
     function regnUtAvstand(l1,o1,l2,o2){const R=6371;const dL=(l2-l1)*Math.PI/180;const dO=(o2-o1)*Math.PI/180;const a=Math.sin(dL/2)**2+Math.cos(l1*Math.PI/180)*Math.cos(l2*Math.PI/180)*Math.sin(dO/2)**2;return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));}
+
+        // =========================================
+        // AUTO-LASTING AV FORRIGE SØK
+        // =========================================
+        // Sjekker om brukeren har et lagret søk fra forrige gang
+        const lagretLat = localStorage.getItem('drivstoff_siste_lat');
+        const lagretLon = localStorage.getItem('drivstoff_siste_lon');
+
+        if (lagretLat && lagretLon) {
+            // Viser en liten beskjed om at vi auto-laster
+            document.getElementById('station-list').innerHTML = "<p class='loading-msg' style='color: var(--text-muted);'>Henter stasjonene fra forrige gang...</p>";
+            
+            // Venter 1 sekund (så ikke Firebase og kartet krangler om oppmerksomheten under oppstart), og henter stasjonene
+            setTimeout(() => {
+                window.hentStasjoner(parseFloat(lagretLat), parseFloat(lagretLon));
+            }, 1000);
+        }
 </script>
 </body>
 </html>
