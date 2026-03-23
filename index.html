@@ -1319,33 +1319,6 @@ window.toggleLeaderboard = function() {
             `;
             list.appendChild(card);
         });
-
-        if (nyesteStasjon && nyesteTid > startOfDay) {
-            let textColor = nyesteStasjon.style.text;
-            let borderColor = nyesteStasjon.style.border;
-            let bgColor = nyesteStasjon.style.bg;
-
-            let b98Html = (nyesteData.bensin98 && nyesteData.bensin98 !== "--") ? `<div class="f-price-box" style="border-color:${borderColor}"><span class="f-lbl">98</span><span class="f-val">${nyesteData.bensin98} ${getTrendHtml(nyesteData.bensin98, nyesteData.prev_bensin98)}</span></div>` : '';
-            let fdHtml = (nyesteData.fd && nyesteData.fd !== "--") ? `<div class="f-price-box" style="border-color:${borderColor}"><span class="f-lbl">FD</span><span class="f-val">${nyesteData.fd} ${getTrendHtml(nyesteData.fd, nyesteData.prev_fd)}</span></div>` : '';
-            let flag = getFlag(sisteLand);
-            let safeUser = sanitize(nyesteData.user);
-
-            featuredContainer.style.display = 'block';
-            featuredContainer.innerHTML = `
-                <div class="featured-card" style="background: ${bgColor}; color: ${textColor}; border: 3px solid ${borderColor === 'transparent' ? 'rgba(255,255,255,0.1)' : borderColor};">
-                    <div class="f-icon-bg">${nyesteStasjon.style.char}</div>
-                    <div class="featured-header">⚡ NYESTE OPPDATERING I DITT SØK</div>
-                    <div class="featured-title">${nyesteStasjon.navn} ${flag} <span style="margin-left:auto;" class="featured-dist">📍 ${nyesteStasjon.dist.toFixed(1)} km</span></div>
-                    <div class="featured-prices">
-                        <div class="f-price-box" style="border-color:${borderColor}"><span class="f-lbl">D</span><span class="f-val">${nyesteData.diesel} ${getTrendHtml(nyesteData.diesel, nyesteData.prev_diesel)}</span></div>
-                        <div class="f-price-box" style="border-color:${borderColor}"><span class="f-lbl">95</span><span class="f-val">${nyesteData.bensin} ${getTrendHtml(nyesteData.bensin, nyesteData.prev_bensin)}</span></div>
-                        ${b98Html}
-                        ${fdHtml}
-                    </div>
-                    <div class="f-user">${formaterTid(nyesteData.timestamp, safeUser)}</div>
-                </div>
-            `;
-        }
         
         document.getElementById('add-station-container').style.display = 'block'; 
         setTimeout(sjekkScroll, 200);
