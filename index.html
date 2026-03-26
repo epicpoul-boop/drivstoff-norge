@@ -917,165 +917,196 @@ window.toggleLeaderboard = function() {
         return { sted: sted, kjede: kjede };
     }
 
-    function visGlobalSisteOppdatering() {
-        let nyesteTid = 0; let nyesteData = null;
+window.visGlobalSisteOppdatering = function() {
+    const globalContainer = document.getElementById('global-nyeste');
+    if (!globalContainer) return;
 
-        for (const id in skylagredePriser) {
-            if (skjulteStasjoner[id]) continue;
-            const p = skylagredePriser[id];
-            if (p.timestamp > nyesteTid && p.navn) { nyesteTid = p.timestamp; nyesteData = p; }
-        }
-
-        const globalContainer = document.getElementById('global-featured-container');
-        if (nyesteData && nyesteTid > (Date.now() - (3 * 24 * 60 * 60 * 1000))) {
-            let distStr = "";
-            let sLat = nyesteData.lat; let sLon = nyesteData.lon;
-            if (endredeGps[nyesteData.id]) { sLat = endredeGps[nyesteData.id].lat; sLon = endredeGps[nyesteData.id].lon; }
-
-            if (sisteLat && sisteLon && sLat && sLon) {
-                const dist = regnUtAvstand(sisteLat, sisteLon, sLat, sLon);
-                distStr = `<span class="featured-dist">📍 ${dist.toFixed(1)} km</span>`;
-            }
-
-let bruktNavn = endredeNavn[nyesteData.id] || nyesteData.navn;
-            
-            // Bruk den nye vaskemaskinen vår for å splitte navn og kjede
-            let formatert = formaterStasjonsNavn(bruktNavn);
-            let stedNavn = sanitize(formatert.sted);
-            let kjedeNavn = sanitize(formatert.kjede);
-            let safeNavn = sanitize(bruktNavn);
-            let safeUser = sanitize(nyesteData.user);
-
-            const style = getBrandStyle(safeNavn);
-            
-            let distTekst = "";
-            if (sisteLat && sisteLon && sLat && sLon) {
-                let dist = regnUtAvstand(sisteLat, sisteLon, sLat, sLon);
-                distTekst = dist < 1 ? " - " + (dist * 1000).toFixed(0) + " m" : " - " + dist.toFixed(1) + " km";
-            }
-
-            // Samme kompakte tidstekst
-            let rawTimeText = formaterTid(nyesteData.timestamp, safeUser).replace("Sist: ", "");
-
-            // Samme squircle-logo
-            let avatarInnhold = style.logo ? `<img src="${style.logo}" style="width: 100%; height: 100%; object-fit: contain; border-radius: 9px;" alt="Logo">` : style.char;
-            let avatarBg = style.logo ? '#ffffff' : style.color;
-
-            // Samme kompakte prisbokser
-            let b98Html = (nyesteData.bensin98 && nyesteData.bensin98 !== "--") ? `<div class="f-price-box" style="padding: 4px 6px;"><span class="f-lbl" style="color:var(--bensin98-color); font-size: 9px;">98</span><span class="f-val" style="font-size: 14px; color:inherit;">${nyesteData.bensin98} ${getTrendHtml(nyesteData.bensin98, nyesteData.prev_bensin98)}</span></div>` : '';
-            let fdHtml = (nyesteData.fd && nyesteData.fd !== "--") ? `<div class="f-price-box" style="padding: 4px 6px;"><span class="f-lbl" style="color:var(--fd-color); font-size: 9px;">FD</span><span class="f-val" style="font-size: 14px; color:inherit;">${nyesteData.fd} ${getTrendHtml(nyesteData.fd, nyesteData.prev_fd)}</span></div>` : '';
-
-            globalContainer.style.display = 'block';
-            globalContainer.innerHTML = `
-                <div class="featured-header" style="margin-bottom: 10px; color: var(--primary);">⚡ NYESTE OPPDATERING I NORGE</div>
-                <div class="station-card" style="background: ${style.glassBg}; border-left: 4px solid ${style.color}; cursor: pointer; margin-bottom: 0;" onclick="apneModal('${nyesteData.id}','${safeNavn.replace(/'/g, "\\'")}', ${sLat}, ${sLon})">
-                    
-                    <div class="card-header-row" style="align-items: center; margin-bottom: 8px;">
-                        <div class="brand-avatar" style="width: 38px; height: 38px; min-width: 38px; border-radius: 10px; background-color: ${avatarBg}; color: ${style.text}; overflow: hidden; padding: ${style.logo ? '2px' : '0'}; box-shadow: 0 4px 10px rgba(0,0,0,0.3); font-size: 16px;">
-                            ${avatarInnhold}
-                        </div>
-                        <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; overflow: hidden; margin-top: 2px;">
-                            <div class="featured-title" style="margin: 0 0 1px 0; font-size: 15px; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow:none; color:inherit;">
-                                ${stedNavn}
-                            </div>
-                            <div class="featured-dist" style="margin: 0; font-size: 11px; opacity: 0.7; font-weight: 500; display: flex; align-items: center; gap: 4px; white-space: nowrap; text-overflow: ellipsis;">
-                                <span>${kjedeNavn}${distTekst}</span>
-                                <span>•</span>
-                                <span style="opacity: 0.9;">${rawTimeText}</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="featured-prices" style="display:flex; gap: 4px; flex-wrap: nowrap; overflow: hidden;">
-                        <div class="f-price-box" style="padding: 4px 6px;"><span class="f-lbl" style="color:var(--diesel-color); font-size: 9px;">D</span><span class="f-val" style="font-size: 14px; color:inherit;">${nyesteData.diesel} ${getTrendHtml(nyesteData.diesel, nyesteData.prev_diesel)}</span></div>
-                        <div class="f-price-box" style="padding: 4px 6px;"><span class="f-lbl" style="color:var(--bensin-color); font-size: 9px;">95</span><span class="f-val" style="font-size: 14px; color:inherit;">${nyesteData.bensin} ${getTrendHtml(nyesteData.bensin, nyesteData.prev_bensin)}</span></div>
-                        ${b98Html} ${fdHtml}
-                    </div>
-                </div>
-            `;
-        } else { globalContainer.style.display = 'none'; }
+    // Hvis vi ikke har noe data, skjul boksen
+    if (!nyesteData) {
+        globalContainer.style.display = 'none';
+        return;
     }
 
-function visDagensEkstremer() {
-        let naa = Date.now();
-        let grense = naa - (24 * 60 * 60 * 1000); 
+    // 1. Vask og formater navnet (Splitter i sted og kjede)
+    let rawName = nyesteData.navn;
+    let formatert = formaterStasjonsNavn(rawName);
+    const stedNavnFeatured = sanitize(formatert.sted);
+    const kjedeNavnFeatured = sanitize(formatert.kjede);
+
+    // 2. Regn ut avstand hvis vi har GPS
+    let distStrVal = "";
+    if (sisteLat && sisteLon && nyesteData.lat && nyesteData.lon) {
+        const distKms = regnUtAvstand(sisteLat, sisteLon, nyesteData.lat, nyesteData.lon);
+        distStrVal = distKms < 1 ? (distKms * 1000).toFixed(0) + " m" : distKms.toFixed(1) + " km";
+    }
+
+    // 3. Hent design, flagg og tid
+    const style = getBrandStyle(rawName);
+    const landTag = getFlag(nyesteData.land || "NO");
+    const nyesteTid = nyesteData.timestamp;
+    let safeUser = sanitize(nyesteData.user || "Ukjent");
+    let rawTimeText = formaterTid(nyesteTid, safeUser).replace("Sist: ", "");
+
+    // 4. Sett opp Avatar (Krympet Squircle)
+    let avatarContent = style.logo 
+        ? `<img src="${style.logo}" style="width: 100%; height: 100%; object-fit: contain; border-radius: 9px;" alt="Logo">` 
+        : style.char;
+    let avatarBg = style.logo ? '#ffffff' : style.color;
+
+    // 5. Bygg prisboksene for 98 og FD (hvis de finnes)
+    let b98Html = (nyesteData.bensin98 && nyesteData.bensin98 !== "--") 
+        ? `<div class="f-price-box" style="padding: 4px 6px;"><span class="f-lbl" style="color:var(--bensin98-color); font-size: 9px;">98</span><span class="f-val" style="font-size: 14px; color:inherit;">${nyesteData.bensin98} ${getTrendHtml(nyesteData.bensin98, nyesteData.prev_bensin98)}</span></div>` 
+        : '';
+    let fdHtml = (nyesteData.fd && nyesteData.fd !== "--") 
+        ? `<div class="f-price-box" style="padding: 4px 6px;"><span class="f-lbl" style="color:var(--fd-color); font-size: 9px;">FD</span><span class="f-val" style="font-size: 14px; color:inherit;">${nyesteData.fd} ${getTrendHtml(nyesteData.fd, nyesteData.prev_fd)}</span></div>` 
+        : '';
+
+    // Vis containeren
+    globalContainer.style.display = 'block';
+
+    // 6. BYGG KORTET (Identisk med stasjonslisten!)
+    globalContainer.innerHTML = `
+        <div class="featured-header" style="margin-bottom: 10px; color: var(--primary); font-size: 12px; font-weight: 700; letter-spacing: 1px;">⚡ NYESTE OPPDATERING I NORGE</div>
         
-        let billigsteAvg = Infinity; let dyresteAvg = 0;
-        let billigsteData = null; let dyresteData = null;
-
-        for (const id in skylagredePriser) {
-            if (skjulteStasjoner[id]) continue;
-            const p = skylagredePriser[id];
+        <div class="station-card" style="background: ${style.glassBg}; border-left: 4px solid ${style.color}; cursor: pointer; transition: all 0.2s ease; margin-bottom: 20px;" onclick="toggleCard('global-feature')">
             
-            if (p.timestamp > grense && p.navn) {
-                if (p.land && p.land !== 'no') continue;
+            <div class="card-header-row" style="align-items: center; margin-bottom: 8px;">
+                <div class="brand-avatar" style="width: 38px; height: 38px; min-width: 38px; border-radius: 10px; background-color: ${avatarBg}; color: ${style.text}; overflow: hidden; padding: ${style.logo ? '2px' : '0'}; box-shadow: 0 4px 10px rgba(0,0,0,0.3); font-size: 16px;">
+                    ${avatarContent}
+                </div>
+                
+                <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; overflow: hidden; margin-top: 2px;">
+                    <div class="featured-title" style="display: flex; justify-content: space-between; align-items: flex-end; margin: 0 0 2px 0; line-height: 1.1; text-shadow: none; color: inherit;">
+                        <span style="font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 8px;">
+                            ${stedNavnFeatured} ${landTag}
+                        </span>
+                        <span style="font-size: 9px; opacity: 0.9; font-weight: 600; white-space: nowrap; flex-shrink: 0; padding-bottom: 2px;">
+                            ${rawTimeText}
+                        </span>
+                    </div>
+                    
+                    <div class="featured-dist" style="margin: 0; font-size: 11px; opacity: 0.7; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        ${kjedeNavnFeatured}${distStrVal ? ' - ' + distStrVal : ''}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="featured-prices" style="display:flex; gap: 4px; flex-wrap: nowrap; overflow: hidden; margin-bottom: 15px; align-items: center;">
+                <div class="f-price-box" style="padding: 4px 6px;"><span class="f-lbl" style="color:var(--diesel-color); font-size: 9px;">D</span><span class="f-val" style="font-size: 14px; color:inherit;">${nyesteData.diesel} ${getTrendHtml(nyesteData.diesel, nyesteData.prev_diesel)}</span></div>
+                <div class="f-price-box" style="padding: 4px 6px;"><span class="f-lbl" style="color:var(--bensin-color); font-size: 9px;">95</span><span class="f-val" style="font-size: 14px; color:inherit;">${nyesteData.bensin} ${getTrendHtml(nyesteData.bensin, nyesteData.prev_bensin)}</span></div>
+                ${b98Html}
+                ${fdHtml}
+            </div>
 
-                let d = parseFloat(p.diesel ? String(p.diesel).replace(',', '.') : NaN);
-                let b = parseFloat(p.bensin ? String(p.bensin).replace(',', '.') : NaN);
+            <div id="actions-global-feature" class="action-buttons" style="display:none; margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 8px;" onclick="event.stopPropagation()">
+                <div class="update-btn" style="border: 1px solid rgba(255,255,255,0.2); color: white;" onclick="apneModal('${nyesteData.id}','${nyesteData.navn.replace(/'/g, "\\'")}', ${nyesteData.lat}, ${nyesteData.lon})">OPPDATER</div>
+                <a class="nav-btn" style="border: 1px solid rgba(255,255,255,0.2); color: white;" href="https://maps.google.com/?q=$${nyesteData.lat},${nyesteData.lon}" target="_blank">KJØR HIT</a>
+                <div class="hist-btn" style="border: 1px solid rgba(255,255,255,0.2); color: white;" onclick="visHistorikk('${nyesteData.id}')">⌛ HISTORIKK</div>
+            </div>
+            
+            <div id="hist-global-feature" class="history-panel" onclick="event.stopPropagation()"></div>
+        </div>
+    `;
+};
 
-                if (!isNaN(d) && !isNaN(b) && d >= 14 && b >= 14) {
-                    let avg = (d + b) / 2;
-                    if (avg < billigsteAvg) { billigsteAvg = avg; billigsteData = { ...p, id: id }; }
-                    if (avg > dyresteAvg && avg <= 35) { dyresteAvg = avg; dyresteData = { ...p, id: id }; }
-                }
-            }
+window.visDagensEkstremer = function() {
+    const container = document.getElementById('dagens-ekstremer');
+    if (!container) return;
+
+    // Sjekk at vi faktisk har funnet de billigste stasjonene
+    // (Bytt ut 'dagensBilligsteDiesel' med det variabelnavnet du bruker i koden din!)
+    if (!dagensBilligsteDiesel && !dagensBilligsteBensin) {
+        container.style.display = 'none';
+        return;
+    }
+
+    container.style.display = 'block';
+    let htmlOut = "";
+
+    // 🛠️ HJELPEFUNKSJON: Bygger et perfekt, striglet kort for ekstreme priser
+    const byggEkstremKort = (data, overskrift, farge) => {
+        if (!data) return "";
+
+        // 1. Vask og formater navnet
+        let rawName = data.navn || (data.tags && (data.tags.name || data.tags.brand)) || "Ukjent Stasjon";
+        let formatert = formaterStasjonsNavn(rawName);
+        const stedNavnFeatured = sanitize(formatert.sted);
+        const kjedeNavnFeatured = sanitize(formatert.kjede);
+
+        // 2. Regn ut avstand
+        let distStrVal = "";
+        if (sisteLat && sisteLon && data.lat && data.lon) {
+            const distKms = regnUtAvstand(sisteLat, sisteLon, data.lat, data.lon);
+            distStrVal = distKms < 1 ? (distKms * 1000).toFixed(0) + " m" : distKms.toFixed(1) + " km";
         }
 
-        const container = document.getElementById('extremes-container');
-        container.style.display = 'block'; 
+        // 3. Styling, flagg og tid
+        const style = getBrandStyle(rawName);
+        const landTag = getFlag(data.land || "NO");
+        let safeUser = sanitize(data.user || "Ukjent");
+        let rawTimeText = formaterTid(data.timestamp, safeUser).replace("Sist: ", "");
 
-        const renderPlaceholder = (title, icon, color) => `
-            <div class="featured-header" style="margin-bottom: 10px; margin-top: 15px;">${icon} ${title}</div>
-            <div class="featured-card" style="background: rgba(0,0,0,0.2); border: 1px dashed ${color}; border-left: 4px solid ${color};">
-                <div style="text-align:center; padding: 15px; font-size: 13px; font-weight: 400; color: var(--text-muted);">Venter på dagens oppdateringer...</div>
-            </div>
-        `;
+        // 4. Avatar (Squircle)
+        let avatarContent = style.logo 
+            ? `<img src="${style.logo}" style="width: 100%; height: 100%; object-fit: contain; border-radius: 9px;" alt="Logo">` 
+            : style.char;
+        let avatarBg = style.logo ? '#ffffff' : style.color;
 
-        const renderCard = (data, title, icon, fallbackBorderColor) => {
-            let bruktNavn = endredeNavn[data.id] || data.navn;
+        // 5. Prisbokser for 98 og FD
+        let b98Html = (data.bensin98 && data.bensin98 !== "--") 
+            ? `<div class="f-price-box" style="padding: 4px 6px;"><span class="f-lbl" style="color:var(--bensin98-color); font-size: 9px;">98</span><span class="f-val" style="font-size: 14px; color:inherit;">${data.bensin98} ${getTrendHtml(data.bensin98, data.prev_bensin98)}</span></div>` 
+            : '';
+        let fdHtml = (data.fd && data.fd !== "--") 
+            ? `<div class="f-price-box" style="padding: 4px 6px;"><span class="f-lbl" style="color:var(--fd-color); font-size: 9px;">FD</span><span class="f-val" style="font-size: 14px; color:inherit;">${data.fd} ${getTrendHtml(data.fd, data.prev_fd)}</span></div>` 
+            : '';
+
+        // Unik ID for toggle-funksjonen (i tilfelle samme stasjon er billigst på både bensin og diesel)
+        const cardId = "ekstrem-" + data.id + "-" + Math.floor(Math.random() * 1000);
+
+        // 6. BYGG KORTET (Identisk med de to andre funksjonene)
+        return `
+            <div class="featured-header" style="margin-top: 15px; margin-bottom: 10px; color: ${farge}; font-size: 12px; font-weight: 700; letter-spacing: 1px;">${overskrift}</div>
             
-            let formatert = formaterStasjonsNavn(bruktNavn);
-            let stedNavn = sanitize(formatert.sted);
-            let kjedeNavn = sanitize(formatert.kjede);
-            let safeNavn = sanitize(bruktNavn);
-            let safeUser = sanitize(data.user);
-            const style = getBrandStyle(safeNavn);
-
-            let rawTimeText = formaterTid(data.timestamp, safeUser).replace("Sist: ", "");
-
-            let avatarInnhold = style.logo ? `<img src="${style.logo}" style="width: 100%; height: 100%; object-fit: contain; border-radius: 9px;" alt="Logo">` : style.char;
-            let avatarBg = style.logo ? '#ffffff' : style.color;
-
-            let b98Html = (data.bensin98 && data.bensin98 !== "--") ? `<div class="f-price-box" style="padding: 4px 6px;"><span class="f-lbl" style="color:var(--bensin98-color); font-size: 9px;">98</span><span class="f-val" style="font-size: 14px; color:inherit;">${data.bensin98} ${getTrendHtml(data.bensin98, data.prev_bensin98)}</span></div>` : '';
-            let fdHtml = (data.fd && data.fd !== "--") ? `<div class="f-price-box" style="padding: 4px 6px;"><span class="f-lbl" style="color:var(--fd-color); font-size: 9px;">FD</span><span class="f-val" style="font-size: 14px; color:inherit;">${data.fd} ${getTrendHtml(data.fd, data.prev_fd)}</span></div>` : '';
-
-            return `
-            <div class="featured-header" style="margin-bottom: 10px; margin-top: 15px;">${icon} ${title}</div>
-            <div class="station-card" style="background: ${style.glassBg}; border-left: 4px solid ${style.color}; cursor: pointer; margin-bottom: 0;" onclick="apneModal('${data.id}','${safeNavn.replace(/'/g, "\\'")}', ${data.lat || 0}, ${data.lon || 0})">
+            <div class="station-card" style="background: ${style.glassBg}; border-left: 4px solid ${style.color}; cursor: pointer; transition: all 0.2s ease; margin-bottom: 20px;" onclick="toggleCard('${cardId}')">
                 
                 <div class="card-header-row" style="align-items: center; margin-bottom: 8px;">
                     <div class="brand-avatar" style="width: 38px; height: 38px; min-width: 38px; border-radius: 10px; background-color: ${avatarBg}; color: ${style.text}; overflow: hidden; padding: ${style.logo ? '2px' : '0'}; box-shadow: 0 4px 10px rgba(0,0,0,0.3); font-size: 16px;">
-                        ${avatarInnhold}
+                        ${avatarContent}
                     </div>
+                    
                     <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; overflow: hidden; margin-top: 2px;">
-                        <div class="featured-title" style="margin: 0 0 1px 0; font-size: 15px; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow:none; color:inherit;">
-                            ${stedNavn}
+                        <div class="featured-title" style="display: flex; justify-content: space-between; align-items: flex-end; margin: 0 0 2px 0; line-height: 1.1; text-shadow: none; color: inherit;">
+                            <span style="font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 8px;">
+                                ${stedNavnFeatured} ${landTag}
+                            </span>
+                            <span style="font-size: 9px; opacity: 0.9; font-weight: 600; white-space: nowrap; flex-shrink: 0; padding-bottom: 2px;">
+                                ${rawTimeText}
+                            </span>
                         </div>
-                        <div class="featured-dist" style="margin: 0; font-size: 11px; opacity: 0.7; font-weight: 500; display: flex; align-items: center; gap: 4px; white-space: nowrap; text-overflow: ellipsis;">
-                            <span>${kjedeNavn}</span>
-                            <span>•</span>
-                            <span style="opacity: 0.9;">${rawTimeText}</span>
+                        
+                        <div class="featured-dist" style="margin: 0; font-size: 11px; opacity: 0.7; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            ${kjedeNavnFeatured}${distStrVal ? ' - ' + distStrVal : ''}
                         </div>
                     </div>
                 </div>
                 
-                <div class="featured-prices" style="display:flex; gap: 4px; flex-wrap: nowrap; overflow: hidden;">
-                    <div class="f-price-box" style="padding: 4px 6px;"><span class="f-lbl" style="color:var(--diesel-color); font-size: 9px;">D</span><span class="f-val" style="font-size: 14px; color:inherit;">${data.diesel} ${getTrendHtml(data.diesel, data.prev_diesel)}</span></div>
-                    <div class="f-price-box" style="padding: 4px 6px;"><span class="f-lbl" style="color:var(--bensin-color); font-size: 9px;">95</span><span class="f-val" style="font-size: 14px; color:inherit;">${data.bensin} ${getTrendHtml(data.bensin, data.prev_bensin)}</span></div>
-                    ${b98Html} ${fdHtml}
+                <div class="featured-prices" style="display:flex; gap: 4px; flex-wrap: nowrap; overflow: hidden; margin-bottom: 15px; align-items: center;">
+                    <div class="f-price-box" style="padding: 4px 6px;"><span class="f-lbl" style="color:var(--diesel-color); font-size: 9px;">D</span><span class="f-val" style="font-size: 14px; color:inherit;">${data.diesel !== undefined ? data.diesel : "--"} ${getTrendHtml(data.diesel, data.prev_diesel)}</span></div>
+                    <div class="f-price-box" style="padding: 4px 6px;"><span class="f-lbl" style="color:var(--bensin-color); font-size: 9px;">95</span><span class="f-val" style="font-size: 14px; color:inherit;">${data.bensin !== undefined ? data.bensin : "--"} ${getTrendHtml(data.bensin, data.prev_bensin)}</span></div>
+                    ${b98Html}
+                    ${fdHtml}
                 </div>
-            </div>`;
-        };
+
+                <div id="actions-${cardId}" class="action-buttons" style="display:none; margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 8px;" onclick="event.stopPropagation()">
+                    <div class="update-btn" style="border: 1px solid rgba(255,255,255,0.2); color: white;" onclick="apneModal('${data.id}','${data.navn ? data.navn.replace(/'/g, "\\'") : ''}', ${data.lat}, ${data.lon})">OPPDATER</div>
+                    <a class="nav-btn" style="border: 1px solid rgba(255,255,255,0.2); color: white;" href="http://googleusercontent.com/maps.google.com/4${data.lat},${data.lon}" target="_blank">KJØR HIT</a>
+                    <div class="hist-btn" style="border: 1px solid rgba(255,255,255,0.2); color: white;" onclick="visHistorikk('${data.id}')">⌛ HISTORIKK</div>
+                </div>
+                
+                <div id="hist-${cardId}" class="history-panel" onclick="event.stopPropagation()"></div>
+            </div>
+        `;
+    };
 
         let html = '<h3 style="font-size: 13px; text-transform: uppercase; color: var(--text-muted); margin-top: 25px; margin-bottom: 5px; text-align: center; font-weight: 600; letter-spacing: 0.5px; text-shadow: 0 1px 2px rgba(0,0,0,0.8);">📍 Norges Ytterpunkter (Siste 24t)</h3>';
         
@@ -1398,8 +1429,8 @@ window.lagrePris = async function() {
             // 5. BYGG PRISENE PÅ NYTT OG SETT DEM INN
             const priceDiv = document.createElement('div');
             priceDiv.className = 'featured-prices';
-            // QoL: Flytter deleren ned ved å øke avstanden under prisene
-            priceDiv.style.cssText = 'display:flex; gap: 4px; flex-wrap: nowrap; overflow: hidden; margin-bottom: 25px; align-items: center;';
+            // Standard spacing:
+            priceDiv.style.cssText = 'display:flex; gap: 4px; flex-wrap: nowrap; overflow: hidden; align-items: center;';
 
             const addPrice = (lbl, val, trnd, col) => {
                 if (!val || val === "--") return;
