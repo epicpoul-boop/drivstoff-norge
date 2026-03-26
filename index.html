@@ -1038,16 +1038,8 @@ window.toggleLeaderboard = function() {
         }
 
         if (!isAnonym) {
-            const nameRef = ref(db, 'users/' + n.toLowerCase());
-            const nameSnap = await get(nameRef);
-            
-            // Hvis navnet eksisterer og eieren IKKE er deg
-            if (nameSnap.exists() && nameSnap.val() !== myUid) {
-                const bekreft = confirm(`Kallenavnet '${n}' er allerede i bruk av noen andre.\n\nEr dette deg og du har fått ny telefon? (Vi bygger søknadsprosessen snart)`);
-                if (!bekreft) return; 
-            } else if (!nameSnap.exists()) { 
-                await set(nameRef, myUid); 
-            }
+            // QoL-oppdatering: Vi har midlertidig skrudd av sjekken for "stjålne" kallenavn
+            // inntil et ordentlig system er på plass.
             localStorage.setItem('drivstoff_navn', n);
         }
 
@@ -1082,6 +1074,8 @@ window.toggleLeaderboard = function() {
         }
 
         const newData = { 
+            station_id: safeId,
+            
             diesel: d, prev_diesel: prev_d, bensin: b, prev_bensin: prev_b, bensin98: b98, prev_bensin98: prev_b98, fd: fd, prev_fd: prev_fd,
             timestamp: Date.now(), user: n, uid: myUid, verified: verified, navn: stasjonNavn, lat: valgtStasjonLat, lon: valgtStasjonLon, land: sisteLand 
         };
@@ -1091,6 +1085,7 @@ window.toggleLeaderboard = function() {
         push(ref(db, 'historikk/' + safeId), newData); 
         push(ref(db, 'alle_oppdateringer'), newData);
          
+
         // --- SAMARBEID: SEND PRIS TIL JVinsnes ---
         try {
             // Sender dieselpris
