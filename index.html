@@ -1010,7 +1010,7 @@ window.toggleLeaderboard = function() {
         return (val >= 14 && val <= 35); 
     }
 
-    window.lagrePris = async function() {
+window.lagrePris = async function() {
         if (!myUid) {
             document.getElementById('modal-error').innerText = "Venter på sikker tilkobling... Prøv igjen om 1 sekund.";
             document.getElementById('modal-error').style.display = "block"; return;
@@ -1043,7 +1043,6 @@ window.toggleLeaderboard = function() {
             localStorage.setItem('drivstoff_navn', n);
         }
 
-        const currentRef = ref(db, 'priser/' + valgtStasjonId);
         const oldData = skylagredePriser[valgtStasjonId] || {};
 
         let prev_d = oldData.diesel || "--"; let prev_b = oldData.bensin || "--"; let prev_b98 = oldData.bensin98 || "--"; let prev_fd = oldData.fd || "--";
@@ -1073,49 +1072,33 @@ window.toggleLeaderboard = function() {
             if (Date.now() - oldData.timestamp < 86400000) verified = true;
         }
 
+        let safeId = String(valgtStasjonId).replace(/[\.\#\$\[\]\/]/g, "_");
+        
         const newData = { 
             station_id: safeId,
-            
             diesel: d, prev_diesel: prev_d, bensin: b, prev_bensin: prev_b, bensin98: b98, prev_bensin98: prev_b98, fd: fd, prev_fd: prev_fd,
             timestamp: Date.now(), user: n, uid: myUid, verified: verified, navn: stasjonNavn, lat: valgtStasjonLat, lon: valgtStasjonLon, land: sisteLand 
         };
         
-        let safeId = String(valgtStasjonId).replace(/[\.\#\$\[\]\/]/g, "_");
         await set(ref(db, 'priser/' + safeId), newData); 
         push(ref(db, 'historikk/' + safeId), newData); 
         push(ref(db, 'alle_oppdateringer'), newData);
          
-
         // --- SAMARBEID: SEND PRIS TIL JVinsnes ---
         try {
-            // Sender dieselpris
             if (d && d !== "--") {
                 fetch("https://jvinsnes.no/drivstoff/submit_price.php", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ 
-                        station_id: safeId, 
-                        fuel_key: "diesel", 
-                        price: parseFloat(d.replace(',', '.')) 
-                    })
-                }).catch(e => console.log("Kunne ikke sende diesel til Jvinsnes", e));
+                    method: "POST", headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ station_id: safeId, fuel_key: "diesel", price: parseFloat(d.replace(',', '.')) })
+                }).catch(e => console.log("Kunne ikke sende diesel", e));
             }
-            // Sender bensinpris
             if (b && b !== "--") {
                 fetch("https://jvinsnes.no/drivstoff/submit_price.php", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ 
-                        station_id: safeId, 
-                        fuel_key: "bensin95", 
-                        price: parseFloat(b.replace(',', '.')) 
-                    })
-                }).catch(e => console.log("Kunne ikke sende bensin til Jvinsnes", e));
+                    method: "POST", headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ station_id: safeId, fuel_key: "bensin95", price: parseFloat(b.replace(',', '.')) })
+                }).catch(e => console.log("Kunne ikke sende bensin", e));
             }
-        } catch(err) {
-            console.log("Samarbeids-API feilet:", err);
-        }
-        // ------------------------------------------
+        } catch(err) { console.log("Samarbeids-API feilet:", err); }
        
         window.lukkModal();
     };
