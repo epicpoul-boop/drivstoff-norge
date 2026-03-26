@@ -308,15 +308,22 @@
         </div>
     </div>
     
-    <div class="panel" style="padding: 15px;">
-        <div style="display: flex; gap: 8px; margin-bottom: 15px;">
-            <input type="search" id="stedsnavn" placeholder="Søk by eller sted..." style="margin-bottom: 0; flex: 1;" onkeypress="if(event.key === 'Enter') sokPaaSted()">
+<div class="panel" style="padding: 15px;">
+        <div style="display: flex; gap: 8px; margin-bottom: 12px; align-items: center;">
             
-            <button class="gps-btn" onclick="startGpsSok()" style="margin-top: 0; width: auto; padding: 0 16px; border-color: rgba(76, 175, 80, 0.3); color: #4caf50; background: rgba(76, 175, 80, 0.1); white-space: nowrap;">📍 Min posisjon</button>
+            <div style="position: relative; flex: 1;">
+                <input type="search" id="stedsnavn" placeholder="Søk by eller sted..." style="margin-bottom: 0; width: 100%; padding-right: 36px; box-sizing: border-box;" onkeypress="if(event.key === 'Enter') sokPaaSted()" oninput="toggleSearchBtn()">
+                
+                <div id="inline-search-btn" style="display: none; position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 16px; opacity: 0.8;" onclick="sokPaaSted()">
+                    🔍
+                </div>
+            </div>
+            
+            <button class="gps-btn" onclick="startGpsSok()" style="margin-top: 0; width: auto; padding: 0 12px; font-size: 12px; border-color: rgba(76, 175, 80, 0.3); color: #4caf50; background: rgba(76, 175, 80, 0.1); white-space: nowrap; height: 42px;">📍 Posisjon</button>
         </div>
         
-        <div style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px;">
-            <input type="range" id="radius" min="1" max="50" value="10" oninput="document.getElementById('radius-val').innerText = this.value" style="margin-bottom: 8px;">
+        <div style="width: 100%;">
+            <input type="range" id="radius" min="1" max="50" value="10" oninput="document.getElementById('radius-val').innerText = this.value" style="margin-bottom: 8px; width: 100%; display: block; box-sizing: border-box;">
             <label style="font-weight:600; display:block; font-size: 12px; color: var(--text-muted); text-align: center;">Søkeradius: <span id="radius-val" style="color:var(--text-main)">10</span> km</label>
         </div>
     </div>
@@ -1386,6 +1393,17 @@ let foundLocalKupp = false;
         document.getElementById('add-station-container').style.display = 'block'; 
         setTimeout(sjekkScroll, 200);
     }
+
+// Sjekker om forstørrelsesglasset skal vises inni søkefeltet
+    window.toggleSearchBtn = function() {
+        const input = document.getElementById('stedsnavn');
+        const btn = document.getElementById('inline-search-btn');
+        if (input.value.length > 0) {
+            btn.style.display = 'block';
+        } else {
+            btn.style.display = 'none';
+        }
+    };
 
     window.sokPaaSted = async function() { 
         const s = document.getElementById('stedsnavn').value; 
