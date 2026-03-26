@@ -1327,7 +1327,7 @@ window.lagrePris = async function() {
             return valA - valB;
         });
 
-let foundLocalKupp = false;
+        let foundLocalKupp = false;
         processedStasjoner.forEach((item, index) => {
             
             // 1. Krymper Squircle-logoen
@@ -1398,7 +1398,8 @@ let foundLocalKupp = false;
             // 5. BYGG PRISENE PÅ NYTT OG SETT DEM INN
             const priceDiv = document.createElement('div');
             priceDiv.className = 'featured-prices';
-            priceDiv.style.cssText = 'display:flex; gap: 4px; flex-wrap: nowrap; overflow: hidden;';
+            // QoL: Flytter deleren ned ved å øke avstanden under prisene
+            priceDiv.style.cssText = 'display:flex; gap: 4px; flex-wrap: nowrap; overflow: hidden; margin-bottom: 25px; align-items: center;';
 
             const addPrice = (lbl, val, trnd, col) => {
                 if (!val || val === "--") return;
