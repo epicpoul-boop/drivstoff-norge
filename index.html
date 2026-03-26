@@ -926,36 +926,59 @@ window.toggleLeaderboard = function() {
                 distStr = `<span class="featured-dist">📍 ${dist.toFixed(1)} km</span>`;
             }
 
-            let bruktNavn = endredeNavn[nyesteData.id] || nyesteData.navn;
-            const style = getBrandStyle(bruktNavn);
+let bruktNavn = endredeNavn[nyesteData.id] || nyesteData.navn;
+            
+            // Bruk den nye vaskemaskinen vår for å splitte navn og kjede
+            let formatert = formaterStasjonsNavn(bruktNavn);
+            let stedNavn = sanitize(formatert.sted);
+            let kjedeNavn = sanitize(formatert.kjede);
             let safeNavn = sanitize(bruktNavn);
             let safeUser = sanitize(nyesteData.user);
 
-            let b98Html = (nyesteData.bensin98 && nyesteData.bensin98 !== "--") ? `<div class="f-price-box"><span class="f-lbl" style="color:var(--bensin98-color);">98</span><span class="f-val">${nyesteData.bensin98} ${getTrendHtml(nyesteData.bensin98, nyesteData.prev_bensin98)}</span></div>` : '';
-            let fdHtml = (nyesteData.fd && nyesteData.fd !== "--") ? `<div class="f-price-box"><span class="f-lbl" style="color:var(--fd-color);">FD</span><span class="f-val">${nyesteData.fd} ${getTrendHtml(nyesteData.fd, nyesteData.prev_fd)}</span></div>` : '';
+            const style = getBrandStyle(safeNavn);
+            
+            let distTekst = "";
+            if (sisteLat && sisteLon && sLat && sLon) {
+                let dist = regnUtAvstand(sisteLat, sisteLon, sLat, sLon);
+                distTekst = dist < 1 ? " - " + (dist * 1000).toFixed(0) + " m" : " - " + dist.toFixed(1) + " km";
+            }
 
-            // Henter den nye logo-sirkelen
-            let avatarInnhold = style.logo ? `<img src="${style.logo}" style="width: 100%; height: 100%; object-fit: contain; border-radius: 50%;" alt="Logo">` : style.char;
+            // Samme kompakte tidstekst
+            let rawTimeText = formaterTid(nyesteData.timestamp, safeUser).replace("Sist: ", "");
+
+            // Samme squircle-logo
+            let avatarInnhold = style.logo ? `<img src="${style.logo}" style="width: 100%; height: 100%; object-fit: contain; border-radius: 9px;" alt="Logo">` : style.char;
             let avatarBg = style.logo ? '#ffffff' : style.color;
+
+            // Samme kompakte prisbokser
+            let b98Html = (nyesteData.bensin98 && nyesteData.bensin98 !== "--") ? `<div class="f-price-box" style="padding: 4px 6px;"><span class="f-lbl" style="color:var(--bensin98-color); font-size: 9px;">98</span><span class="f-val" style="font-size: 14px; color:inherit;">${nyesteData.bensin98} ${getTrendHtml(nyesteData.bensin98, nyesteData.prev_bensin98)}</span></div>` : '';
+            let fdHtml = (nyesteData.fd && nyesteData.fd !== "--") ? `<div class="f-price-box" style="padding: 4px 6px;"><span class="f-lbl" style="color:var(--fd-color); font-size: 9px;">FD</span><span class="f-val" style="font-size: 14px; color:inherit;">${nyesteData.fd} ${getTrendHtml(nyesteData.fd, nyesteData.prev_fd)}</span></div>` : '';
 
             globalContainer.style.display = 'block';
             globalContainer.innerHTML = `
                 <div class="featured-header" style="margin-bottom: 10px; color: var(--primary);">⚡ NYESTE OPPDATERING I NORGE</div>
-                <div class="featured-card" style="background: ${style.glassBg}; border-left: 4px solid ${style.color}; cursor: pointer;" onclick="apneModal('${nyesteData.id}','${safeNavn.replace(/'/g, "\\'")}', ${sLat}, ${sLon})">
+                <div class="station-card" style="background: ${style.glassBg}; border-left: 4px solid ${style.color}; cursor: pointer; margin-bottom: 0;" onclick="apneModal('${nyesteData.id}','${safeNavn.replace(/'/g, "\\'")}', ${sLat}, ${sLon})">
                     
-                    <div class="card-header-row">
-                        <div class="brand-avatar" style="background-color: ${avatarBg}; color: ${style.text}; overflow: hidden; padding: ${style.logo ? '2px' : '0'};">
+                    <div class="card-header-row" style="align-items: center; margin-bottom: 8px;">
+                        <div class="brand-avatar" style="width: 38px; height: 38px; min-width: 38px; border-radius: 10px; background-color: ${avatarBg}; color: ${style.text}; overflow: hidden; padding: ${style.logo ? '2px' : '0'}; box-shadow: 0 4px 10px rgba(0,0,0,0.3); font-size: 16px;">
                             ${avatarInnhold}
                         </div>
-                        <div class="featured-title">${safeNavn}</div>
-                        ${distStr}
+                        <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; overflow: hidden; margin-top: 2px;">
+                            <div class="featured-title" style="margin: 0 0 1px 0; font-size: 15px; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow:none; color:inherit;">
+                                ${stedNavn}
+                            </div>
+                            <div class="featured-dist" style="margin: 0; font-size: 11px; opacity: 0.7; font-weight: 500; display: flex; align-items: center; gap: 4px; white-space: nowrap; text-overflow: ellipsis;">
+                                <span>${kjedeNavn}${distTekst}</span>
+                                <span>•</span>
+                                <span style="opacity: 0.9;">${rawTimeText}</span>
+                            </div>
+                        </div>
                     </div>
                     
-                    <div class="featured-prices" style="align-items: center;">
-                        <div class="f-price-box"><span class="f-lbl" style="color:var(--diesel-color);">D</span><span class="f-val">${nyesteData.diesel} ${getTrendHtml(nyesteData.diesel, nyesteData.prev_diesel)}</span></div>
-                        <div class="f-price-box"><span class="f-lbl" style="color:var(--bensin-color);">95</span><span class="f-val">${nyesteData.bensin} ${getTrendHtml(nyesteData.bensin, nyesteData.prev_bensin)}</span></div>
+                    <div class="featured-prices" style="display:flex; gap: 4px; flex-wrap: nowrap; overflow: hidden;">
+                        <div class="f-price-box" style="padding: 4px 6px;"><span class="f-lbl" style="color:var(--diesel-color); font-size: 9px;">D</span><span class="f-val" style="font-size: 14px; color:inherit;">${nyesteData.diesel} ${getTrendHtml(nyesteData.diesel, nyesteData.prev_diesel)}</span></div>
+                        <div class="f-price-box" style="padding: 4px 6px;"><span class="f-lbl" style="color:var(--bensin-color); font-size: 9px;">95</span><span class="f-val" style="font-size: 14px; color:inherit;">${nyesteData.bensin} ${getTrendHtml(nyesteData.bensin, nyesteData.prev_bensin)}</span></div>
                         ${b98Html} ${fdHtml}
-                        <div class="time-ago" style="color: inherit; opacity: 0.85; margin-left: auto; display: flex; align-items: center; text-align: right;">${formaterTid(nyesteData.timestamp, safeUser)}</div>
                     </div>
                 </div>
             `;
@@ -997,17 +1020,51 @@ window.toggleLeaderboard = function() {
             </div>
         `;
 
-        const renderCard = (data, title, icon, fallbackBorderColor) => {
+const renderCard = (data, title, icon, fallbackBorderColor) => {
             let bruktNavn = endredeNavn[data.id] || data.navn;
-            const style = getBrandStyle(bruktNavn);
+            
+            let formatert = formaterStasjonsNavn(bruktNavn);
+            let stedNavn = sanitize(formatert.sted);
+            let kjedeNavn = sanitize(formatert.kjede);
             let safeNavn = sanitize(bruktNavn);
             let safeUser = sanitize(data.user);
+            const style = getBrandStyle(safeNavn);
 
-            let b98Html = (data.bensin98 && data.bensin98 !== "--") ? `<div class="f-price-box"><span class="f-lbl" style="color:var(--bensin98-color);">98</span><span class="f-val">${data.bensin98} ${getTrendHtml(data.bensin98, data.prev_bensin98)}</span></div>` : '';
-            let fdHtml = (data.fd && data.fd !== "--") ? `<div class="f-price-box"><span class="f-lbl" style="color:var(--fd-color);">FD</span><span class="f-val">${data.fd} ${getTrendHtml(data.fd, data.prev_fd)}</span></div>` : '';
+            let rawTimeText = formaterTid(data.timestamp, safeUser).replace("Sist: ", "");
 
-            let avatarInnhold = style.logo ? `<img src="${style.logo}" style="width: 100%; height: 100%; object-fit: contain; border-radius: 50%;" alt="Logo">` : style.char;
+            let avatarInnhold = style.logo ? `<img src="${style.logo}" style="width: 100%; height: 100%; object-fit: contain; border-radius: 9px;" alt="Logo">` : style.char;
             let avatarBg = style.logo ? '#ffffff' : style.color;
+
+            let b98Html = (data.bensin98 && data.bensin98 !== "--") ? `<div class="f-price-box" style="padding: 4px 6px;"><span class="f-lbl" style="color:var(--bensin98-color); font-size: 9px;">98</span><span class="f-val" style="font-size: 14px; color:inherit;">${data.bensin98} ${getTrendHtml(data.bensin98, data.prev_bensin98)}</span></div>` : '';
+            let fdHtml = (data.fd && data.fd !== "--") ? `<div class="f-price-box" style="padding: 4px 6px;"><span class="f-lbl" style="color:var(--fd-color); font-size: 9px;">FD</span><span class="f-val" style="font-size: 14px; color:inherit;">${data.fd} ${getTrendHtml(data.fd, data.prev_fd)}</span></div>` : '';
+
+            return `
+            <div class="featured-header" style="margin-bottom: 10px; margin-top: 15px;">${icon} ${title}</div>
+            <div class="station-card" style="background: ${style.glassBg}; border-left: 4px solid ${style.color}; cursor: pointer; margin-bottom: 0;" onclick="apneModal('${data.id}','${safeNavn.replace(/'/g, "\\'")}', ${data.lat || 0}, ${data.lon || 0})">
+                
+                <div class="card-header-row" style="align-items: center; margin-bottom: 8px;">
+                    <div class="brand-avatar" style="width: 38px; height: 38px; min-width: 38px; border-radius: 10px; background-color: ${avatarBg}; color: ${style.text}; overflow: hidden; padding: ${style.logo ? '2px' : '0'}; box-shadow: 0 4px 10px rgba(0,0,0,0.3); font-size: 16px;">
+                        ${avatarInnhold}
+                    </div>
+                    <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; overflow: hidden; margin-top: 2px;">
+                        <div class="featured-title" style="margin: 0 0 1px 0; font-size: 15px; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow:none; color:inherit;">
+                            ${stedNavn}
+                        </div>
+                        <div class="featured-dist" style="margin: 0; font-size: 11px; opacity: 0.7; font-weight: 500; display: flex; align-items: center; gap: 4px; white-space: nowrap; text-overflow: ellipsis;">
+                            <span>${kjedeNavn}</span>
+                            <span>•</span>
+                            <span style="opacity: 0.9;">${rawTimeText}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="featured-prices" style="display:flex; gap: 4px; flex-wrap: nowrap; overflow: hidden;">
+                    <div class="f-price-box" style="padding: 4px 6px;"><span class="f-lbl" style="color:var(--diesel-color); font-size: 9px;">D</span><span class="f-val" style="font-size: 14px; color:inherit;">${data.diesel} ${getTrendHtml(data.diesel, data.prev_diesel)}</span></div>
+                    <div class="f-price-box" style="padding: 4px 6px;"><span class="f-lbl" style="color:var(--bensin-color); font-size: 9px;">95</span><span class="f-val" style="font-size: 14px; color:inherit;">${data.bensin} ${getTrendHtml(data.bensin, data.prev_bensin)}</span></div>
+                    ${b98Html} ${fdHtml}
+                </div>
+            </div>`;
+        };
 
             // Her har vi lagt til Glassmorphism, Logo-sirkel og klikkbarhet for å oppdatere direkte!
             return `
