@@ -280,9 +280,20 @@
 
     <h2 id="app-tittel" style="user-select: none; -webkit-user-select: none; cursor: pointer;">DRIVSTOFF NORGE</h2>
 
+    <div id="system-melding" style="display:none; text-align:center; color:var(--gold); font-size: 13px; font-weight:700; margin-bottom:15px; padding:12px; background:rgba(255,215,0,0.1); border-radius:8px; border:1px solid rgba(255,215,0,0.3); box-shadow: 0 4px 10px rgba(0,0,0,0.5);"></div>
+
     <div id="skjult-admin-panel">
         <h3 class="admin-header">👑 Admin Sentral</h3>
-        <p style="font-size: 12px; color: var(--text-muted); margin-top: 0;">Velkommen, Sjef. Her kommer snart modulene for å godkjenne navnesøknader.</p>
+        
+        <div style="margin-bottom: 15px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px;">
+            <label style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 5px;">Global Systemmelding:</label>
+            <input type="text" id="admin-msg-input" placeholder="Skriv en beskjed til alle brukere..." style="margin-bottom: 8px;">
+            <div style="display: flex; gap: 8px;">
+                <button style="background: var(--success); font-size: 11px; padding: 10px;" onclick="lagreSystemMelding()">📢 Publiser</button>
+                <button style="background: transparent; border: 1px solid var(--danger); color: var(--danger); font-size: 11px; padding: 10px;" onclick="slettSystemMelding()">🗑️ Fjern</button>
+            </div>
+        </div>
+
         <button style="background: var(--danger); padding: 10px; font-size: 12px;" onclick="loggUtAdmin()">🔒 Logg ut Admin</button>
     </div>
 
@@ -428,22 +439,25 @@
             <button onclick="lagrePris()">Lagre Priser</button>
         </div>
 
-        <div class="admin-section">
+        <div id="modal-admin-section" class="admin-section">
             <p class="admin-title">⚙️ Administrer stasjon</p>
-            <div class="admin-row">
+            
+            <div class="admin-row" style="margin-bottom: 8px;">
                 <button class="admin-btn" onclick="visEndreNavnFelt()">✏️ Endre navn</button>
                 <button class="admin-btn" onclick="oppdaterStasjonsGps()">📍 Flytt GPS hit</button>
+            </div>
+            
+            <div class="admin-row">
+                <button id="admin-tom-priser-btn" class="admin-btn danger-btn" style="display:none;" onclick="adminTomPriser()">🧹 Tøm priser</button>
                 <button class="admin-btn danger-btn" onclick="slettStasjon()">🗑️ Slett stasjon</button>
             </div>
             
-            <div id="admin-rename-div">
+            <div id="admin-rename-div" style="display:none; margin-top: 12px; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
                 <label style="font-size:11px; color:var(--text-muted); margin-bottom: 5px; display:block;">Nytt stasjonsnavn:</label>
                 <input type="text" id="input-new-station-name" placeholder="F.eks YX Kjørbekk">
-                <button style="padding: 10px; font-size: 13px;" onclick="lagreNyttNavn()">Lagre navn for alle brukere</button>
+                <button style="padding: 10px; font-size: 13px; margin-top: 8px;" onclick="lagreNyttNavn()">Lagre navn for alle brukere</button>
             </div>
         </div>
-    </div>
-</div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
@@ -516,6 +530,14 @@ window.toggleLeaderboard = function() {
                 if (inputFelt) inputFelt.focus();
             }, 100);
         }
+        // Låser opp Admin-verktøy i modalen hvis du er innlogget som admin
+        if (myUid === adminUid) {
+            const tomBtn = document.getElementById('admin-tom-priser-btn');
+            if(tomBtn) tomBtn.style.display = 'block';
+        } else {
+            const tomBtn = document.getElementById('admin-tom-priser-btn');
+            if(tomBtn) tomBtn.style.display = 'none';
+        }
     };
 
     window.vis98Felt = function() { document.getElementById('div-bensin98').style.display = 'block'; document.getElementById('btn-show-98').style.display = 'none'; };
@@ -526,6 +548,35 @@ window.toggleLeaderboard = function() {
     window.lukkLeggTilStasjonModal = () => document.getElementById('add-station-modal').style.display = 'none';
     window.blaNedover = () => { window.scrollBy({ top: window.innerHeight * 0.7, behavior: 'smooth' }); };
     
+    // --- ADMIN MELDINGS-VERKTØY ---
+    
+    // Lagrer en global melding i databasen
+    window.lagreSystemMelding = function() {
+        const msg = document.getElementById('admin-msg-input').value.trim();
+        if (!msg) return;
+        set(ref(db, 'admin/system_melding'), msg).then(() => alert("Meldingen er publisert til alle brukere!"));
+    };
+
+    // Sletter den globale meldingen
+    window.slettSystemMelding = function() {
+        set(ref(db, 'admin/system_melding'), "").then(() => {
+            document.getElementById('admin-msg-input').value = "";
+            alert("Meldingen er fjernet fra appen.");
+        });
+    };
+
+    // Lytter live etter globale systemmeldinger fra Admin
+    onValue(ref(db, 'admin/system_melding'), (snapshot) => {
+        const msg = snapshot.val();
+        const msgDiv = document.getElementById('system-melding');
+        if (msg && msg.trim() !== "") {
+            msgDiv.innerText = "📢 " + msg;
+            msgDiv.style.display = "block";
+        } else {
+            msgDiv.style.display = "none";
+        }
+    });
+
     window.slettStasjon = function() {
         if (confirm("⚠️ ER DU SIKKER?\n\nVil du slette denne stasjonen fra kartet for alle brukere? Bruk dette kun dersom stasjonen er permanent nedlagt eller ikke finnes.")) {
             let safeId = String(valgtStasjonId).replace(/[\.\#\$\[\]\/]/g, "_"); 
@@ -599,10 +650,11 @@ window.toggleLeaderboard = function() {
     appTittel.addEventListener('mouseup', () => clearTimeout(trykkTimer));
     appTittel.addEventListener('touchmove', () => clearTimeout(trykkTimer)); 
 
-    function apneHemmeligInnlogging() {
+function apneHemmeligInnlogging() {
         if (myUid === adminUid) {
             alert("😎 Velkommen tilbake, Sjef!");
             document.getElementById('skjult-admin-panel').style.display = 'block';
+            lastAdminData(); // <-- NYHET: Henter dataene når du auto-logger inn
             return;
         }
 
@@ -616,6 +668,7 @@ window.toggleLeaderboard = function() {
                 alert("✅ Logget inn som Administrator!");
                 myUid = userCredential.user.uid;
                 document.getElementById('skjult-admin-panel').style.display = 'block';
+                lastAdminData(); // <-- NYHET: Henter dataene når du logger inn med passord
             })
             .catch((error) => {
                 alert("❌ Feil e-post eller passord.");
