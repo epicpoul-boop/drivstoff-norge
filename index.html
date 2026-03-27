@@ -572,7 +572,14 @@ window.toggleLeaderboard = function() {
     window.lagreSystemMelding = function() {
         const msg = document.getElementById('admin-msg-input').value.trim();
         if (!msg) return;
-        set(ref(db, 'admin/system_melding'), msg).then(() => alert("Meldingen er publisert til alle brukere!"));
+        
+        set(ref(db, 'admin/system_melding'), msg)
+            .then(() => alert("✅ Meldingen er publisert til alle brukere!"))
+            .catch(error => {
+                // Fanger opp hvis Firebase-serveren nekter å lagre
+                alert("❌ Feil fra serveren: " + error.message);
+                console.error(error);
+            });
     };
 
     // Sletter den globale meldingen
@@ -1162,15 +1169,33 @@ window.visDagensEkstremer = function() {
     container.innerHTML = htmlOut;
 }
 
-    // OPPDATERT: Nekter alt under 14 kr
-    function validerPris(pris) {
-        if (!pris || pris === "--" || pris === "0") return true; 
-        let val = parseFloat(String(pris).replace(',', '.'));
-        if (isNaN(val)) return false;
-        return (val >= 14 && val <= 35); 
+// OPPDATERT: Sjekker min/maks grenser, OG at hoppet ikke er større enn 7 kr
+    function validerPris(nyPris, gammelPris, typeNavn) {
+        if (!nyPris || nyPris === "--" || nyPris === "0") return { ok: true }; 
+        
+        let nyVal = parseFloat(String(nyPris).replace(',', '.'));
+        if (isNaN(nyVal)) return { ok: false, feil: `Ugyldig tall for ${typeNavn}.` };
+        
+        // 1. Er prisen i det hele tatt realistisk?
+        if (nyVal < 14 || nyVal > 35) {
+            return { ok: false, feil: `⚠️ <b>Urealistisk pris på ${typeNavn}!</b><br>Prisen må være mellom 14.00 og 35.00 kr.` };
+        }
+
+        // 2. Er spranget fra forrige pris for stort? (> 7 kr)
+        if (gammelPris && gammelPris !== "--") {
+            let gmlVal = parseFloat(String(gammelPris).replace(',', '.'));
+            if (!isNaN(gmlVal)) {
+                let forskjell = Math.abs(nyVal - gmlVal);
+                if (forskjell > 7) {
+                    return { ok: false, feil: `⚠️ <b>For stort sprang på ${typeNavn}!</b><br>Du endrer fra ${gammelPris} til ${nyPris}. Maks endring er 7 kr av gangen. Skrev du feil?` };
+                }
+            }
+        }
+        
+        return { ok: true };
     }
 
-window.lagrePris = async function() {
+    window.lagrePris = async function() {
         if (!myUid) {
             document.getElementById('modal-error').innerText = "Venter på sikker tilkobling... Prøv igjen om 1 sekund.";
             document.getElementById('modal-error').style.display = "block"; return;
@@ -1186,10 +1211,21 @@ window.lagrePris = async function() {
 
         if (!d && !b && !b98 && !fd) { modalError.innerText = "Du må fylle inn minst én pris!"; modalError.style.display = "block"; return; }
 
-        if (!validerPris(d) || !validerPris(b) || !validerPris(b98) || !validerPris(fd)) {
-            modalError.innerHTML = "⚠️ <b>Urealistisk pris!</b><br>Prisen må være mellom 14.00 og 35.00 kr.";
-            modalError.style.display = "block"; return;
-        }
+        // --- Hent gamle data HER slik at vi kan sjekke spranget i pris ---
+        const oldData = skylagredePriser[valgtStasjonId] || {};
+
+        // Sjekker alle priser med den nye, smarte valideringen
+        let sjekkD = validerPris(d, oldData.diesel, "Diesel");
+        if (!sjekkD.ok) { modalError.innerHTML = sjekkD.feil; modalError.style.display = "block"; return; }
+        
+        let sjekkB = validerPris(b, oldData.bensin, "Bensin 95");
+        if (!sjekkB.ok) { modalError.innerHTML = sjekkB.feil; modalError.style.display = "block"; return; }
+        
+        let sjekkB98 = validerPris(b98, oldData.bensin98, "Bensin 98");
+        if (!sjekkB98.ok) { modalError.innerHTML = sjekkB98.feil; modalError.style.display = "block"; return; }
+        
+        let sjekkFd = validerPris(fd, oldData.fd, "Farget Diesel");
+        if (!sjekkFd.ok) { modalError.innerHTML = sjekkFd.feil; modalError.style.display = "block"; return; }
 
         let isAnonym = false;
         if (!n) {
@@ -1198,12 +1234,8 @@ window.lagrePris = async function() {
         }
 
         if (!isAnonym) {
-            // QoL-oppdatering: Vi har midlertidig skrudd av sjekken for "stjålne" kallenavn
-            // inntil et ordentlig system er på plass.
             localStorage.setItem('drivstoff_navn', n);
         }
-
-        const oldData = skylagredePriser[valgtStasjonId] || {};
 
         let prev_d = oldData.diesel || "--"; let prev_b = oldData.bensin || "--"; let prev_b98 = oldData.bensin98 || "--"; let prev_fd = oldData.fd || "--";
 
