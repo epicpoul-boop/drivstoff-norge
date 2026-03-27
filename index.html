@@ -908,13 +908,12 @@ window.toggleLeaderboard = function() {
                        .replace(/\s*\(?express\)?\s*/gi, ' ')
                        .trim();
         
-        // 2. Finn ut hvilken kjede det er
+// 2. Finn ut hvilken kjede det er
         let kjede = "Ukjent";
         let nLower = n.toLowerCase();
         
         if (nLower.includes("circle k")) kjede = "Circle K";
         else if (nLower.includes("yx")) kjede = "YX";
-        // NY: Fanger opp "Uno X" med mellomrom
         else if (nLower.includes("uno-x") || nLower.includes("unox") || nLower.includes("uno x")) kjede = "Uno-X";
         else if (nLower.includes("esso")) kjede = "Esso";
         else if (nLower.includes("st1")) kjede = "St1";
@@ -926,18 +925,24 @@ window.toggleLeaderboard = function() {
         else if (nLower.includes("haltbakk")) kjede = "Haltbakk";
         else if (nLower.includes("joker")) kjede = "Joker";
         else if (nLower.includes("lpg")) kjede = "LPG";
-        // NY: Legger til CNG (Gass-stasjoner)
-        else if (nLower.includes("cng")) kjede = "CNG"; 
-        
-        // QoL Fix: Jeg har fjernet "Olje" fra denne listen. 
-        // Ordet "Olje" er for generisk, og kuttet navnet til "Olje Leverandøren" i to. 
-        // Nå vil stasjonen beholde sitt fulle navn!
+        else if (nLower.includes("cng")) kjede = "CNG";
+        // NY: Sjekker spesifikt for Oljeleverandøren
+        else if (nLower.includes("oljeleverandør") || nLower.includes("olje leverandør")) kjede = "Oljeleverandøren";
+        else if (nLower.includes("olje")) kjede = "Olje";
         
         // 3. Trekk kjedenavnet ut av strengen for å kun sitte igjen med stedet
         let sted = n;
         if (kjede !== "Ukjent") {
-            let reg = new RegExp(kjede.replace("-", "\\-?").replace(" ", "\\s*"), "ig");
-            sted = sted.replace(reg, '').trim();
+            // Spesial-fjerning for trøblete navn
+            if (kjede === "Uno-X") {
+                sted = sted.replace(/uno\s*-?\s*x/ig, ''); // Fanger Uno-X, UnoX og Uno X
+            } else if (kjede === "Oljeleverandøren") {
+                sted = sted.replace(/olje\s*leverandør(en)?/ig, ''); 
+            } else {
+                let reg = new RegExp(kjede.replace("-", "\\-?").replace(" ", "\\s*"), "ig");
+                sted = sted.replace(reg, '');
+            }
+            sted = sted.trim();
         }
         
         // 4. Fjern løse bindestreker eller komma i starten/slutten (f.eks "- Voss")
