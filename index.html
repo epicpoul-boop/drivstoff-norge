@@ -914,7 +914,8 @@ window.toggleLeaderboard = function() {
         
         if (nLower.includes("circle k")) kjede = "Circle K";
         else if (nLower.includes("yx")) kjede = "YX";
-        else if (nLower.includes("uno-x") || nLower.includes("unox")) kjede = "Uno-X";
+        // NY: Fanger opp "Uno X" med mellomrom
+        else if (nLower.includes("uno-x") || nLower.includes("unox") || nLower.includes("uno x")) kjede = "Uno-X";
         else if (nLower.includes("esso")) kjede = "Esso";
         else if (nLower.includes("st1")) kjede = "St1";
         else if (nLower.includes("best")) kjede = "Best";
@@ -925,7 +926,12 @@ window.toggleLeaderboard = function() {
         else if (nLower.includes("haltbakk")) kjede = "Haltbakk";
         else if (nLower.includes("joker")) kjede = "Joker";
         else if (nLower.includes("lpg")) kjede = "LPG";
-        else if (nLower.includes("olje")) kjede = "Olje";
+        // NY: Legger til CNG (Gass-stasjoner)
+        else if (nLower.includes("cng")) kjede = "CNG"; 
+        
+        // QoL Fix: Jeg har fjernet "Olje" fra denne listen. 
+        // Ordet "Olje" er for generisk, og kuttet navnet til "Olje Leverandøren" i to. 
+        // Nå vil stasjonen beholde sitt fulle navn!
         
         // 3. Trekk kjedenavnet ut av strengen for å kun sitte igjen med stedet
         let sted = n;
