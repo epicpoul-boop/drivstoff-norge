@@ -458,6 +458,8 @@
                 <button style="padding: 10px; font-size: 13px; margin-top: 8px;" onclick="lagreNyttNavn()">Lagre navn for alle brukere</button>
             </div>
         </div>
+    </div>
+</div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
@@ -465,6 +467,22 @@
     // OPPDATERT: Inkluderer signInWithEmailAndPassword og signOut for admin-innlogging
     import { getAuth, signInAnonymously, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
+    // --- FIREBASE CONFIG ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyBlEIj2yxM-mJdBPw7zgDsirF9yAipdPkw",
+      authDomain: "drivstoff-norge-caeaa.firebaseapp.com",
+      databaseURL: "https://drivstoff-norge-caeaa-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "drivstoff-norge-caeaa",
+      storageBucket: "drivstoff-norge-caeaa.firebasestorage.app",
+      messagingSenderId: "18889820365",
+      appId: "1:18889820365:web:0bd8c054f70452c1ab4184"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const auth = getAuth(app);
+    let myUid = null; 
+    
 window.toggleLeaderboard = function() {
         const exp = document.getElementById('leaderboard-expanded');
         const chev = document.getElementById('leader-chevron');
@@ -578,7 +596,7 @@ window.toggleLeaderboard = function() {
     });
 
     window.slettStasjon = function() {
-        if (confirm("⚠️ ER DU SIKKER?\n\nVil du slette denne stasjonen fra kartet for alle brukere? Bruk dette kun dersom stasjonen er permanent nedlagt eller ikke finnes.")) {
+        if (confirm("⚠️ ER DU SIKKER?\n\nBruk dette kun dersom stasjonen er permanent nedlagt eller ikke finnes.")) {
             let safeId = String(valgtStasjonId).replace(/[\.\#\$\[\]\/]/g, "_"); 
             set(ref(db, 'skjulte_stasjoner/' + safeId), true)
             .then(() => {
@@ -623,22 +641,6 @@ window.toggleLeaderboard = function() {
         }
     };
 
-    // --- FIREBASE CONFIG ---
-    const firebaseConfig = {
-      apiKey: "AIzaSyBlEIj2yxM-mJdBPw7zgDsirF9yAipdPkw",
-      authDomain: "drivstoff-norge-caeaa.firebaseapp.com",
-      databaseURL: "https://drivstoff-norge-caeaa-default-rtdb.europe-west1.firebasedatabase.app",
-      projectId: "drivstoff-norge-caeaa",
-      storageBucket: "drivstoff-norge-caeaa.firebasestorage.app",
-      messagingSenderId: "18889820365",
-      appId: "1:18889820365:web:0bd8c054f70452c1ab4184"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-    const auth = getAuth(app);
-    let myUid = null; 
-
     // --- HEMMELIG ADMIN INNLOGGING (FORT KNOX) ---
     const adminUid = 'Y9G9KDuAGgW9qWzMMWbIj7yyHwR2'; // DIN NØKKEL ER NÅ KODET INN!
     const appTittel = document.getElementById('app-tittel');
@@ -654,7 +656,6 @@ function apneHemmeligInnlogging() {
         if (myUid === adminUid) {
             alert("😎 Velkommen tilbake, Sjef!");
             document.getElementById('skjult-admin-panel').style.display = 'block';
-            lastAdminData(); // <-- NYHET: Henter dataene når du auto-logger inn
             return;
         }
 
@@ -668,7 +669,6 @@ function apneHemmeligInnlogging() {
                 alert("✅ Logget inn som Administrator!");
                 myUid = userCredential.user.uid;
                 document.getElementById('skjult-admin-panel').style.display = 'block';
-                lastAdminData(); // <-- NYHET: Henter dataene når du logger inn med passord
             })
             .catch((error) => {
                 alert("❌ Feil e-post eller passord.");
