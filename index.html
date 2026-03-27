@@ -1279,8 +1279,9 @@ window.lagrePris = async function() {
             let safeId = String(id).replace(/[\.\#\$\[\]\/]/g, "_");
             const p = skylagredePriser[safeId] || { diesel: "--", bensin: "--", bensin98: "--", fd: "--", timestamp: 0 };
             
-            let brukLat = s.lat;
-            let brukLon = s.lon;
+            // Sjekker om det er en prikk (s.lat) ELLER en bygning (s.center.lat)
+            let brukLat = s.lat || (s.center && s.center.lat);
+            let brukLon = s.lon || (s.center && s.center.lon);
             if (endredeGps[safeId]) {
                 brukLat = endredeGps[safeId].lat;
                 brukLon = endredeGps[safeId].lon;
@@ -1523,7 +1524,8 @@ window.lagrePris = async function() {
             const server = endpoints[retryCount % endpoints.length];
 
             try {
-                const res = await fetch(`${server}?data=${encodeURIComponent(`[out:json];node["amenity"="fuel"](around:${r},${lat},${lon});out;`)}`); 
+// NYHET: Bruker 'nwr' for å hente bygninger/områder også, og 'out center;' for å få et midtpunkt!
+const res = await fetch(`${server}?data=${encodeURIComponent(`[out:json];nwr["amenity"="fuel"](around:${r},${lat},${lon});out center;`)}`); 
                 
                 // Hvis serveren svarer med en feil (f.eks "Too Many Requests"), tving frem en feilmelding for å trigge ny prøving
                 if (!res.ok) throw new Error("Server overbelastet");
