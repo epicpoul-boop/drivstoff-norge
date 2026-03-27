@@ -901,8 +901,9 @@ window.toggleLeaderboard = function() {
     }
 
     function formaterStasjonsNavn(rawNavn) {
-        // 1. Fjern irriterende ekstraord uansett store/små bokstaver
-        let n = rawNavn.replace(/\s*\(?automat\)?\s*/gi, ' ')
+// 1. Fjern irriterende ekstraord uansett store/små bokstaver
+        // MAGIEN: (?!\s*1) forteller koden at den skal la "Automat 1" være i fred!
+        let n = rawNavn.replace(/\s*\(?automat\)?(?!\s*1)\s*/gi, ' ')
                        .replace(/\s*\(?truck\)?\s*/gi, ' ')
                        .replace(/\s*\(?express\)?\s*/gi, ' ')
                        .trim();
