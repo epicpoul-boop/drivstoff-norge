@@ -300,28 +300,31 @@
     <div id="global-featured-container"></div>
     <div id="featured-station-container"></div>
 
-    <div class="leaderboard-card" style="text-align: center;">
-        <div onclick="toggleLeaderboard()" style="cursor: pointer;">
-            <div class="leader-section" style="margin-bottom: 12px;">
-                <div class="leader-title" style="margin-bottom: 5px;">Dagens bidragsyter 🏆 <span id="cd-day" class="countdown" style="display: none;"></span></div>
-                <div id="best-day" class="leader-name gold-txt" style="font-size: 22px; margin-bottom: 5px; text-shadow: 0 2px 5px rgba(0,0,0,0.5);">Laster...</div>
-            </div>
-            
-            <div class="leader-section" style="margin-bottom: 15px;">
-                <span class="leader-title">Ukens bidragsyter 🥇 <span id="cd-week" class="countdown" style="display: none;"></span></span>
-                <span id="best-week" class="leader-name silver-txt" style="font-size: 18px;">Laster...</span>
-            </div>
-
-            <div style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--text-main); background: rgba(255,255,255,0.08); padding: 6px 16px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); transition: var(--transition);">
-                Se Topp 10 <span class="expand-icon" id="leader-chevron">▼</span>
-            </div>
+<div class="leaderboard-card" style="text-align: center;">
+    <div onclick="toggleLeaderboard()" style="cursor: pointer;">
+        <div class="leader-section" style="margin-bottom: 12px;">
+            <div class="leader-title" style="margin-bottom: 5px;">Dagens bidragsyter 🏆 <span id="cd-day" class="countdown" style="display: none;"></span></div>
+            <div id="best-day" class="leader-name gold-txt" style="font-size: 22px; margin-bottom: 5px; text-shadow: 0 2px 5px rgba(0,0,0,0.5);">Laster...</div>
         </div>
+        
+        <div id="leader-hint" style="font-size: 10px; color: var(--text-muted); opacity: 0.7; margin-bottom: 15px;">Trykk for ukens vinner og toppliste ▼</div>
 
-        <div id="leaderboard-expanded" style="display: none; margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; text-align: left;">
-            <div class="leader-title" style="margin-bottom: 10px; text-align: center;">Topp 10 - All Time</div>
-            <div id="top-list-items"></div>
+        <div style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--text-main); background: rgba(255,255,255,0.08); padding: 6px 16px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); transition: var(--transition);">
+            Se Topp 10 <span class="expand-icon" id="leader-chevron">▼</span>
         </div>
     </div>
+
+    <div id="leaderboard-expanded" style="display: none; margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; text-align: left;">
+        
+        <div class="leader-section" style="text-align: center; margin-bottom: 20px; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px;">
+            <span class="leader-title">Ukens bidragsyter 🥇 <span id="cd-week" class="countdown" style="display: none;"></span></span>
+            <span id="best-week" class="leader-name silver-txt" style="font-size: 18px;">Laster...</span>
+        </div>
+
+        <div class="leader-title" style="margin-bottom: 10px; text-align: center;">Topp 10 - All Time</div>
+        <div id="top-list-items"></div>
+    </div>
+</div>
     
 <div class="panel" style="padding: 15px;">
         <div style="display: flex; gap: 8px; margin-bottom: 12px; align-items: center;">
@@ -484,26 +487,31 @@
     let myUid = null; 
     
 window.toggleLeaderboard = function() {
-        const exp = document.getElementById('leaderboard-expanded');
-        const chev = document.getElementById('leader-chevron');
-        const cdDay = document.getElementById('cd-day');
-        const cdWeek = document.getElementById('cd-week');
+    const exp = document.getElementById('leaderboard-expanded');
+    const chev = document.getElementById('leader-chevron');
+    const hint = document.getElementById('leader-hint'); // Henter det nye hintet
+    const cdDay = document.getElementById('cd-day');
+    const cdWeek = document.getElementById('cd-week');
 
-        if(exp.style.display === 'none') {
-            exp.style.display = 'block';
-            chev.style.transform = 'rotate(180deg)';
-            // Viser nedtellingene når menyen åpnes
-            cdDay.style.display = 'inline';
-            cdWeek.style.display = 'inline';
-        } else {
-            exp.style.display = 'none';
-            chev.style.transform = 'rotate(0deg)';
-            // Skjuler nedtellingene igjen
-            cdDay.style.display = 'none';
-            cdWeek.style.display = 'none';
-        }
-        setTimeout(sjekkScroll, 200);
-    };
+    if(exp.style.display === 'none') {
+        exp.style.display = 'block';
+        chev.style.transform = 'rotate(180deg)';
+        if(hint) hint.style.display = 'none'; // Skjuler hintet når det er åpent
+        
+        // Viser nedtellingene
+        if(cdDay) cdDay.style.display = 'inline';
+        if(cdWeek) cdWeek.style.display = 'inline';
+    } else {
+        exp.style.display = 'none';
+        chev.style.transform = 'rotate(0deg)';
+        if(hint) hint.style.display = 'block'; // Viser hintet igjen når det lukkes
+        
+        // Skjuler nedtellingene
+        if(cdDay) cdDay.style.display = 'none';
+        if(cdWeek) cdWeek.style.display = 'none';
+    }
+    setTimeout(sjekkScroll, 200);
+};
 
     // --- MAGISKE HJELPEFUNKSJONER ER TILBAKE ---
     window.lukkModal = function() { 
