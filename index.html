@@ -492,7 +492,7 @@ window.toggleLeaderboard = function() {
     };
     // -------------------------------------------
 
-    window.apneModal = function(id, n, lat, lon) { 
+        window.apneModal = function(id, n, lat, lon, focusId = null) { 
         valgtStasjonId = id; valgtStasjonLat = lat; valgtStasjonLon = lon;
         document.getElementById('modal-station-name').innerText = n; 
         document.getElementById('input-nickname').value = localStorage.getItem('drivstoff_navn') || ""; 
@@ -508,6 +508,14 @@ window.toggleLeaderboard = function() {
         
         document.getElementById('admin-rename-div').style.display = 'none';
         document.getElementById('update-modal').style.display = 'block'; 
+        
+        // NYTT: Autofokus på trykket pris!
+        if (focusId) {
+            setTimeout(() => {
+                const inputFelt = document.getElementById(focusId);
+                if (inputFelt) inputFelt.focus();
+            }, 100);
+        }
     };
 
     window.vis98Felt = function() { document.getElementById('div-bensin98').style.display = 'block'; document.getElementById('btn-show-98').style.display = 'none'; };
@@ -967,8 +975,8 @@ window.visGlobalSisteOppdatering = function() {
     let avatarContent = style.logo ? `<img src="${style.logo}" style="width: 100%; height: 100%; object-fit: contain; border-radius: 9px;" alt="Logo">` : style.char;
     let avatarBg = style.logo ? '#ffffff' : style.color;
 
-    let b98Html = (nyesteData.bensin98 && nyesteData.bensin98 !== "--") ? `<div class="f-price-box" style="padding: 4px 6px;"><span class="f-lbl" style="color:var(--bensin98-color); font-size: 9px;">98</span><span class="f-val" style="font-size: 14px; color:inherit;">${nyesteData.bensin98} ${getTrendHtml(nyesteData.bensin98, nyesteData.prev_bensin98)}</span></div>` : '';
-    let fdHtml = (nyesteData.fd && nyesteData.fd !== "--") ? `<div class="f-price-box" style="padding: 4px 6px;"><span class="f-lbl" style="color:var(--fd-color); font-size: 9px;">FD</span><span class="f-val" style="font-size: 14px; color:inherit;">${nyesteData.fd} ${getTrendHtml(nyesteData.fd, nyesteData.prev_fd)}</span></div>` : '';
+let b98Html = (nyesteData.bensin98 && nyesteData.bensin98 !== "--") ? `<div class="f-price-box" style="padding: 4px 6px; cursor: pointer;" onclick="event.stopPropagation(); apneModal('${nyesteData.id}','${nyesteData.navn.replace(/'/g, "\\'")}', ${nyesteData.lat}, ${nyesteData.lon}, 'input-bensin98')"><span class="f-lbl" style="color:var(--bensin98-color); font-size: 9px;">98</span><span class="f-val" style="font-size: 14px; color:inherit;">${nyesteData.bensin98} ${getTrendHtml(nyesteData.bensin98, nyesteData.prev_bensin98)}</span></div>` : '';
+    let fdHtml = (nyesteData.fd && nyesteData.fd !== "--") ? `<div class="f-price-box" style="padding: 4px 6px; cursor: pointer;" onclick="event.stopPropagation(); apneModal('${nyesteData.id}','${nyesteData.navn.replace(/'/g, "\\'")}', ${nyesteData.lat}, ${nyesteData.lon}, 'input-fd')"><span class="f-lbl" style="color:var(--fd-color); font-size: 9px;">FD</span><span class="f-val" style="font-size: 14px; color:inherit;">${nyesteData.fd} ${getTrendHtml(nyesteData.fd, nyesteData.prev_fd)}</span></div>` : '';
 
     globalContainer.style.display = 'block';
     globalContainer.innerHTML = `
@@ -990,14 +998,13 @@ window.visGlobalSisteOppdatering = function() {
             </div>
             
             <div class="featured-prices" style="display:flex; gap: 4px; flex-wrap: nowrap; overflow: hidden; align-items: center;">
-                <div class="f-price-box" style="padding: 4px 6px;"><span class="f-lbl" style="color:var(--diesel-color); font-size: 9px;">D</span><span class="f-val" style="font-size: 14px; color:inherit;">${nyesteData.diesel} ${getTrendHtml(nyesteData.diesel, nyesteData.prev_diesel)}</span></div>
-                <div class="f-price-box" style="padding: 4px 6px;"><span class="f-lbl" style="color:var(--bensin-color); font-size: 9px;">95</span><span class="f-val" style="font-size: 14px; color:inherit;">${nyesteData.bensin} ${getTrendHtml(nyesteData.bensin, nyesteData.prev_bensin)}</span></div>
+                <div class="f-price-box" style="padding: 4px 6px; cursor: pointer;" onclick="event.stopPropagation(); apneModal('${nyesteData.id}','${nyesteData.navn.replace(/'/g, "\\'")}', ${nyesteData.lat}, ${nyesteData.lon}, 'input-diesel')"><span class="f-lbl" style="color:var(--diesel-color); font-size: 9px;">D</span><span class="f-val" style="font-size: 14px; color:inherit;">${nyesteData.diesel} ${getTrendHtml(nyesteData.diesel, nyesteData.prev_diesel)}</span></div>
+                <div class="f-price-box" style="padding: 4px 6px; cursor: pointer;" onclick="event.stopPropagation(); apneModal('${nyesteData.id}','${nyesteData.navn.replace(/'/g, "\\'")}', ${nyesteData.lat}, ${nyesteData.lon}, 'input-bensin')"><span class="f-lbl" style="color:var(--bensin-color); font-size: 9px;">95</span><span class="f-val" style="font-size: 14px; color:inherit;">${nyesteData.bensin} ${getTrendHtml(nyesteData.bensin, nyesteData.prev_bensin)}</span></div>
                 ${b98Html} ${fdHtml}
             </div>
-
             <div id="actions-global-feature" class="action-buttons" style="display:none; margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 8px;" onclick="event.stopPropagation()">
                 <div class="update-btn" style="border: 1px solid rgba(255,255,255,0.2); color: white;" onclick="apneModal('${nyesteData.id}','${nyesteData.navn.replace(/'/g, "\\'")}', ${nyesteData.lat}, ${nyesteData.lon})">OPPDATER</div>
-                <a class="nav-btn" style="border: 1px solid rgba(255,255,255,0.2); color: white;" href="https://maps.google.com/?q=$$${nyesteData.lat},${nyesteData.lon}" target="_blank">KJØR HIT</a>
+                <a class="nav-btn" style="border: 1px solid rgba(255,255,255,0.2); color: white;" href="https://maps.google.com/?q=$$$${nyesteData.lat},${nyesteData.lon}" target="_blank">KJØR HIT</a>
                 <div class="hist-btn" style="border: 1px solid rgba(255,255,255,0.2); color: white;" onclick="visHistorikk('${nyesteData.id}')">⌛ HISTORIKK</div>
             </div>
             <div id="hist-global-feature" class="history-panel" onclick="event.stopPropagation()"></div>
@@ -1398,19 +1405,26 @@ window.lagrePris = async function() {
             // Standard spacing:
             priceDiv.style.cssText = 'display:flex; gap: 4px; flex-wrap: nowrap; overflow: hidden; align-items: center;';
 
-            const addPrice = (lbl, val, trnd, col) => {
+            // NY addPrice med focusId og onClick
+            const addPrice = (lbl, val, trnd, col, focusId) => {
                 if (!val || val === "--") return;
                 const box = document.createElement('div');
                 box.className = 'f-price-box';
                 box.style.padding = '4px 6px';
+                box.style.cursor = 'pointer'; // Viser finger-ikon
+                box.onclick = (e) => {
+                    e.stopPropagation(); // Veldig viktig! Hindrer kortet i å åpne menyen
+                    apneModal(item.id, item.escapedName, item.brukLat, item.brukLon, focusId);
+                };
                 box.innerHTML = `<span class="f-lbl" style="color:${col}; font-size: 9px;">${lbl}</span><span class="f-val" style="font-size: 14px; color:inherit;">${val} ${trnd}</span>`;
                 priceDiv.appendChild(box);
             };
 
-            addPrice("D", item.displayD, item.trendD, "var(--diesel-color)");
-            addPrice("95", item.displayB, item.trendB, "var(--bensin-color)");
-            addPrice("98", item.displayB98, item.trendB98, "var(--bensin98-color)");
-            addPrice("FD", item.displayFd, item.trendFd, "var(--fd-color)");
+            // Sender med de eksakte ID-ene som du har i HTML-en din
+            addPrice("D", item.displayD, item.trendD, "var(--diesel-color)", "input-diesel");
+            addPrice("95", item.displayB, item.trendB, "var(--bensin-color)", "input-bensin");
+            addPrice("98", item.displayB98, item.trendB98, "var(--bensin98-color)", "input-bensin98");
+            addPrice("FD", item.displayFd, item.trendFd, "var(--fd-color)", "input-fd");
 
             // Den magiske koden som faktisk smetter prisene inn mellom headeren og knappene:
             card.insertBefore(priceDiv, card.querySelector('.action-buttons'));
