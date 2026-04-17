@@ -37,8 +37,8 @@
         body { 
             font-family: -apple-system, sans-serif; 
             background-color: var(--bg-color); 
-            color: var(--text-main); 
-            margin: 0; padding: 15px; padding-bottom: 50px; 
+            color: var(--text-main);
+            margin: 0; padding: 15px; padding-bottom: 80px; 
             font-size: 13px; line-height: 1.4; 
             position: relative;
             z-index: 1;
@@ -209,9 +209,15 @@
         .trend-down { color: var(--success); font-size: 13px; } 
         .verify-badge { color: var(--success); font-size: 12px; margin-left: 2px; }
 
-        .action-buttons { display: flex; gap: 6px; margin-top: 12px; border-top: 1px solid rgba(0,0,0,0.15); padding-top: 10px; z-index: 2; position: relative; }
-        .update-btn, .nav-btn, .hist-btn { padding: 0 4px; font-size: 10px; border-radius: 6px; flex: 1; font-weight: 700; text-align: center; text-decoration: none; cursor:pointer; display: flex; align-items: center; justify-content: center; height: 28px; border: 1px solid transparent; background: transparent; transition: var(--transition); letter-spacing: 0.5px; text-transform: uppercase; }
+        .actions-container { margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px; }
+        .action-buttons-row { display: flex; gap: 6px; }
+        .update-btn, .nav-btn, .hist-btn { flex: 1; padding: 0 10px; font-size: 10px; border-radius: 6px; font-weight: 700; text-align: center; text-decoration: none; cursor:pointer; display: flex; align-items: center; justify-content: center; height: 36px; border: 1px solid rgba(255,255,255,0.2); color: white; background: transparent; transition: var(--transition); letter-spacing: 0.5px; text-transform: uppercase; }
         .update-btn:active, .nav-btn:active, .hist-btn:active { background: rgba(255,255,255,0.15); }
+
+        .rabatt-panel { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
+        .rabatt-item { display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.2); padding: 4px 8px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); }
+        .rabatt-knapp { min-width: 140px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 8px 10px; border-radius: 8px; font-size: 12px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; text-align: left; }
+        .rabatt-knapp img { width: 20px; height: 20px; object-fit: contain; }
 
         .history-panel { display: none; background: rgba(0,0,0,0.3); border-radius: 8px; margin-top: 10px; padding: 10px; font-size: 11px; color: inherit; box-shadow: inset 0 2px 5px rgba(0,0,0,0.2); z-index: 2; position: relative; }
         .history-item { display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.1); padding: 4px 0; }
@@ -250,7 +256,7 @@
         #scroll-down-btn:active { opacity: 1; transform: translateY(2px); }
 
         #update-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); z-index: 1000; overflow-y: auto; backdrop-filter: blur(5px); }
-        .modal-content { position: relative; margin: 40px auto; background-color: rgba(43, 43, 54, 0.95); padding: 25px; border-radius: var(--radius-md); width: 90%; max-width: 350px; box-sizing: border-box; box-shadow: var(--shadow-md); border: 1px solid rgba(255,255,255,0.1); }
+        .modal-content { position: relative; margin: 40px auto; background-color: rgba(43, 43, 54, 0.95); padding: 25px; border-radius: var(--radius-md); width: 90%; max-width: 350px; box-sizing: border-box; box-shadow: var(--shadow-md); border: 1px solid rgba(255,255,255,0.1); z-index: 2001; }
         #modal-error { color: var(--danger); font-size: 13px; margin-bottom: 12px; display: none; padding: 10px; background: rgba(255,0,0,0.1); border-radius: 8px; font-weight: bold; }
         
         .btn-add-98 { background: transparent; border: 1px dashed #555; color: #a0a0a0; padding: 10px; font-size: 12px; border-radius: 8px; width: 100%; font-weight: 600;}
@@ -268,11 +274,106 @@
         /* HEMMELIG ADMIN PANEL STYLING */
         #skjult-admin-panel { display: none; background: linear-gradient(135deg, #1a1a24 0%, #0a0a0c 100%); border: 2px solid var(--gold); border-radius: var(--radius-md); padding: 15px; margin-bottom: 20px; box-shadow: 0 0 15px rgba(255, 215, 0, 0.2); }
         .admin-header { color: var(--gold); font-weight: 800; text-transform: uppercase; font-size: 16px; margin-top: 0; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+
+        /* --- NYTT: Bunnmeny --- */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(20, 20, 28, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0;
+            padding-bottom: calc(8px + env(safe-area-inset-bottom)); /* For iPhone X notch */
+            z-index: 999;
+        }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--text-muted); text-decoration: none; font-size: 10px; font-weight: 600; gap: 4px; padding: 4px 12px; border-radius: 8px; transition: var(--transition); cursor: pointer; }
+        .nav-item:active { background: rgba(255,255,255,0.1); }
+        .nav-item .icon { font-size: 22px; }
+    </style>
+    <!-- NYTT: CSS for fane-visning (SPA) -->
+    <style>
+        .view {
+            display: none;
+        }
+        .view.active {
+            display: block;
+        }
+        .bottom-nav .nav-item.active {
+            color: var(--primary);
+        }
+
+        /* NYTT: Global bil-visning */
+        #global-car-display {
+            position: sticky;
+            top: 0;
+            left: 0;
+            width: calc(100% + 30px);
+            background: rgba(0, 102, 204, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 162, 255, 0.3);
+            padding: 8px 15px;
+            z-index: 1000;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: -15px -15px 15px -15px; /* Trekker den ut til kantene og gir pusterom under */
+        }
+        #global-car-display:active {
+            background: rgba(0, 102, 204, 0.35);
+        }
+        #global-car-regnr {
+            background: rgba(0,0,0,0.3);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            letter-spacing: 1px;
+            font-size: 11px;
+        }
+
+        /* NYTT: Linjegraf */
+        .line-chart-container { position: relative; height: 180px; margin-top: 10px; margin-bottom: 10px; }
+        .line-chart-svg { width: 100%; height: 100%; overflow: visible; }
+        .line-chart-svg .grid-line { stroke: rgba(255,255,255,0.1); stroke-width: 1; stroke-dasharray: 2, 4; }
+        .line-chart-svg .axis-label { fill: var(--text-muted); font-size: 9px; }
+        .line-chart-svg .user-line { stroke: var(--success); stroke-width: 3; fill: none; }
+        .line-chart-svg .nat-line { stroke: var(--danger); stroke-width: 1.5; fill: none; }
+        .line-chart-svg .user-dot { fill: var(--success); stroke: var(--bg-color); stroke-width: 2; }
+        .chart-legend { display: flex; justify-content: center; gap: 20px; font-size: 10px; margin-top: 25px; }
+        .legend-item { display: flex; align-items: center; gap: 5px; }
+        .legend-color { width: 12px; height: 12px; border-radius: 3px; }
+
+        /* NYTT: Statistikk-oversikt */
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
+        .stat-item { background: rgba(0,0,0,0.2); padding: 12px; border-radius: 8px; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
+        .stat-value { font-size: 22px; font-weight: 700; color: var(--primary); line-height: 1.2; }
+        .stat-label { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+        .stat-item.full-width { grid-column: 1 / -1; }
+
+
     </style>
 </head>
 <body>
 
-<div class="container">
+<div id="global-car-display" style="display: none;">
+    <span class="icon" style="font-size: 18px;">🚗</span>
+    <div style="flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+        <span id="global-car-name"></span>
+    </div>
+    <span id="global-car-regnr"></span>
+</div>
+
+<div id="marked-view" class="view active">
     <div id="install-banner" class="install-banner">
         <span id="banner-text">Legg til på startskjermen for full app-opplevelse. Trykk på <b>⋮</b> øverst til høyre og velg "Legg til på startskjermen". </span>
         <span id="banner-arrow" class="install-arrow">↑</span>
@@ -285,6 +386,20 @@
     <div id="skjult-admin-panel">
         <h3 class="admin-header">👑 Admin Sentral</h3>
         
+        <div style="margin-bottom: 15px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px;">
+            <label style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 5px;">Importer data fra Drivstoffpriser:</label>
+            <button style="background: var(--primary); font-size: 11px; padding: 10px;" onclick="importerDrivstoffpriserData()">📥 Importer Stasjoner & Priser</button>
+        </div>
+
+        <div style="margin-bottom: 15px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px;">
+            <label style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 5px;">Databasevedlikehold:</label>
+            <div style="display: flex; gap: 8px;">
+                <button id="btn-rydd-duplikater" class="admin-btn danger-btn" style="background: rgba(255, 68, 68, 0.1);" onclick="ryddDuplikaterIDatabase()">🧹 Rydd OSM-dupl.</button>
+                <button id="btn-rydd-navn-duplikater" class="admin-btn danger-btn" style="background: rgba(255, 68, 68, 0.1);" onclick="ryddNavnDuplikater()">🧹 Rydd Navn-duplikater</button>
+                <button id="btn-rydd-gps-duplikater" class="admin-btn danger-btn" style="background: rgba(255, 68, 68, 0.1);" onclick="ryddGpsDuplikater()">🧹 Rydd GPS-dupl.</button>
+            </div>
+        </div>
+
         <div style="margin-bottom: 15px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px;">
             <label style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 5px;">Global Systemmelding:</label>
             <input type="text" id="admin-msg-input" placeholder="Skriv en beskjed til alle brukere..." style="margin-bottom: 8px;">
@@ -354,11 +469,6 @@
     <div id="extremes-container" style="display: none; margin-top: 30px; margin-bottom: 30px; padding-top: 25px; padding-bottom: 5px; border-top: 1px solid rgba(255, 255, 255, 0.08); border-bottom: 1px solid rgba(255, 255, 255, 0.08);"></div>
 
     <div class="footer">
-        <div class="footer-buttons">
-            <button class="footer-btn btn-share" onclick="delAppen()">📢 Del appen</button>
-            <a href="mailto:thaldling@gmail.com?subject=Tilbakemelding%20Drivstoff%20Norge" class="footer-btn btn-feedback">✉️ Tilbakemelding</a>
-        </div>
-
         <div class="footer-info-box">
             <p class="footer-text">
                 <strong>🔒 Personvern:</strong> Vi sporer deg ikke. Posisjonen din brukes kun lokalt for å finne stasjoner. Appen bruker sikker, anonym innlogging i bakgrunnen for å beskytte dugnaden. Ingen reklame, ingen abonnement.
@@ -372,7 +482,165 @@
         <a class="appstore-link" onclick="visInfoModal()">Hvorfor er ikke appen i App Store?</a>
     </div>
 
-<button id="scroll-down-btn" onclick="blaNedover()">👇</button>
+</div>
+
+<div id="garasje-view" class="view">
+    <h2 style="user-select: none; -webkit-user-select: none;">Min Garasje</h2>
+
+    <!-- === MIN BIL === -->
+    <div id="min-bil-seksjon" style="display: none;">
+        <div id="min-bil-info-container" class="panel" style="text-align:left; padding: 20px; border-left: 4px solid var(--primary);">
+            <h3 style="margin-top:0; text-align:center; margin-bottom: 20px; font-weight: 800; font-family: 'Montserrat', sans-serif;"><span id="min-bil-merke"></span> <span id="min-bil-modell"></span></h3>
+            <div style="display: grid; grid-template-columns: auto 1fr; gap: 12px 15px; align-items: center; font-size: 14px;">
+                <span style="font-weight: 600; color: var(--text-muted);">Drivstoff:</span>
+                <span id="min-bil-drivstoff" style="font-weight: 700;"></span>
+
+                <span style="font-weight: 600; color: var(--text-muted);">Forbruk:</span>
+                <div style="font-weight: 700; display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: center;">
+                    <span><span id="min-bil-forbruk"></span> l/mil (Fabrikk)</span>
+                    <span id="faktisk-forbruk-display" style="display: none; font-size: 12px; padding: 2px 6px; border-radius: 5px; font-weight: 600;"></span>
+                </div>
+                
+                <span style="font-weight: 600; color: var(--text-muted);">Utslippsklasse:</span>
+                <span id="min-bil-utslippsklasse" style="font-weight: 700;"></span>
+
+                <span style="font-weight: 600; color: var(--text-muted);">Hestekrefter:</span>
+                <span style="font-weight: 700;"><span id="min-bil-hk"></span> hk</span>
+
+                <span style="font-weight: 600; color: var(--text-muted);">Egenvekt:</span>
+                <span style="font-weight: 700;"><span id="min-bil-vekt"></span> kg</span>
+                
+                <span style="font-weight: 600; color: var(--text-muted);">Karosseri:</span>
+                <span id="min-bil-karosseri" style="font-weight: 700;"></span>
+
+                <span style="font-weight: 600; color: var(--text-muted);">Neste EU-kontroll:</span>
+                <span id="min-bil-eu-kontroll" style="font-weight: 700;"></span>
+
+                <span style="font-weight: 600; color: var(--text-muted);">Førstegangsreg.:</span>
+                <span id="min-bil-forstegangsreg" style="font-weight: 700;"></span>
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 25px;">
+                <button onclick="visStatistikkForBil()" style="flex: 1; background-color: var(--primary);">📊 Statistikk</button>
+                <button id="bytt-bil-btn" onclick="byttBil()" style="flex: 1; background: transparent; border: 1px solid var(--text-muted); color: var(--text-muted); font-size: 12px; padding: 10px; margin-top: 0;">Bytt eller fjern bil</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- === SAMMENLIGNINGSBIL === -->
+    <div id="sammenlign-bil-seksjon" style="display: none;">
+        <h4 style="text-align:center; color:var(--text-muted); margin-top: 25px; margin-bottom: 10px; font-weight: 600;">Søkeresultat</h4>
+        <div id="sammenlign-bil-info-container" class="panel" style="text-align:left; padding: 20px;">
+            <h3 style="margin-top:0; text-align:center; margin-bottom: 20px; font-weight: 800; font-family: 'Montserrat', sans-serif;"><span id="sammenlign-bil-merke"></span> <span id="sammenlign-bil-modell"></span></h3>
+            <div style="display: grid; grid-template-columns: auto 1fr; gap: 12px 15px; align-items: center; font-size: 14px;">
+                <span style="font-weight: 600; color: var(--text-muted);">Drivstoff:</span>
+                <span id="sammenlign-bil-drivstoff" style="font-weight: 700;"></span>
+
+                <span style="font-weight: 600; color: var(--text-muted);">Forbruk:</span>
+                <span><span id="sammenlign-bil-forbruk"></span> l/mil (Fabrikk)</span>
+                
+                <span style="font-weight: 600; color: var(--text-muted);">Utslippsklasse:</span>
+                <span id="sammenlign-bil-utslippsklasse" style="font-weight: 700;"></span>
+
+                <span style="font-weight: 600; color: var(--text-muted);">Hestekrefter:</span>
+                <span style="font-weight: 700;"><span id="sammenlign-bil-hk"></span> hk</span>
+
+                <span style="font-weight: 600; color: var(--text-muted);">Egenvekt:</span>
+                <span style="font-weight: 700;"><span id="sammenlign-bil-vekt"></span> kg</span>
+                
+                <span style="font-weight: 600; color: var(--text-muted);">Karosseri:</span>
+                <span id="sammenlign-bil-karosseri" style="font-weight: 700;"></span>
+
+                <span style="font-weight: 600; color: var(--text-muted);">Neste EU-kontroll:</span>
+                <span id="sammenlign-bil-eu-kontroll" style="font-weight: 700;"></span>
+
+                <span style="font-weight: 600; color: var(--text-muted);">Førstegangsreg.:</span>
+                <span id="sammenlign-bil-forstegangsreg" style="font-weight: 700;"></span>
+            </div>
+            <button id="velg-bil-btn" onclick="velgSomMinBil()" style="background-color: var(--success); margin-top: 25px;">✅ Velg som min bil</button>
+        </div>
+    </div>
+
+    <!-- === SØKEPANEL === -->
+    <div id="garasje-sok-panel">
+        <div class="panel" style="margin-bottom: 10px;">
+            <p id="sok-panel-tittel" style="font-size:13px; color:var(--text-muted); margin-bottom: 15px; text-align:center; line-height: 1.5;">Søk opp bilen din med registreringsnummer for å se tekniske data og logge reelt forbruk.</p>
+            <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:5px;">Registreringsnummer</label>
+            <div style="display:flex; gap:10px;">
+                <input type="text" id="regnr-input" placeholder="Eks: AB12345" style="text-transform: uppercase; margin-bottom: 0;" onkeypress="if(event.key === 'Enter') document.getElementById('hent-bil-info-btn').click()">
+                <button id="hent-bil-info-btn" onclick="hentBilData(this)" style="width: auto; padding: 0 20px;">Hent bil-info</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- === LOGG FORBRUK === -->
+    <div id="forbruk-logg-container" class="panel" style="display: none;">
+        <h4 style="margin-top:0; text-align:center;">⛽ Logg Drivstofforbruk</h4>
+        <p style="font-size: 11px; text-align: center; color: var(--text-muted); margin-bottom: 15px;">
+          Fyll tanken <b>helt full</b> for å få nøyaktig måling. Forbruket regnes ut ved neste fylling.
+        </p>
+        <div style="margin-bottom:12px">
+            <label style="font-size:12px; color:var(--text-muted)">Nåværende kilometerstand</label>
+            <input type="text" inputmode="numeric" id="input-km" placeholder="Eks: 10400">
+        </div>
+        <div style="margin-bottom:12px">
+            <label style="font-size:12px; color:var(--text-muted)">Liter fylt (fra pumpa)</label>
+            <input type="text" inputmode="decimal" id="input-liter" placeholder="Eks: 25.0" oninput="this.value = this.value.replace(',', '.')">
+        </div>
+        <div style="margin-bottom:12px">
+            <label style="font-size:12px; color:var(--text-muted)">Pris per liter (valgfritt)</label>
+            <input type="text" inputmode="decimal" id="input-pris" placeholder="Eks: 21.50" oninput="this.value = this.value.replace(',', '.')">
+        </div>
+        <button onclick="loggForbruk()">Lagre fylling</button>
+        <div id="forbruk-resultat" style="margin-top: 15px; text-align: center; font-size: 14px; font-weight: bold; line-height: 1.4;"></div>
+        <button id="nullstill-forbruk-btn" onclick="nullstillForbruk()" style="background: transparent; border: 1px solid var(--danger); color: var(--danger); font-size: 11px; padding: 8px; margin-top: 15px; width: auto; display: none; margin-left: auto; margin-right: auto;">Nullstill logg</button>
+    </div>
+</div>
+
+<div id="profil-view" class="view">
+    <h2 style="user-select: none; -webkit-user-select: none;">Min Profil</h2>
+    <div class="panel">
+        <p style="font-size:13px; color:var(--text-muted); margin-bottom: 15px; text-align:center;">Her kan du administrere dine personlige innstillinger og snarveier.</p>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+            <button class="footer-btn" style="background: rgba(255,255,255,0.05);" onclick="apneLommebokModal()">👛 Min Lommebok</button>
+            <a href="mailto:thaldling@gmail.com?subject=Tilbakemelding%20Drivstoff%20Norge" class="footer-btn btn-feedback" style="width:100%; text-decoration:none;">✉️ Gi tilbakemelding</a>
+            <button class="footer-btn btn-share" onclick="delAppen()">📢 Del Appen</button>
+        </div>
+    </div>
+</div>
+
+<div id="statistikk-view" class="view">
+    <div style="display: flex; align-items: center; margin-bottom: 15px;">
+        <button onclick="switchView('garasje-view', document.querySelector('.nav-item[onclick*=\'garasje-view\']'))" style="width: auto; padding: 0 15px; margin-right: 15px; background: transparent; border: none; font-size: 24px;">←</button>
+        <h2 style="margin: 0; text-align: left; flex-grow: 1;">Statistikk</h2>
+    </div>
+    <h3 id="statistikk-bil-navn" style="text-align: center; margin-top: -10px; margin-bottom: 20px; color: var(--text-muted); font-weight: 600;"></h3>
+
+    <div class="panel">
+        <h4 style="margin-top:0;">Drivstoff</h4>
+        <div id="drivstoff-statistikk-innhold">
+            <!-- Innhold genereres av JS -->
+        </div>
+    </div>
+
+    <div class="panel">
+        <h4 style="margin-top:0;">Andre Utgifter</h4>
+        <div id="utgifter-liste" style="margin-bottom: 20px;">
+            <!-- Innhold genereres av JS -->
+        </div>
+        <div id="utgifter-oppsummering" style="text-align: right; font-weight: bold; margin-bottom: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">
+            <!-- Innhold genereres av JS -->
+        </div>
+
+        <h5 style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">Legg til ny utgift</h5>
+        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+            <input type="text" id="utgift-beskrivelse" placeholder="Beskrivelse (f.eks. Service)" style="flex: 2;">
+            <input type="text" inputmode="numeric" id="utgift-belop" placeholder="Beløp (kr)" style="flex: 1;">
+        </div>
+        <button onclick="loggNyUtgift()">+ Legg til utgift</button>
+    </div>
+</div>
+
+<button id="scroll-down-btn" style="bottom: 85px; right: 15px;" onclick="blaNedover()">👇</button>
 
 <div id="info-modal" onclick="if(event.target==this) lukkInfoModal()">
     <div class="info-content">
@@ -483,6 +751,81 @@
     const db = getDatabase(app);
     const auth = getAuth(app);
     let myUid = null; 
+    let fabrikkForbrukPerMil = null;
+    let tempRegnr = null; // For "Velg som min bil"
+    let tempBilData = null; // For å lagre data lokalt
+    
+    let nasjonaltSnittBetaltBensin = null;
+    let nasjonaltSnittBetaltDiesel = null;
+
+    // --- RABATT-DATABASE ---
+    const rabattDatabase = {
+        "Trumf": {
+            "Esso": [
+                { belop: 40, fuel: "bensin" },
+                { belop: 40, fuel: "diesel" }
+            ]
+        },
+        "Coop": {
+            "YX": [
+                { belop: 45, fuel: "bensin" },
+                { belop: 45, fuel: "diesel" },
+                { belop: 45, fuel: "bensin98" }
+            ],
+            "Uno-X": [
+                { belop: 85, fuel: "bensin" },
+                { belop: 85, fuel: "diesel" }
+            ],
+            "Best": [
+                { belop: 45, fuel: "bensin" },
+                { belop: 45, fuel: "diesel" },
+                { belop: 45, fuel: "bensin98" }
+            ],
+            "Circle K": [
+                { belop: 45, fuel: "bensin" },
+                { belop: 45, fuel: "diesel" },
+                { belop: 45, fuel: "bensin98" }
+            ]
+        },
+        "NAF": {
+            "Circle K": [
+                { belop: 75, fuel: "bensin" },
+                { belop: 75, fuel: "diesel" }
+            ],
+            "YX": [
+                { belop: 85, fuel: "bensin" },
+                { belop: 85, fuel: "diesel" }
+            ],
+            "Uno-X": [
+                { belop: 85, fuel: "bensin" },
+                { belop: 85, fuel: "diesel" }
+            ],
+            "Esso": [
+                { belop: 85, fuel: "bensin" },
+                { belop: 85, fuel: "diesel" }
+            ]
+        },
+        "YX Visa": {
+            "YX": [
+                { belop: 40, fuel: "bensin" },
+                { belop: 40, fuel: "diesel" }
+            ]
+        },
+        "Agrol": {
+            "Circle K": [
+                { belop: 30, fuel: "bensin" },
+                { belop: 30, fuel: "diesel" }
+            ],
+            "Best": [
+                { belop: 30, fuel: "bensin" },
+                { belop: 30, fuel: "diesel" }
+            ],
+            "Esso": [
+                { belop: 30, fuel: "bensin" },
+                { belop: 30, fuel: "diesel" }
+            ]
+        }
+    };
     
 window.toggleLeaderboard = function() {
     const exp = document.getElementById('leaderboard-expanded');
@@ -508,20 +851,993 @@ window.toggleLeaderboard = function() {
     setTimeout(sjekkScroll, 200);
 };
 
-    // --- MAGISKE HJELPEFUNKSJONER ER TILBAKE ---
-    window.lukkModal = function() { 
-        document.getElementById('update-modal').style.display='none'; 
-        document.getElementById('modal-error').style.display='none'; 
-        document.getElementById('admin-rename-div').style.display='none'; 
+    // --- LOMMEBOK-FUNKSJONER ---
+    window.apneLommebokModal = function() {
+        lastInnLommebok();
+        document.getElementById('lommebok-modal').style.display = 'block';
     };
+    
+    window.lukkLommebokModal = function() {
+        document.getElementById('lommebok-modal').style.display = 'none';
+    };
+    
+    // --- NYTT: Funksjoner for fane-navigasjon ---
+    window.switchView = function(viewId, navElement) {
+        // Skjul alle faner
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        
+        // Deaktiver alle knapper i bunnmenyen
+        document.querySelectorAll('.bottom-nav .nav-item').forEach(n => n.classList.remove('active'));
+
+        // Vis den valgte fanen
+        const view = document.getElementById(viewId);
+        if (view) view.classList.add('active');
+
+        // Aktiver den trykkede knappen
+        if (navElement) navElement.classList.add('active');
+        
+        // Sjekk om scroll-knappen trengs i den nye visningen
+        setTimeout(sjekkScroll, 50);
+        
+        // Auto-last bil i garasjen
+        if (viewId === 'garasje-view') {
+            const lagretRegnr = localStorage.getItem('min_garasje_regnr');
+            const sokTittel = document.getElementById('sok-panel-tittel');
+            const minBilSeksjon = document.getElementById('min-bil-seksjon');
+            const sammenlignSeksjon = document.getElementById('sammenlign-bil-seksjon');
+
+            // Alltid skjul sammenligningsbilen og tøm søkefeltet når fanen åpnes
+            sammenlignSeksjon.style.display = 'none';
+            document.getElementById('regnr-input').value = '';
+
+            if (lagretRegnr) {
+                minBilSeksjon.style.display = 'block';
+                sokTittel.textContent = 'Søk opp en annen bil for å sammenligne.';
+                
+                // Prøv å laste fra cache først for å unngå unødvendig API-kall
+                const lagretDataJson = localStorage.getItem('min_garasje_data');
+                if (lagretDataJson) {
+                    const lagretData = JSON.parse(lagretDataJson);
+                    if (lagretData.regnr === lagretRegnr) {
+                        visBilData(lagretData, 'min-');
+                        return; // Vellykket hurtiglasting, avslutt her.
+                    }
+                }
+
+                // Fallback: Hvis ingen lokal data finnes, hent fra API som før
+                // Vi setter regnr i inputfeltet midlertidig kun for at hentBilData skal fungere
+                document.getElementById('regnr-input').value = lagretRegnr;
+                hentBilData(document.getElementById('hent-bil-info-btn'), true);
+                document.getElementById('regnr-input').value = ''; // Tøm feltet igjen etterpå
+
+            } else {
+                minBilSeksjon.style.display = 'none';
+                document.getElementById('forbruk-logg-container').style.display = 'none';
+                sokTittel.textContent = 'Søk opp bilen din med registreringsnummer for å se tekniske data og logge reelt forbruk.';
+            }
+        }
+    };
+
+    window.velgSomMinBil = function() {
+        if (tempRegnr && tempBilData) {
+            localStorage.setItem('min_garasje_regnr', tempRegnr);
+            localStorage.setItem('min_garasje_data', JSON.stringify(tempBilData));
+            localStorage.removeItem('forbruk_logg'); // Nullstill logg for ny bil
+            tempRegnr = null;
+            tempBilData = null;
+            
+            // Last inn garasje-visningen på nytt for å vise den som lagret
+            switchView('garasje-view', document.querySelector('.nav-item[onclick*="garasje-view"]'));
+            oppdaterGlobalBilVisning();
+        }
+    }
+
+    window.byttBil = function() {
+        if (confirm("Er du sikker på at du vil fjerne denne bilen? Forbruksloggen vil også bli slettet.")) {
+            localStorage.removeItem('min_garasje_regnr');
+            localStorage.removeItem('min_garasje_data');
+            localStorage.removeItem('forbruk_logg');
+            document.getElementById('faktisk-forbruk-display').style.display = 'none';
+
+            document.getElementById('min-bil-seksjon').style.display = 'none';
+            document.getElementById('forbruk-logg-container').style.display = 'none';
+            document.getElementById('sammenlign-bil-seksjon').style.display = 'none';
+            
+            const sokPanel = document.getElementById('garasje-sok-panel');
+            sokPanel.style.display = 'block';
+            document.getElementById('sok-panel-tittel').textContent = 'Søk opp bilen din med registreringsnummer for å se tekniske data og logge reelt forbruk.';
+            document.getElementById('regnr-input').value = '';
+            oppdaterGlobalBilVisning();
+        }
+    }
+
+    function oppdaterGlobalBilVisning() {
+        const lagretRegnr = localStorage.getItem('min_garasje_regnr');
+        const globalCarDisplay = document.getElementById('global-car-display');
+
+        if (lagretRegnr) {
+            const lagretDataJson = localStorage.getItem('min_garasje_data');
+            if (lagretDataJson) {
+                const lagretData = JSON.parse(lagretDataJson);
+                if (lagretData.regnr === lagretRegnr) {
+                    document.getElementById('global-car-name').textContent = `${lagretData.merke} ${lagretData.modell}`;
+                    document.getElementById('global-car-regnr').textContent = lagretData.regnr;
+                    globalCarDisplay.style.display = 'flex';
+                    globalCarDisplay.onclick = () => switchView('garasje-view', document.querySelector('.nav-item[onclick*="garasje-view"]'));
+                    return; // Avslutt hvis alt er i orden
+                }
+            }
+        }
+        // Hvis vi kommer hit, er ingen bil valgt eller data mangler
+        globalCarDisplay.style.display = 'none';
+    }
+
+    function visBilData(bilData, prefix) {
+        const containerId = `${prefix}bil-info-container`;
+        const bilInfoContainer = document.getElementById(containerId);
+        if (!bilInfoContainer) {
+            console.error(`Container ${containerId} not found!`);
+            return;
+        }
+
+        // Populate the DOM
+        document.getElementById(`${prefix}bil-merke`).textContent = bilData.merke;
+        document.getElementById(`${prefix}bil-modell`).textContent = bilData.modell;
+        document.getElementById(`${prefix}bil-drivstoff`).textContent = bilData.drivstoff;
+        document.getElementById(`${prefix}bil-eu-kontroll`).textContent = bilData.euKontrollDato;
+        document.getElementById(`${prefix}bil-forbruk`).textContent = bilData.forbrukPerMil;
+        document.getElementById(`${prefix}bil-utslippsklasse`).textContent = bilData.utslippsklasse;
+        document.getElementById(`${prefix}bil-hk`).textContent = bilData.hk;
+        document.getElementById(`${prefix}bil-vekt`).textContent = bilData.vekt;
+        document.getElementById(`${prefix}bil-karosseri`).textContent = bilData.karosseri;
+        document.getElementById(`${prefix}bil-forstegangsreg`).textContent = bilData.forstegangRegDato;
+
+        // Sett data-attributt for å vite hvilken bil som vises
+        bilInfoContainer.setAttribute('data-regnr', bilData.regnr);
+
+        if (prefix === 'min-') {
+            // Dette er den lagrede bilen
+            document.getElementById('min-bil-seksjon').style.display = 'block';
+            document.getElementById('forbruk-logg-container').style.display = 'block';
+            
+            // Oppdater global variabel for forbruksberegning
+            fabrikkForbrukPerMil = bilData.forbrukPerMil !== 'Ukjent' ? parseFloat(String(bilData.forbrukPerMil).replace(',', '.')) : null;
+            visForbruksStatus();
+        } else if (prefix === 'sammenlign-') {
+            // Dette er sammenligningsbilen
+            document.getElementById('sammenlign-bil-seksjon').style.display = 'block';
+        }
+    }
+
+    window.hentBilData = async function(button, isSavedCarLoad = false) {
+        const regnrInput = document.getElementById('regnr-input');
+        const originalButtonText = button.innerHTML;
+
+        const regnr = regnrInput.value.trim().toUpperCase();
+        
+        if (!regnr) {
+            if (!isSavedCarLoad) alert('Vennligst skriv inn et registreringsnummer.');
+            return;
+        }
+
+        // NYTT: Sjekk og håndhev daglig søkegrense (kun for nye søk)
+        if (!isSavedCarLoad) {
+            const today = new Date().toISOString().split('T')[0];
+            let lastSearchDate = localStorage.getItem('bil_sok_dato');
+            let searchCount = parseInt(localStorage.getItem('bil_sok_antall') || '0', 10);
+
+            if (lastSearchDate !== today) {
+                searchCount = 0;
+                localStorage.setItem('bil_sok_dato', today);
+            }
+
+            if (searchCount >= 10) {
+                alert(`Du har nådd dagens grense på 10 bilsøk. Prøv igjen i morgen.\n\nLagrede biler i "Min Garasje" teller ikke mot denne grensen.`);
+                return;
+            }
+
+            localStorage.setItem('bil_sok_antall', (searchCount + 1).toString());
+        }
+
+        button.disabled = true;
+        button.innerHTML = 'Henter...';
+        
+        // Skjul kun sammenligningsbilen ved nytt søk
+        if (!isSavedCarLoad) {
+            document.getElementById('sammenlign-bil-seksjon').style.display = 'none';
+        }
+
+        if (!isSavedCarLoad) {
+            tempRegnr = regnr; // Lagre regnr for "Velg som min bil"-knappen
+            tempBilData = null; // Nullstill midlertidig data
+        }
+
+        try {
+            const proxyUrl = `https://europe-west1-drivstoff-norge-caeaa.cloudfunctions.net/getCarData?regnr=${regnr}`;
+            const response = await fetch(proxyUrl);
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                let errorMsg = `Fant ikke data for ${regnr}. Status: ${response.status}`;
+                try {
+                    const errorData = JSON.parse(errorText);
+                    if (errorData.error) {
+                        errorMsg = errorData.error;
+                    } else if (errorText.includes("OPPLYSNINGER_IKKE_TILGJENGELIGE")) {
+                        errorMsg = `Opplysninger for ${regnr} er ikke offentlig tilgjengelige.`;
+                    }
+                } catch (e) {
+                    if (errorText) errorMsg = errorText;
+                }
+                throw new Error(errorMsg);
+            }
+
+            const data = await response.json();
+            const bilData = data?.kjoretoydataListe?.[0];
+            if (!bilData) throw new Error(`Ingen kjøretøydata funnet for ${regnr}.`);
+
+            console.log("🏎️ RAW DATA FRA VEGVESENET:", bilData);
+
+            const tekniskeData = bilData.tekniskeData || bilData.godkjenning?.tekniskGodkjenning?.tekniskeData;
+
+            if (!tekniskeData) {
+                console.error("Strukturfeil: Fant ikke 'tekniskeData' i API-responsen.");
+                throw new Error("Uventet format fra Vegvesenet. Kan ikke hente tekniske detaljer for denne bilen.");
+            }
+
+            // Henter ut data fra objektene
+            const merke = tekniskeData.generelt?.merke?.[0]?.merke || 'Ukjent';
+            const modell = tekniskeData.generelt?.handelsbetegnelse?.[0] || 'Ukjent';
+
+            // Drivstoff
+            const drivstoffRaw = tekniskeData.miljodata?.miljoOgdrivstoffGruppe?.[0]?.drivstoffKodeMiljodata?.kodeNavn || 'Ukjent';
+            const drivstoff = drivstoffRaw !== 'Ukjent' ? (drivstoffRaw.charAt(0).toUpperCase() + drivstoffRaw.slice(1).toLowerCase()) : 'Ukjent';
+
+            // EU-kontroll
+            const euKontrollDatoRaw = bilData.periodiskKjoretoyKontroll?.kontrollfrist;
+            let euKontrollDato = 'Ukjent';
+            if (euKontrollDatoRaw) {
+                const [year, month, day] = euKontrollDatoRaw.split('-');
+                euKontrollDato = `${day}.${month}.${year}`;
+            }
+
+            // Forbruk
+            const forbrukL100km = tekniskeData?.miljodata?.miljoOgdrivstoffGruppe?.[0]?.forbrukOgUtslipp?.[0]?.forbrukBlandetKjoring;
+            let forbrukPerMil = 'Ukjent';
+            fabrikkForbrukPerMil = null; // Nullstill før vi henter ny bil
+            if (forbrukL100km) {
+                const forbrukNum = parseFloat(forbrukL100km) / 10;
+                fabrikkForbrukPerMil = forbrukNum; // Lagre numerisk verdi for sammenligning
+                forbrukPerMil = forbrukNum.toFixed(2).replace('.', ',');
+            }
+
+            // Utslippsklasse
+            const utslippsklasse = tekniskeData.miljodata?.euroKlasse?.kodeNavn?.split(' -')[0] || 'Ukjent';
+
+            // Hestekrefter (fra kW)
+            const effektKw = tekniskeData.motorOgDrivverk?.motor?.[0]?.drivstoff?.[0]?.maksNettoEffekt;
+            const hk = effektKw ? Math.round(effektKw * 1.35962) : 'Ukjent';
+
+            // Egenvekt
+            const vekt = tekniskeData.vekter?.egenvekt || 'Ukjent';
+
+            // Karosseri
+            const karosseri = tekniskeData.karosseriOgLasteplan?.karosseritype?.kodeNavn || 'Ukjent';
+
+            // Førstegangsregistrering
+            const forstegangRegDatoRaw = bilData.forstegangsregistrering?.registrertForstegangNorgeDato;
+            let forstegangRegDato = 'Ukjent';
+            if (forstegangRegDatoRaw) {
+                const [year, month, day] = forstegangRegDatoRaw.split('-');
+                forstegangRegDato = `${day}.${month}.${year}`;
+            }
+
+            const bilDataObject = {
+                regnr, merke, modell, drivstoff, euKontrollDato,
+                forbrukPerMil, utslippsklasse, hk, vekt, karosseri, forstegangRegDato
+            };
+
+            if (isSavedCarLoad) {
+                // Dette er den innledende lastingen av brukerens lagrede bil
+                visBilData(bilDataObject, 'min-');
+                // Lagre også dataen til localStorage hvis den ble hentet fra API (ikke var i cache)
+                localStorage.setItem('min_garasje_data', JSON.stringify(bilDataObject));
+            } else {
+                // Dette er et nytt søk for sammenligning
+                visBilData(bilDataObject, 'sammenlign-');
+                // Lagre dataen midlertidig for "Velg som min bil"-knappen
+                tempBilData = bilDataObject;
+            }
+    } catch (error) {
+        console.error('Feil ved henting av bildata:', error);
+        alert(`Kunne ikke hente bil: ${error.message}`);
+    } finally {
+        button.disabled = false;
+        button.innerHTML = originalButtonText;
+    }
+};
+
+    window.visStatistikkForBil = function() { // Denne funksjonen er nå oppdatert for å håndtere alle nye statistikk-elementer
+        const lagretDataJson = localStorage.getItem('min_garasje_data');
+        if (!lagretDataJson) {
+            alert("Ingen bil valgt.");
+            return;
+        }
+        const bilData = JSON.parse(lagretDataJson);
+        document.getElementById('statistikk-bil-navn').textContent = `${bilData.merke} ${bilData.modell}`;
+
+        let drivstoffLoggData = JSON.parse(localStorage.getItem('forbruk_logg') || '[]');
+        const drivstoffLogg = Array.isArray(drivstoffLoggData) ? drivstoffLoggData : [];
+        const drivstoffContainer = document.getElementById('drivstoff-statistikk-innhold');
+
+        if (drivstoffLogg.length < 2) { // Krever minst to fyllinger for å beregne forbruk/kostnad
+            drivstoffContainer.innerHTML = "<p style='font-size: 12px; color: var(--text-muted);'>For lite data til å vise statistikk. Logg minst to fyllinger for å se grafer og gjennomsnitt.</p>";
+            visAlleUtgifter(); // Viser "Andre utgifter" selv om drivstoffdata mangler
+            switchView('statistikk-view', null);
+            return;
+        }
+
+        // --- BEREGNINGER ---
+        let totalLiterForSnittpris = 0;
+        let totalPengerForSnittpris = 0;
+
+            const now = new Date();
+            const currentMonthName = now.toLocaleDateString('no-NO', { month: 'long' });
+            const currentYear = now.getFullYear();
+            let kostnadDenneMnd = 0;
+            let kostnadDetteAar = 0;
+
+            drivstoffLogg.forEach(log => {
+                if (log.pris && log.pris > 0 && log.liter > 0) {
+                    totalPengerForSnittpris += log.liter * log.pris;
+                    totalLiterForSnittpris += log.liter;
+
+                    const kostnad = log.liter * log.pris;
+                    const logDate = new Date(log.timestamp);
+                    if (logDate.getFullYear() === currentYear) {
+                        kostnadDetteAar += kostnad;
+                        if (logDate.getMonth() === now.getMonth()) {
+                            kostnadDenneMnd += kostnad;
+                        }
+                    }
+                }
+            });
+
+            let totalLiter = 0;
+            let totalPenger = 0;
+            let totalKm = 0;
+            const forbruksData = [];
+            for (let i = 1; i < drivstoffLogg.length; i++) {
+                const current = drivstoffLogg[i];
+                const previous = drivstoffLogg[i-1];
+                
+                const liter = current.liter;
+                const kmKjort = current.km - previous.km;
+                
+                if (kmKjort > 0 && liter > 0) {
+                    const forbruk = liter / (kmKjort / 10);
+                    
+                    totalLiter += liter;
+                    totalKm += kmKjort;
+                    if (current.pris && current.pris > 0) {
+                        totalPenger += liter * current.pris;
+                    }
+                }
+            }
+
+        const snittForbruk = totalKm > 0 ? totalLiter / (totalKm / 10) : 0;
+        const kostnadPerMil = totalKm > 0 ? totalPenger / (totalKm / 10) : 0;
+        const dinSnittPris = totalLiterForSnittpris > 0 ? totalPengerForSnittpris / totalLiterForSnittpris : 0;
+
+        const bilDrivstoff = bilData.drivstoff.toLowerCase();
+        const nasjonaltSnittPris = bilDrivstoff.includes('diesel') ? nasjonaltSnittBetaltDiesel : nasjonaltSnittBetaltBensin;
+
+        let prisjegerTekst = '';
+        if (dinSnittPris > 0 && nasjonaltSnittPris && nasjonaltSnittPris > 0) {
+            const diff = dinSnittPris - nasjonaltSnittPris;
+            if (diff < -0.2) { prisjegerTekst = `Du er en prisjeger! 🏆`; } 
+            else if (diff > 0.5) { prisjegerTekst = `Du kan spare mer! 🧐`; }
+        }
+
+        // --- GRAF & HTML ---
+        const twoMonthsAgo = new Date();
+        twoMonthsAgo.setMonth(now.getMonth() - 2);
+        const userPriceData = drivstoffLogg.filter(log => log.pris && log.pris > 0 && new Date(log.timestamp) >= twoMonthsAgo).map(log => ({ x: log.timestamp, y: log.pris }));
+        
+        let grafHtml = '<p style="font-size:12px; color:var(--text-muted);">Logg flere fyllinger med pris for å se prisgrafen.</p>';
+        if (userPriceData.length >= 2) {
+            const allPrices = userPriceData.map(p => p.y);
+            if (nasjonaltSnittPris) allPrices.push(nasjonaltSnittPris);
+
+            const minPrice = Math.min(...allPrices);
+            const maxPrice = Math.max(...allPrices);
+            const priceRange = maxPrice - minPrice;
+            
+            const yMin = Math.floor(minPrice - priceRange * 0.1);
+            const yMax = Math.ceil(maxPrice + priceRange * 0.1);
+
+            const firstTimestamp = userPriceData[0].x;
+            const lastTimestamp = userPriceData[userPriceData.length - 1].x;
+            const timeRange = lastTimestamp - firstTimestamp;
+
+            const toPercentX = (timestamp) => timeRange > 0 ? ((timestamp - firstTimestamp) / timeRange) * 100 : 50;
+            const toPercentY = (price) => (yMax - yMin) > 0 ? 100 - ((price - yMin) / (yMax - yMin)) * 100 : 50;
+
+            const userPath = userPriceData.map(p => `${toPercentX(p.x)},${toPercentY(p.y)}`).join(' ');
+            const userDots = userPriceData.map(p => `<circle cx="${toPercentX(p.x)}%" cy="${toPercentY(p.y)}%" r="3" class="user-dot" />`).join('');
+
+            let natLineHtml = '';
+            if (nasjonaltSnittPris) {
+                const natY = toPercentY(nasjonaltSnittPris);
+                natLineHtml = `<line x1="0" y1="${natY}%" x2="100%" y2="${natY}%" class="nat-line" />`;
+            }
+            
+            const xAxisLabels = `<text x="0" y="115%" class="axis-label">${new Date(firstTimestamp).toLocaleDateString('no-NO', {day:'2-digit', month:'short'})}</text><text x="100%" y="115%" text-anchor="end" class="axis-label">${new Date(lastTimestamp).toLocaleDateString('no-NO', {day:'2-digit', month:'short'})}</text>`;
+            const yAxisLabels = `<text x="-2%" y="8%" text-anchor="end" class="axis-label">${yMax.toFixed(1)}</text><text x="-2%" y="98%" text-anchor="end" class="axis-label">${yMin.toFixed(1)}</text>`;
+
+            grafHtml = `<h5 style="margin-top: 20px; margin-bottom: 10px; font-size: 12px; color: var(--text-muted);">Din pris vs. Norgessnitt (kr/l)</h5><div class="line-chart-container"><svg class="line-chart-svg" viewBox="0 0 100 100" preserveAspectRatio="none"><line x1="0" y1="0" x2="100%" y2="0" class="grid-line" /><line x1="0" y1="50%" x2="100%" y2="50%" class="grid-line" /><line x1="0" y1="100%" x2="100%" y2="100%" class="grid-line" />${yAxisLabels}${xAxisLabels}${natLineHtml}<polyline points="${userPath}" class="user-line" />${userDots}</svg></div><div class="chart-legend"><div class="legend-item"><span class="legend-color" style="background-color: var(--success);"></span>Din Pris</div><div class="legend-item"><span class="legend-color" style="background-color: var(--danger);"></span>Andre betaler</div></div>`;
+        }
+
+        drivstoffContainer.innerHTML = `
+                <div class="stats-grid">
+                    <div class="stat-item full-width">
+                        <div class="stat-value">${kostnadDenneMnd.toFixed(0)} kr</div>
+                        <div class="stat-label">Drivstoff i ${currentMonthName} (Totalt i år: ${kostnadDetteAar.toFixed(0)} kr)</div>
+                    </div>
+                </div>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-value">${snittForbruk.toFixed(2).replace('.',',')}</div>
+                    <div class="stat-label">Gj.snitt forbruk (l/mil)</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">${kostnadPerMil > 0 ? kostnadPerMil.toFixed(2).replace('.',',') : '-'} kr</div>
+                    <div class="stat-label">Kostnad per mil</div>
+                </div>
+            </div>
+            <div style="font-size: 12px; text-align: center; margin-bottom: 25px; color: var(--text-muted);">
+                Din snittpris: <b>${dinSnittPris > 0 ? dinSnittPris.toFixed(2).replace('.',',') : '-'} kr/l</b>. 
+                Andre betaler i snitt: <b>${nasjonaltSnittPris && nasjonaltSnittPris > 0 ? nasjonaltSnittPris.toFixed(2).replace('.',',') : '-'} kr/l</b>.
+                ${prisjegerTekst ? `<br><span style="color: var(--success); font-weight: 600;">${prisjegerTekst}</span>` : ''}
+            </div>
+                ${grafHtml}
+            `;
+
+        visAlleUtgifter();
+        switchView('statistikk-view', null);
+    }
+
+    function getUtgifter() { return JSON.parse(localStorage.getItem('andre_utgifter') || '[]'); }
+    function saveUtgifter(utgifter) { localStorage.setItem('andre_utgifter', JSON.stringify(utgifter)); }
+
+    window.loggNyUtgift = function() {
+        const beskrivelseInput = document.getElementById('utgift-beskrivelse');
+        const belopInput = document.getElementById('utgift-belop');
+        const beskrivelse = beskrivelseInput.value.trim();
+        const belop = parseFloat(belopInput.value.replace(',', '.'));
+
+        if (!beskrivelse || isNaN(belop) || belop <= 0) { alert("Fyll inn både beskrivelse og et gyldig beløp."); return; }
+
+        const utgifter = getUtgifter();
+        utgifter.push({ beskrivelse: beskrivelse, belop: belop, timestamp: Date.now() });
+        saveUtgifter(utgifter);
+        beskrivelseInput.value = ''; belopInput.value = '';
+        visAlleUtgifter();
+    }
+
+    window.slettUtgift = function(timestamp) {
+        if (!confirm("Slette denne utgiften?")) return;
+        let utgifter = getUtgifter();
+        utgifter = utgifter.filter(u => u.timestamp !== timestamp);
+        saveUtgifter(utgifter);
+        visAlleUtgifter();
+    }
+
+    window.showAllExpenses = function() {
+        document.querySelectorAll('.extra-expense').forEach(el => {
+            el.style.display = el.tagName === 'DIV' ? 'flex' : 'block';
+        });
+        const btn = document.getElementById('show-all-expenses-btn');
+        if (btn) btn.remove();
+    }
+
+    function visAlleUtgifter() {
+        const utgifter = getUtgifter();
+        const drivstoffLogg = JSON.parse(localStorage.getItem('forbruk_logg') || '[]');
+        const listeContainer = document.getElementById('utgifter-liste');
+        const oppsummeringContainer = document.getElementById('utgifter-oppsummering');
+        
+        const oldBtn = document.getElementById('show-all-expenses-btn');
+        if(oldBtn) oldBtn.remove();
+
+        const now = new Date();
+        const currentYear = now.getFullYear();
+
+        const allExpenses = [
+            ...utgifter.map(u => ({ ...u, type: 'other' })),
+            ...drivstoffLogg.filter(log => log.pris && log.liter && log.liter > 0).map(log => ({
+                beskrivelse: `Drivstoff (${log.liter.toFixed(1).replace('.', ',')}L)`,
+                belop: log.pris * log.liter,
+                timestamp: log.timestamp,
+                type: 'fuel'
+            }))
+        ];
+
+        if (allExpenses.length === 0) {
+            listeContainer.innerHTML = "<p style='font-size: 12px; color: var(--text-muted);'>Ingen utgifter er logget.</p>";
+            oppsummeringContainer.innerHTML = `<p style="margin: 0;">Utgifter hittil i år (${currentYear}): <b>0,00 kr</b></p>`;
+            return;
+        }
+
+        allExpenses.sort((a, b) => b.timestamp - a.timestamp);
+
+        const expenseLimit = 5;
+        let html = '';
+        let currentMonthYear = null;
+        let totaltBelopOverall = 0;
+        let totaltBelopThisYear = 0;
+
+        allExpenses.forEach((exp, index) => {
+            totaltBelopOverall += exp.belop;
+            const date = new Date(exp.timestamp);
+            if (date.getFullYear() === currentYear) { totaltBelopThisYear += exp.belop; }
+
+            const monthYear = date.toLocaleDateString('no-NO', { month: 'long', year: 'numeric' });
+            const isExtra = index >= expenseLimit;
+
+            if (monthYear !== currentMonthYear) {
+                currentMonthYear = monthYear;
+                html += `<h5 ${isExtra ? 'class="extra-expense" style="display: none;"' : ''} style="margin-top: 20px; margin-bottom: 5px; color: var(--text-muted); font-size: 12px; text-transform: capitalize;">${monthYear}</h5>`;
+            }
+
+            const dato = date.toLocaleDateString('no-NO');
+            const deleteButton = exp.type === 'other' ? `<span onclick="slettUtgift(${exp.timestamp})" style="cursor: pointer; color: var(--danger); font-size: 18px; padding-left: 15px;">&times;</span>` : '';
+            html += `<div ${isExtra ? 'class="extra-expense" style="display: none;"' : ''} style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05);"><div><span style="display: block;">${exp.beskrivelse}</span><span style="font-size: 10px; color: var(--text-muted);">${dato}</span></div><div style="display: flex; align-items: center; gap: 15px;"><span style="font-weight: bold;">${exp.belop.toFixed(2).replace('.',',')} kr</span>${deleteButton}</div></div>`;
+        });
+
+        listeContainer.innerHTML = html;
+
+        if (allExpenses.length > expenseLimit) {
+            listeContainer.insertAdjacentHTML('afterend', `<button id="show-all-expenses-btn" onclick="showAllExpenses()" style="margin-top: 15px;">Se alle utgifter</button>`);
+        }
+
+        oppsummeringContainer.innerHTML = `<p style="margin: 0;">Utgifter hittil i år (${currentYear}): <b>${totaltBelopThisYear.toFixed(2).replace('.',',')} kr</b></p><p style="margin: 0; font-size: 11px; color: var(--text-muted);">Totalt logget: ${totaltBelopOverall.toFixed(2).replace('.',',')} kr</p>`;
+    }
+
+    // --- NYTT: Funksjoner for fylling-modal ---
+    window.apneFyllingModal = function(priser) {
+        const lagretDataJson = localStorage.getItem('min_garasje_data');
+        if (!lagretDataJson) {
+            alert("Fant ikke data for din lagrede bil. Velg bilen på nytt i garasjen.");
+            return;
+        }
+        const lagretData = JSON.parse(lagretDataJson);
+        
+        const bilDrivstoff = lagretData.drivstoff.toLowerCase();
+        let prisForBil = null;
+        if (priser) {
+            if (bilDrivstoff === 'diesel') prisForBil = priser.d;
+            else if (bilDrivstoff === 'bensin') prisForBil = priser.b;
+            else if (bilDrivstoff === 'bensin98') prisForBil = priser.b98;
+            else if (bilDrivstoff === 'fd') prisForBil = priser.fd;
+        }
+
+        const prisInput = document.getElementById('fylling-input-pris');
+        prisInput.value = (prisForBil && prisForBil !== '--') ? prisForBil : '';
+
+        document.getElementById('fylling-drivstoff-type').textContent = lagretData.drivstoff;
+        document.getElementById('fylling-modal').style.display = 'block';
+    };
+
+    window.lukkFyllingModal = function() {
+        const modal = document.getElementById('fylling-modal');
+        if (modal) modal.style.display = 'none';
+        document.getElementById('fylling-input-km').value = '';
+        document.getElementById('fylling-input-liter').value = '';
+        document.getElementById('fylling-input-pris').value = '';
+    };
+
+    window.loggForbrukFraModal = function() {
+        const kmInput = document.getElementById('fylling-input-km');
+        const literInput = document.getElementById('fylling-input-liter');
+        const prisInput = document.getElementById('fylling-input-pris');
+        const resultatDiv = document.getElementById('forbruk-resultat');
+        const nullstillBtn = document.getElementById('nullstill-forbruk-btn');
+
+        const nyKm = parseFloat(kmInput.value);
+        const nyLiter = parseFloat(literInput.value.replace(',', '.'));
+        const nyPris = parseFloat(prisInput.value.replace(',', '.'));
+
+        if (isNaN(nyKm) || nyKm <= 0 || isNaN(nyLiter) || nyLiter < 0) { // Tillater 0 liter
+            alert("Vennligst fyll inn gyldig kilometerstand og antall liter.");
+            return;
+        }
+
+        let loggData = JSON.parse(localStorage.getItem('forbruk_logg') || '[]');
+        const logg = Array.isArray(loggData) ? loggData : [];
+        const forrigeLoggEntry = logg.length > 0 ? logg[logg.length - 1] : null;
+        
+        if (forrigeLoggEntry) {
+            if (nyKm <= forrigeLoggEntry.km) {
+                alert(`Kilometerstanden (${nyKm}) kan ikke være lavere enn eller lik forrige logg (${forrigeLoggEntry.km}).`);
+                return;
+            }
+            const kmKjort = nyKm - forrigeLoggEntry.km;
+            const milKjort = kmKjort / 10;
+            if (milKjort <= 0) {
+                alert("Du må ha kjørt mer enn 0 km siden sist.");
+                return;
+            }
+            const forbrukPerMil = nyLiter / milKjort;
+            alert(`Fylling lagret! Ditt beregnede forbruk var ${forbrukPerMil.toFixed(2).replace('.', ',')} l/mil. Sjekk garasjen for detaljer.`);
+        } else {
+            alert("Første fylling er logget! Logg neste (full tank) for å se forbruket ditt.");
+        }
+
+        // Kaller den eksisterende loggForbruk-funksjonen for å fullføre lagring og UI-oppdatering i garasjen
+        loggForbruk(nyKm, nyLiter, nyPris);
+        lukkFyllingModal();
+    };
+
+    // --- NYTT: Funksjoner for forbrukslogg ---
+    window.loggForbruk = function(kmFraModal, literFraModal, prisFraModal) {
+        const resultatDiv = document.getElementById('forbruk-resultat');
+        const kmInput = document.getElementById('input-km');
+        const literInput = document.getElementById('input-liter');
+        const prisInput = document.getElementById('input-pris');
+        const nullstillBtn = document.getElementById('nullstill-forbruk-btn');
+
+        const nyKm = kmFraModal !== undefined ? kmFraModal : parseFloat(kmInput.value);
+        const nyLiter = literFraModal !== undefined ? literFraModal : parseFloat(literInput.value.replace(',', '.'));
+        const nyPris = prisFraModal !== undefined ? prisFraModal : parseFloat(prisInput.value.replace(',', '.'));
+
+        if (isNaN(nyKm) || nyKm <= 0 || isNaN(nyLiter) || nyLiter < 0) { // Tillater 0 liter
+            alert("Vennligst fyll inn gyldig kilometerstand og antall liter.");
+            return;
+        }
+
+        let loggData = JSON.parse(localStorage.getItem('forbruk_logg') || '[]');
+        const logg = Array.isArray(loggData) ? loggData : [];
+        const forrigeLoggEntry = logg.length > 0 ? logg[logg.length - 1] : null;
+        
+        if (forrigeLoggEntry) {
+            if (nyKm <= forrigeLoggEntry.km) {
+                alert(`Kilometerstanden (${nyKm}) kan ikke være lavere enn eller lik forrige logg (${forrigeLoggEntry.km}).`);
+                return;
+            }
+
+            const kmKjort = nyKm - forrigeLoggEntry.km;
+            const milKjort = kmKjort / 10;
+            
+            if (milKjort <= 0) {
+                alert("Du må ha kjørt mer enn 0 km siden sist.");
+                return;
+            }
+
+            const forbrukPerMil = nyLiter / milKjort;
+
+            // NYTT: Oppdater visning av faktisk forbruk ved siden av fabrikkforbruk
+            const faktiskForbrukDisplay = document.getElementById('faktisk-forbruk-display');
+            if (faktiskForbrukDisplay && fabrikkForbrukPerMil) {
+                const prosentDiff = ((forbrukPerMil - fabrikkForbrukPerMil) / fabrikkForbrukPerMil) * 100;
+                let farge = 'var(--danger)';
+                let bgColor = 'rgba(255, 68, 68, 0.15)';
+                if (prosentDiff < -1) {
+                    farge = 'var(--success)';
+                    bgColor = 'rgba(76, 175, 80, 0.15)';
+                }
+                faktiskForbrukDisplay.style.display = 'inline-block';
+                faktiskForbrukDisplay.style.color = farge;
+                faktiskForbrukDisplay.style.background = bgColor;
+                faktiskForbrukDisplay.innerHTML = `Faktisk: <b>${forbrukPerMil.toFixed(2).replace('.', ',')} l/mil</b>`;
+            }
+            // ---
+
+            let sammenligningHtml = '';
+            // Sammenlign med fabrikkforbruk hvis det finnes
+            if (fabrikkForbrukPerMil !== null && fabrikkForbrukPerMil > 0) {
+                const prosentDiff = ((forbrukPerMil - fabrikkForbrukPerMil) / fabrikkForbrukPerMil) * 100;
+                
+                let farge = 'var(--text-muted)';
+                let tegn = '';
+                let tekst = 'likt som';
+
+                if (prosentDiff > 1) { // Mer enn 1% høyere forbruk = dårligere
+                    farge = 'var(--danger)';
+                    tegn = '▲';
+                    tekst = 'mer enn';
+                } else if (prosentDiff < -1) { // Mer enn 1% lavere forbruk = bedre
+                    farge = 'var(--success)';
+                    tegn = '▼';
+                    tekst = 'mindre enn';
+                }
+
+                sammenligningHtml = `
+                    <span style="font-size:11px; color: ${farge}; display:block; margin-top: 5px;">
+                        ${tegn} ${Math.abs(prosentDiff).toFixed(0)}% ${tekst} fabrikkforbruk (${fabrikkForbrukPerMil.toFixed(2).replace('.',',')} l/mil)
+                    </span>
+                `;
+            }
+
+            resultatDiv.style.color = 'var(--text-main)';
+            resultatDiv.innerHTML = `
+                Siste forbruk: <span style="color: var(--success);">${forbrukPerMil.toFixed(2).replace('.', ',')}</span> liter/mil
+                <span style="font-size:11px; color: var(--text-muted); display:block;">(${kmKjort.toFixed(0)} km / ${nyLiter.toFixed(1).replace('.',',')} l siden sist)</span>
+                ${sammenligningHtml}
+            `;
+        } else {
+            resultatDiv.style.color = 'var(--primary)';
+            resultatDiv.innerHTML = "Første fylling er logget! Logg neste (full tank) for å se forbruket ditt.";
+        }
+
+        // Denne delen var rotete, nå er den ryddet opp for å alltid bruke en array
+        let currentLogg = JSON.parse(localStorage.getItem('forbruk_logg') || '[]');
+        if (!Array.isArray(currentLogg)) currentLogg = [];
+        const nyLogg = { km: nyKm, liter: nyLiter, pris: isNaN(nyPris) ? null : nyPris, timestamp: Date.now() };
+        currentLogg.push(nyLogg);
+        localStorage.setItem('forbruk_logg', JSON.stringify(currentLogg));
+
+        // NYTT: Send fylling til databasen for nasjonal statistikk
+        if (nyLogg.pris && nyLogg.liter > 0) {
+            const bilData = JSON.parse(localStorage.getItem('min_garasje_data'));
+            if (bilData && bilData.drivstoff) {
+                const fyllingData = {
+                    pris: nyLogg.pris,
+                    liter: nyLogg.liter,
+                    drivstoff: bilData.drivstoff.toLowerCase(),
+                    timestamp: nyLogg.timestamp
+                };
+                push(ref(db, 'fyllinger'), fyllingData);
+            }
+        }
+        
+        nullstillBtn.style.display = 'block';
+        if (kmInput) kmInput.value = '';
+        if (literInput) literInput.value = '';
+        if (prisInput) prisInput.value = '';
+    }
+
+    window.nullstillForbruk = function() {
+        if (confirm("Er du sikker på at du vil slette forbruksloggen din? Dette sletter også alle andre loggførte utgifter.")) {
+            localStorage.removeItem('forbruk_logg');
+            localStorage.removeItem('andre_utgifter');
+            document.getElementById('faktisk-forbruk-display').style.display = 'none';
+            visForbruksStatus();
+        }
+    }
+
+    window.lukkModal = function() {
+        document.getElementById('update-modal').style.display = 'none';
+        const error = document.getElementById('modal-error');
+        if (error) error.style.display = 'none';
+        const renameDiv = document.getElementById('admin-rename-div');
+        if (renameDiv) renameDiv.style.display = 'none';
+    };
+
+    function visForbruksStatus() {
+        const resultatDiv = document.getElementById('forbruk-resultat');
+        const nullstillBtn = document.getElementById('nullstill-forbruk-btn');
+        const loggData = JSON.parse(localStorage.getItem('forbruk_logg') || '[]');
+        const forrigeLoggEntry = loggData.length > 0 ? loggData[loggData.length - 1] : null;
+
+        if (forrigeLoggEntry) {
+            resultatDiv.innerHTML = 'Klar for neste fylling. Skriv inn data over for å beregne forbruk.';
+            nullstillBtn.style.display = 'block';
+        } else {
+            resultatDiv.innerHTML = "Logg din første fylling for å starte.";
+            nullstillBtn.style.display = 'none';
+        }
+    }
+    
+    function lastInnLommebok() {
+        const lommebok = JSON.parse(localStorage.getItem('drivstoff_lommebok') || '{}');
+        document.getElementById('kort-trumf').checked = lommebok.Trumf || false;
+        document.getElementById('kort-coop').checked = lommebok.Coop || false;
+        document.getElementById('kort-naf').checked = lommebok.NAF || false;
+        document.getElementById('kort-yxvisa').checked = lommebok['YX Visa'] || false;
+        document.getElementById('kort-agrol').checked = lommebok['Agrol'] || false;
+    }
+    
+    window.lagreLommebok = function() {
+        const lommebok = {
+            Trumf: document.getElementById('kort-trumf').checked,
+            Coop: document.getElementById('kort-coop').checked,
+            NAF: document.getElementById('kort-naf').checked,
+            'YX Visa': document.getElementById('kort-yxvisa').checked,
+            'Agrol': document.getElementById('kort-agrol').checked
+        };
+        localStorage.setItem('drivstoff_lommebok', JSON.stringify(lommebok));
+    };
+    
+    function hentLommebok() {
+        return JSON.parse(localStorage.getItem('drivstoff_lommebok') || '{}');
+    }
+    
+    function parseFuelPrice(priceStr) {
+        if (!priceStr && priceStr !== 0) return null;
+        const parsed = parseFloat(String(priceStr).replace(',', '.'));
+        return isNaN(parsed) ? null : parsed;
+    }
+    
+    function hentPrisForFordel(item, fuel) {
+        const prisMap = {
+            bensin: item.displayB,
+            diesel: item.displayD,
+            bensin98: item.displayB98,
+            fd: item.displayFd
+        };
+        if (fuel && prisMap[fuel]) {
+            return parseFuelPrice(prisMap[fuel]);
+        }
+        for (const key of ["bensin", "diesel", "bensin98", "fd"]) {
+            const p = parseFuelPrice(prisMap[key]);
+            if (p !== null) return p;
+        }
+        return null;
+    }
+    
+    function byggRabattPanel(item) {
+        let rabattHtml = '';
+        const lommebok = hentLommebok();
+        const relevanteKort = Object.keys(rabattDatabase)
+            .filter(kort => lommebok[kort])
+            .flatMap(kort => {
+                const fordelForKjede = rabattDatabase[kort][item.kjedeNavn];
+                const fordelForAll = rabattDatabase[kort]['alle'];
+                const fordelData = fordelForKjede || fordelForAll;
+                if (!fordelData) return [];
+
+                // Spesialhåndtering for Agrol - kun på bemannede stasjoner
+                if (kort === 'Agrol' && (item.kjedeNavn === 'Circle K' || item.kjedeNavn === 'Esso')) {
+                    const erUbetjent = item.navn?.toLowerCase().includes('express') || item.navn?.toLowerCase().includes('automat') || item.navn?.toLowerCase().includes('1-2-3');
+                    if (erUbetjent) {
+                        return []; // Returner en tom array for å hoppe over dette kortet for ubetjente stasjoner
+                    }
+                }
+
+                if (fordelData.prosent) {
+                    return ['bensin', 'diesel', 'bensin98', 'fd'].map(fuelType => {
+                        const basePrice = hentPrisForFordel(item, fuelType);
+                        if (basePrice === null) return null;
+                        const rabattIKr = basePrice * (fordelData.prosent / 100);
+                        return { kort, rabattIKr, fuel: fuelType };
+                    }).filter(Boolean);
+                }
+
+                const fordelArray = Array.isArray(fordelData) ? fordelData : [fordelData];
+                return fordelArray.map(fordel => {
+                    let adjustedBelop = fordel.belop;
+                    if (kort === 'Trumf' && item.kjedeNavn === 'Esso' && item.navn?.toLowerCase().includes('express')) adjustedBelop = 20;
+                    if (kort === 'Coop' && item.kjedeNavn === 'Circle K' && item.navn?.toLowerCase().includes('express')) adjustedBelop = 25;
+                    if (kort === 'NAF' && item.kjedeNavn === 'Circle K' && item.navn?.toLowerCase().includes('express')) adjustedBelop = 55;
+                    return { kort, rabattIKr: adjustedBelop / 100, fuel: fordel.fuel };
+                });
+            })
+            .map(data => {
+                const basePrice = hentPrisForFordel(item, data.fuel);
+                if (basePrice === null) return null;
+                return { ...data, basePrice, prisMedFordel: basePrice - data.rabattIKr };
+            })
+            .filter(Boolean);
+
+        if (relevanteKort.length === 0) {
+            return { html: '', bestePriser: { bensin: null, diesel: null, bensin98: null, fd: null, overall: null } };
+        }
+
+        const bestePriserPerFuel = { bensin: null, diesel: null, bensin98: null, fd: null };
+        relevanteKort.forEach(k => {
+            if (bestePriserPerFuel[k.fuel] === null || k.prisMedFordel < bestePriserPerFuel[k.fuel]) {
+                bestePriserPerFuel[k.fuel] = k.prisMedFordel;
+            }
+        });
+
+        const groupedKort = {};
+        relevanteKort.forEach(kortData => {
+            if (!groupedKort[kortData.kort]) groupedKort[kortData.kort] = [];
+            groupedKort[kortData.kort].push(kortData);
+        });
+
+        const sortedKort = Object.keys(groupedKort).sort((a, b) => {
+            const minA = Math.min(...groupedKort[a].map(k => k.prisMedFordel));
+            const minB = Math.min(...groupedKort[b].map(k => k.prisMedFordel));
+            return minA - minB;
+        });
+
+        sortedKort.forEach((kort, index) => {
+            const kortDataList = groupedKort[kort];
+            const harKort = lommebok[kort];
+            let knappHandling = harKort ? `alert('Husk å bruke ${kort}-kortet!')` : '';
+            let affiliateUrl = '';
+            if (!harKort) {
+                if (kort === 'YX Visa') affiliateUrl = 'https://yxvisa.no/'; else if (kort === 'NAF') affiliateUrl = 'https://www.naf.no/medlemskap/medlemsfordeler/drivstoff-og-lading/'; else if (kort === 'Coop') affiliateUrl = 'https://www.coop.no/'; else if (kort === 'Trumf') affiliateUrl = 'https://www.trumf.no/';
+                knappHandling = affiliateUrl ? `window.open('${affiliateUrl}', '_blank')` : '';
+            }
+
+            let logoUrl = '';
+            if (kort === 'Coop') logoUrl = 'fordel/coop.png';
+            else if (kort === 'NAF') logoUrl = 'fordel/naf.png';
+            else if (kort === 'YX Visa') logoUrl = 'fordel/yxvisa.png';
+            else if (kort === 'Agrol') logoUrl = 'fordel/agrol.png';
+            else if (kort === 'Trumf') logoUrl = 'fordel/trumf.png';
+
+            const fuelOrder = { 'diesel': 1, 'bensin': 2, 'bensin98': 3, 'fd': 4 };
+            kortDataList.sort((a, b) => (fuelOrder[a.fuel] || 99) - (fuelOrder[b.fuel] || 99));
+
+            const priceBoxes = kortDataList.map(kortData => {
+                const fuelLabel = kortData.fuel === 'bensin' ? '95' : kortData.fuel === 'diesel' ? 'D' : kortData.fuel === 'bensin98' ? '98' : kortData.fuel === 'fd' ? 'FD' : '';
+                const fuelColor = kortData.fuel === 'bensin' ? 'var(--bensin-color)' : kortData.fuel === 'diesel' ? 'var(--diesel-color)' : kortData.fuel === 'bensin98' ? 'var(--bensin98-color)' : 'var(--fd-color)';
+                const prisTekst = kortData.prisMedFordel.toFixed(2).replace('.', ',');
+                return `<div class="f-price-box" style="padding: 4px 6px;">
+                            <span class="f-lbl" style="color:${fuelColor};">${fuelLabel}</span>
+                            <span class="f-val" style="font-size: 12px;">${prisTekst}</span>
+                        </div>`;
+            }).join('');
+
+            let itemStyle = '';
+            if (sortedKort.length > 1) {
+                if (index === 0) {
+                    itemStyle = 'border-color: rgba(76, 175, 80, 0.5); background: rgba(76, 175, 80, 0.1);';
+                } else if (index === sortedKort.length - 1) {
+                    itemStyle = 'border-color: rgba(255, 68, 68, 0.4); background: rgba(255, 68, 68, 0.1);';
+                }
+            }
+
+            let cardBlockHtml = `
+                <div class="rabatt-item" style="${itemStyle}">
+                    <button class="rabatt-knapp" style="background: transparent; border: none; padding: 0; justify-content: flex-start; flex:1;" onclick="${knappHandling}">
+                        ${logoUrl ? `<img src="${logoUrl}" style="width: 20px; height: 20px; object-fit: contain;" alt="${kort}">` : kort}
+                        <span>${kort}</span>
+                        ${!harKort ? `<span style="font-size: 10px; opacity: 0.8;">Søk her</span>` : ''}
+                    </button>
+                    <div style="display:flex; gap:4px;">${priceBoxes}</div>
+                </div>
+            `;
+
+            if (!harKort && kort === 'YX Visa') {
+                cardBlockHtml += `<div style="font-size: 10px; color: var(--text-muted); margin: 2px 0 8px 0; width:100%;">Låneeksempel: Eff. rente 26,75 %. 15.000 o/12 mnd. Kostnad: 1939. Totalt: 16.939</div>`;
+            }
+
+            rabattHtml += `<div>${cardBlockHtml}</div>`;
+        });
+
+        const overallBestePris = Math.min(...Object.values(bestePriserPerFuel).filter(p => p !== null));
+
+        return { 
+            html: rabattHtml, 
+            bestePriser: {
+                ...bestePriserPerFuel,
+                overall: isFinite(overallBestePris) ? overallBestePris : null
+            }
+        };
+    }
+
+    function finnBesteRabatt(kjede) {
+        const lommebok = hentLommebok();
+        let besteKort = null;
+        let besteRabatt = 0;
+        
+        for (const kort in lommebok) {
+            if (lommebok[kort] && rabattDatabase[kort] && rabattDatabase[kort][kjede]) {
+                const rabattObj = rabattDatabase[kort][kjede];
+                const rabatt = rabattObj.belop || 0;
+                if (rabatt > besteRabatt) {
+                    besteRabatt = rabatt;
+                    besteKort = kort;
+                }
+            }
+        }
+        
+        return { kort: besteKort, rabatt: besteRabatt };
+    }
+
+    // --- OPPDATERT: AUTO-LASTING AV FORRIGE SØK ---
 
     window.toggleCard = function(id) {
         const actions = document.getElementById('actions-' + id);
         const hist = document.getElementById('hist-' + id);
         if (actions) {
-            // Bytter mellom å vise og skjule knappene
-            actions.style.display = (actions.style.display === 'none') ? 'flex' : 'none';
-            // Skjuler også historikken automatisk hvis du klapper sammen kortet
+            // Bruker 'block' for å unngå en bug som stopper stasjonslisten fra å vises
+            actions.style.display = (actions.style.display === 'none') ? 'block' : 'none';
             if (actions.style.display === 'none' && hist) hist.style.display = 'none';
         }
     };
@@ -695,16 +2011,405 @@ function apneHemmeligInnlogging() {
         });
     }
 
-    // Logger inn automatisk i bakgrunnen for vanlige brukere
-    signInAnonymously(auth).catch((error) => { console.error("Kunne ikke koble til sikkerhetsserver:", error.message); });
+    // --- IMPORTER DATA FRA DRIVSTOFFPRISER ---
+    window.importerDrivstoffpriserData = async function() {
+        const currentUid = auth.currentUser?.uid || myUid;
+        if (!currentUid) {
+            alert("Du er ikke logget inn. Logg inn som admin og prøv igjen.");
+            return;
+        }
+        if (currentUid !== adminUid) {
+            alert(`Du er logget inn som UID: ${currentUid}. Denne UID-en er ikke admin-UID-en som er hardkodet i appen. Logg inn med admin-kontoen som matcher admin-UID-en.`);
+            console.warn('Admin UID mismatch:', { currentUid, adminUid, authUid: auth.currentUser?.uid });
+            return;
+        }
+        if (!confirm("Er du sikker på at du vil importere data fra Drivstoffpriser? Dette kan ta litt tid.")) return;
+        
+        try {
+            console.log('Importer data som admin:', currentUid, 'auth.currentUser.uid:', auth.currentUser?.uid, 'myUid:', myUid);
+            alert("Starter import... Dette kan ta noen minutter.");
+            
+            // Hent stasjoner
+            const stasjonerResponse = await fetch('https://drivstoffpriser.github.io/Drivstoffpriser-App/data/stations.json');
+            const stasjonerData = await stasjonerResponse.json();
+            const stasjoner = stasjonerData.stations || [];
+            
+            // Hent priser
+            const priserResponse = await fetch('https://drivstoffpriser.github.io/Drivstoffpriser-App/data/prices.json');
+            const priserData = await priserResponse.json();
+            const priser = priserData.prices || [];
+            
+            let nyeStasjoner = 0;
+            let oppdatertePriser = 0;
+            
+            // NYTT: Hent alle eksisterende stasjoner FØRST for å kunne sjekke mot dem.
+            const alleEksisterendeStasjonerRef = ref(db, 'egne_stasjoner');
+            const eksisterendeSnapshot = await get(alleEksisterendeStasjonerRef);
+            const alleEksisterendeStasjoner = Object.values(eksisterendeSnapshot.val() || {});
+            const DISTANCE_THRESHOLD_KM = 0.05; // 50 meter
 
+            // Importer stasjoner
+            for (const stasjon of stasjoner) {
+                const safeId = String(stasjon.id).replace(/[\.\#\$\[\]\/]/g, "_");
+                const stasjonRef = ref(db, 'egne_stasjoner/' + safeId);
+                const snapshot = await get(stasjonRef);
+                if (snapshot.exists()) continue;
+
+                const nyStasjonNavnFormatert = formaterStasjonsNavn(stasjon.name || "");
+                const nyStasjonLat = Number(stasjon.latitude);
+                const nyStasjonLon = Number(stasjon.longitude);
+
+                let erDuplikat = false;
+                for (const eksisterende of alleEksisterendeStasjoner) {
+                    const avstand = regnUtAvstand(nyStasjonLat, nyStasjonLon, eksisterende.lat, eksisterende.lon);
+                    if (avstand < DISTANCE_THRESHOLD_KM) { erDuplikat = true; break; }
+
+                    const eksisterendeNavnFormatert = formaterStasjonsNavn(eksisterende.navn || "");
+                    if (nyStasjonNavnFormatert.sted.toLowerCase() === eksisterendeNavnFormatert.sted.toLowerCase() &&
+                        nyStasjonNavnFormatert.kjede === eksisterendeNavnFormatert.kjede) {
+                        erDuplikat = true;
+                        break;
+                    }
+                }
+
+                if (!erDuplikat) {
+                    const nyStasjonData = { lat: nyStasjonLat || 0, lon: nyStasjonLon || 0, navn: String(stasjon.name || 'Ukjent'), kjede: String(stasjon.brand || 'Ukjent'), id: String(stasjon.id) };
+                    await set(stasjonRef, nyStasjonData);
+                    nyeStasjoner++;
+                    alleEksisterendeStasjoner.push(nyStasjonData);
+                }
+            }
+            
+            const stasjonMap = new Map(stasjoner.map((stasjon) => [String(stasjon.id), stasjon]));
+
+            for (const pris of priser) {
+                const stationKey = pris.stationId ?? pris.station_id ?? pris.id;
+                if (!stationKey) continue;
+
+                const safeId = String(stationKey).replace(/[\.\#\$\[\]\/]/g, "_");
+                const prisRef = ref(db, 'priser/' + safeId);
+                const snapshot = await get(prisRef);
+                const eksisterende = snapshot.val() || {};
+                const stasjon = stasjonMap.get(String(stationKey));
+
+                // Sjekk om det allerede finnes priser for denne stasjonen
+                if (eksisterende && Object.keys(eksisterende).length > 0) {
+                    // Hvis den eksisterende prisen er lagt inn av en ekte bruker (is_import er false/undefined)
+                    if (!eksisterende.is_import) {
+                        const alderMs = Date.now() - (eksisterende.timestamp || 0);
+                        const erEldreEnn24t = alderMs > (24 * 60 * 60 * 1000);
+                        
+                        // Er prisen under 24 timer gammel, hopper vi over importen
+                        if (!erEldreEnn24t) {
+                            continue; 
+                        }
+                    }
+                }
+
+                const fuelType = pris.fuelType === 'petrol95' ? 'bensin'
+                    : pris.fuelType === 'petrol98' ? 'bensin98'
+                    : pris.fuelType === 'diesel' ? 'diesel'
+                    : '';
+                if (!fuelType) continue;
+
+                const hentStreng = (verdi) => {
+                    if (verdi === undefined || verdi === null || verdi === '') return '--';
+                    const num = parseFloat(String(verdi).replace(',', '.'));
+                    if (isNaN(num)) return '--';
+                    // Tvinger maks 2 desimaler (f.eks 20.499 -> 20,50) for å matche databasens regex-regler
+                    return num.toFixed(2).replace('.', ',');
+                };
+
+                // Siden appen din opererer i 2026, setter vi alltid tidsstempelet til "nå"
+                // for å unngå at priser fra eksterne kilder (som er i 2024/2025) ser gamle ut.
+                const validTimestamp = Date.now();
+
+                const nyPrisObjekt = {
+                    station_id: safeId,
+                    timestamp: validTimestamp,
+                    user: 'Import',
+                    uid: currentUid,
+                    verified: false,
+                    is_import: true,
+                    lat: Number(stasjon?.latitude) || 0,
+                    lon: Number(stasjon?.longitude) || 0,
+                    land: 'NO',
+                    navn: String(stasjon?.name || 'Ukjent'),
+                    diesel: eksisterende.diesel || '--',
+                    bensin: eksisterende.bensin || '--',
+                    bensin98: eksisterende.bensin98 || '--',
+                    fd: eksisterende.fd || '--',
+                    prev_diesel: eksisterende.prev_diesel || '--',
+                    prev_bensin: eksisterende.prev_bensin || '--',
+                    prev_bensin98: eksisterende.prev_bensin98 || '--',
+                    prev_fd: eksisterende.prev_fd || '--'
+                };
+
+                nyPrisObjekt[fuelType] = hentStreng(pris.price ?? pris.value ?? pris.price_value);
+                console.log('Importer pris skriv til DB:', safeId, nyPrisObjekt);
+                await set(prisRef, nyPrisObjekt);
+                oppdatertePriser++;
+            }
+            
+            alert(`Import fullført!\nNye stasjoner: ${nyeStasjoner}\nOppdaterte priser: ${oppdatertePriser}`);
+            
+        } catch (error) {
+            alert("Feil under import: " + error.message);
+            console.error(error);
+        }
+    };
+
+    window.ryddDuplikaterIDatabase = async function() {
+        if (!confirm("⚠️ ADVARSEL ⚠️\n\nDette vil sjekke alle dine importerte stasjoner mot det globale kartet og slette de som allerede finnes der (duplikater).\n\nDette er en permanent handling for å rydde i databasen. Er du sikker?")) {
+            return;
+        }
+
+        const ryddBtn = document.getElementById('btn-rydd-duplikater');
+        const originalText = ryddBtn.innerHTML;
+        ryddBtn.disabled = true;
+        ryddBtn.innerHTML = '🧹 Rydder... (kan ta tid)';
+
+        try {
+            alert("Starter opprydding... Dette kan ta et minutt. Du vil få en ny beskjed når det er ferdig.");
+
+            // 1. Hent alle 'egne_stasjoner' fra Firebase
+            const egneStasjonerRef = ref(db, 'egne_stasjoner');
+            const snapshot = await get(egneStasjonerRef);
+            const alleEgneStasjoner = snapshot.val() || {};
+            
+            const stasjonerTilSjekk = Object.entries(alleEgneStasjoner)
+                .filter(([key, stasjon]) => stasjon.id && stasjon.id.startsWith('osm_'))
+                .map(([key, stasjon]) => ({ key: key, id: stasjon.id }));
+
+            if (stasjonerTilSjekk.length === 0) {
+                alert("Fant ingen importerte stasjoner å sjekke. Ingenting å rydde.");
+                return;
+            }
+
+            // 2. Del opp stasjonene i mindre biter (chunks) for å unngå API-overbelastning
+            const CHUNK_SIZE = 150; // Antall stasjoner per API-kall
+            const DELAY_MS = 1000;   // 1 sekund pause mellom kallene
+            const alleEksisterendeOsmIder = new Set();
+
+            for (let i = 0; i < stasjonerTilSjekk.length; i += CHUNK_SIZE) {
+                const chunk = stasjonerTilSjekk.slice(i, i + CHUNK_SIZE);
+                
+                // Bygg en query for den nåværende biten
+                const osmIdList = chunk.map(s => `node(${s.id.split('_')[1]});`).join('');
+                const query = `[out:json];(${osmIdList});out ids;`;
+
+                // 3. Hent data fra Overpass for denne biten
+                const endpoint = "https://overpass-api.de/api/interpreter";
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `data=${encodeURIComponent(query)}`
+                });
+                
+                if (!response.ok) {
+                    if (response.status === 429) {
+                        throw new Error(`Overpass API er overbelastet (status: 429). Vent noen minutter og prøv igjen.`);
+                    }
+                    throw new Error(`Overpass API svarte med status: ${response.status}. Prøv igjen om litt.`);
+                }
+
+                const overpassResult = await response.json();
+                
+                // Legg til resultatene i den store listen
+                overpassResult.elements.forEach(el => alleEksisterendeOsmIder.add(`osm_${el.id}`));
+
+                // Vent litt før neste kall for å være snill med API-et
+                if (i + CHUNK_SIZE < stasjonerTilSjekk.length) {
+                    await new Promise(resolve => setTimeout(resolve, DELAY_MS));
+                }
+            }
+            
+            // 4. Lag en liste over ID-er som FAKTISK finnes på det globale kartet
+
+            // 5. Finn ut hvilke stasjoner i 'egne_stasjoner' som skal slettes
+            const stasjonerAaAlette = stasjonerTilSjekk
+                .filter(stasjon => alleEksisterendeOsmIder.has(stasjon.id))
+                .map(stasjon => stasjon.key);
+
+            if (stasjonerAaAlette.length === 0) {
+                alert("Ingen duplikater funnet. Databasen din er allerede ren! ✨");
+                return;
+            }
+
+            // 6. Slett duplikatene fra Firebase
+            for (const stasjonKey of stasjonerAaAlette) {
+                await set(ref(db, `egne_stasjoner/${stasjonKey}`), null);
+            }
+
+            alert(`✅ Opprydding fullført!\n\nFjernet ${stasjonerAaAlette.length} duplikatstasjoner fra databasen din.`);
+
+        } catch (error) {
+            alert("En feil oppstod under opprydding: " + error.message);
+            console.error("Feil under duplikat-opprydding:", error);
+        } finally {
+            ryddBtn.disabled = false;
+            ryddBtn.innerHTML = originalText;
+        }
+    };
+
+    window.ryddNavnDuplikater = async function() {
+        if (!confirm("⚠️ ADVARSEL ⚠️\n\nDette vil finne alle stasjoner i din 'egne_stasjoner' database som har nøyaktig samme navn, og slette alle unntatt én i hver gruppe.\n\nDette er en permanent handling. Er du sikker?")) {
+            return;
+        }
+
+        const btn = document.getElementById('btn-rydd-navn-duplikater');
+        const originalText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '🧹 Rydder...';
+
+        try {
+            const egneStasjonerRef = ref(db, 'egne_stasjoner');
+            const snapshot = await get(egneStasjonerRef);
+            const alleEgneStasjoner = snapshot.val() || {};
+
+            const stasjonerEtterNavn = {};
+            for (const key in alleEgneStasjoner) {
+                const stasjon = alleEgneStasjoner[key];
+                if (!stasjon.navn) continue;
+
+                // BRUKER SAMME NAVNE-VASK SOM RESTEN AV APPEN
+                const formatert = formaterStasjonsNavn(stasjon.navn);
+                const unikNavnNokkel = `${formatert.sted} (${formatert.kjede})`;
+
+                if (!stasjonerEtterNavn[unikNavnNokkel]) {
+                    stasjonerEtterNavn[unikNavnNokkel] = [];
+                }
+                stasjonerEtterNavn[unikNavnNokkel].push({ key, ...stasjon });
+            }
+
+            let stasjonerAaAlette = [];
+            let duplikatGrupper = 0;
+            for (const navn in stasjonerEtterNavn) {
+                const gruppe = stasjonerEtterNavn[navn];
+                if (gruppe.length > 1) {
+                    duplikatGrupper++;
+                    // Sorterer for å beholde den "beste" stasjonen (den med en ekte OSM-id)
+                    gruppe.sort((a, b) => {
+                        const aHarOsm = a.id && a.id.startsWith('osm_');
+                        const bHarOsm = b.id && b.id.startsWith('osm_');
+                        if (aHarOsm && !bHarOsm) return -1; // a er bedre, behold den
+                        if (!aHarOsm && bHarOsm) return 1;  // b er bedre, behold den
+                        return 0; // ingen preferanse
+                    });
+                    const tilSletting = gruppe.slice(1).map(s => s.key);
+                    stasjonerAaAlette.push(...tilSletting);
+                }
+            }
+
+            if (stasjonerAaAlette.length === 0) {
+                alert("Ingen duplikater funnet basert på formatert navn. Databasen din er allerede ren! ✨");
+                return;
+            }
+
+            for (const stasjonKey of stasjonerAaAlette) {
+                await set(ref(db, `egne_stasjoner/${stasjonKey}`), null);
+            }
+
+            alert(`✅ Opprydding fullført!\n\nFant ${duplikatGrupper} grupper med duplikater.\nFjernet ${stasjonerAaAlette.length} overflødige stasjoner.`);
+        } catch (error) {
+            alert("En feil oppstod under opprydding: " + error.message);
+            console.error("Feil under navn-duplikat-opprydding:", error);
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        }
+    };
+
+    window.ryddGpsDuplikater = async function() {
+        const DISTANCE_THRESHOLD_M = 10;
+        if (!confirm(`⚠️ ADVARSEL ⚠️\n\nDette vil finne alle stasjoner i 'egne_stasjoner' som er innenfor ${DISTANCE_THRESHOLD_M} meter fra hverandre, og slette duplikatene.\n\nDenne handlingen er permanent. Er du sikker?`)) {
+            return;
+        }
+
+        const btn = document.getElementById('btn-rydd-gps-duplikater');
+        const originalText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '🧹 Analyserer...';
+
+        try {
+            const egneStasjonerRef = ref(db, 'egne_stasjoner');
+            const snapshot = await get(egneStasjonerRef);
+            const alleEgneStasjoner = snapshot.val() || {};
+
+            const stasjoner = Object.entries(alleEgneStasjoner).map(([key, stasjon]) => ({
+                key, ...stasjon
+            }));
+
+            if (stasjoner.length < 2) {
+                alert("Ikke nok stasjoner til å sjekke for duplikater.");
+                return;
+            }
+
+            const visited = new Set();
+            const clusters = [];
+
+            for (const startStasjon of stasjoner) {
+                if (visited.has(startStasjon.key)) continue;
+
+                const cluster = [];
+                const queue = [startStasjon];
+                visited.add(startStasjon.key);
+
+                while (queue.length > 0) {
+                    const current = queue.shift();
+                    cluster.push(current);
+
+                    for (const other of stasjoner) {
+                        if (visited.has(other.key) || !current.lat || !other.lat) continue;
+
+                        const dist = regnUtAvstand(current.lat, current.lon, other.lat, other.lon);
+                        if (dist * 1000 < DISTANCE_THRESHOLD_M) {
+                            visited.add(other.key);
+                            queue.push(other);
+                        }
+                    }
+                }
+                clusters.push(cluster);
+            }
+
+            const duplikatKlynger = clusters.filter(c => c.length > 1);
+            const stasjonerAaAlette = new Set();
+
+            for (const klynge of duplikatKlynger) {
+                klynge.sort((a, b) => (a.id && a.id.startsWith('osm_') ? -1 : 1) - (b.id && b.id.startsWith('osm_') ? -1 : 1));
+                for (let i = 1; i < klynge.length; i++) stasjonerAaAlette.add(klynge[i].key);
+            }
+
+            if (stasjonerAaAlette.size === 0) { alert("Ingen GPS-duplikater funnet. Databasen din er ren! ✨"); return; }
+
+            btn.innerHTML = '🧹 Sletter...';
+            for (const stasjonKey of stasjonerAaAlette) await set(ref(db, `egne_stasjoner/${stasjonKey}`), null);
+
+            alert(`✅ Opprydding fullført!\n\nFant ${duplikatKlynger.length} grupper med GPS-duplikater.\nFjernet ${stasjonerAaAlette.size} overflødige stasjoner.`);
+        } catch (error) {
+            alert("En feil oppstod under opprydding: " + error.message);
+            console.error("Feil under GPS-duplikat-opprydding:", error);
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        }
+    };
+
+    // Håndterer bruker-autentisering.
+    // Sjekker først om brukeren har en økt fra før. Hvis ikke, opprettes en ny anonym økt.
+    // Dette sikrer at hver enhet har en stabil, unik ID over tid.
     onAuthStateChanged(auth, (user) => {
         if (user) {
+            // Bruker er logget inn (enten fra en tidligere økt, eller som admin)
             myUid = user.uid;
             if (myUid === adminUid) {
-                // Viser admin-panelet hvis du allerede var innlogget fra forrige gang
+                // Viser admin-panelet hvis brukeren er admin
                 document.getElementById('skjult-admin-panel').style.display = 'block';
             }
+        } else {
+            // Ingen bruker er logget inn, så vi oppretter en ny anonym bruker.
+            // Denne vil bli lagret og gjenbrukt i fremtidige økter.
+            signInAnonymously(auth).catch((error) => { console.error("Kunne ikke koble til sikkerhetsserver:", error.message); });
         }
     });
 
@@ -763,7 +2468,7 @@ function apneHemmeligInnlogging() {
 
     const scrollBtn = document.getElementById('scroll-down-btn');
     function sjekkScroll() {
-        const erLangNok = document.documentElement.scrollHeight > window.innerHeight;
+        const erLangNok = document.documentElement.scrollHeight > (window.innerHeight + 100); // +100 for å gi litt buffer
         const erIkkeIBunnen = window.innerHeight + window.scrollY < document.documentElement.scrollHeight - 100;
         if (scrollBtn) {
             if (erLangNok && erIkkeIBunnen) { scrollBtn.style.display = 'flex'; } else { scrollBtn.style.display = 'none'; }
@@ -813,7 +2518,7 @@ function apneHemmeligInnlogging() {
             }
 
             // Finn Nyeste Oppdatering
-            if (p.timestamp > tempNyesteTid) {
+            if (p.timestamp > tempNyesteTid && !p.is_import) {
                 tempNyesteTid = p.timestamp;
                 window.nyesteData = p;
             }
@@ -838,6 +2543,15 @@ function apneHemmeligInnlogging() {
     onValue(ref(db, 'skjulte_stasjoner'), (snapshot) => { skjulteStasjoner = snapshot.val() || {}; if (gjeldendeStasjoner.length > 0) visStasjoner(gjeldendeStasjoner, sisteLat, sisteLon); });
     onValue(ref(db, 'stasjon_navn'), (snapshot) => { endredeNavn = snapshot.val() || {}; if (gjeldendeStasjoner.length > 0) visStasjoner(gjeldendeStasjoner, sisteLat, sisteLon); });
     onValue(ref(db, 'stasjon_gps'), (snapshot) => { endredeGps = snapshot.val() || {}; if (gjeldendeStasjoner.length > 0) visStasjoner(gjeldendeStasjoner, sisteLat, sisteLon); });
+
+    // Lytter til den nye statistikken for nasjonalt snitt
+    onValue(ref(db, 'statistikk/nasjonaltSnittBetalt'), (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+            nasjonaltSnittBetaltBensin = data.bensin;
+            nasjonaltSnittBetaltDiesel = data.diesel;
+        }
+    });
 
     function getTrendHtml(curr, prev) {
         if(!curr || !prev || curr==="--" || prev==="--") return "";
@@ -879,7 +2593,7 @@ function apneHemmeligInnlogging() {
         let startOfWeek = new Date(now.getFullYear(), now.getMonth(), diffToMonday).getTime();
 
         Object.values(alleData).forEach(p => {
-            if (!p.user || p.user === "Anonym") return; 
+            if (!p.user || p.user === "Anonym" || p.is_import) return; 
             let safeUser = sanitize(p.user);
             totalTellere[safeUser] = (totalTellere[safeUser] || 0) + 1;
             const d = new Date(p.timestamp); d.setHours(0,0,0,0);
@@ -1053,6 +2767,8 @@ window.visGlobalSisteOppdatering = function() {
 let b98Html = (nyesteData.bensin98 && nyesteData.bensin98 !== "--") ? `<div class="f-price-box" style="padding: 4px 6px; cursor: pointer;" onclick="event.stopPropagation(); apneModal('${nyesteData.id}','${nyesteData.navn.replace(/'/g, "\\'")}', ${nyesteData.lat}, ${nyesteData.lon}, 'input-bensin98')"><span class="f-lbl" style="color:var(--bensin98-color); font-size: 9px;">98</span><span class="f-val" style="font-size: 14px; color:inherit;">${nyesteData.bensin98} ${getTrendHtml(nyesteData.bensin98, nyesteData.prev_bensin98)}</span></div>` : '';
     let fdHtml = (nyesteData.fd && nyesteData.fd !== "--") ? `<div class="f-price-box" style="padding: 4px 6px; cursor: pointer;" onclick="event.stopPropagation(); apneModal('${nyesteData.id}','${nyesteData.navn.replace(/'/g, "\\'")}', ${nyesteData.lat}, ${nyesteData.lon}, 'input-fd')"><span class="f-lbl" style="color:var(--fd-color); font-size: 9px;">FD</span><span class="f-val" style="font-size: 14px; color:inherit;">${nyesteData.fd} ${getTrendHtml(nyesteData.fd, nyesteData.prev_fd)}</span></div>` : '';
 
+    const rabattResultat = byggRabattPanel({ kjedeNavn: kjedeNavnFeatured, navn: rawName, displayD: nyesteData.diesel, displayB: nyesteData.bensin, displayB98: nyesteData.bensin98, displayFd: nyesteData.fd });
+
     globalContainer.style.display = 'block';
     globalContainer.innerHTML = `
         <div class="featured-header" style="margin-bottom: 10px; color: var(--primary); font-size: 12px; font-weight: 700; letter-spacing: 1px;">⚡ NYESTE OPPDATERING I NORGE</div>
@@ -1077,10 +2793,13 @@ let b98Html = (nyesteData.bensin98 && nyesteData.bensin98 !== "--") ? `<div clas
                 <div class="f-price-box" style="padding: 4px 6px; cursor: pointer;" onclick="event.stopPropagation(); apneModal('${nyesteData.id}','${nyesteData.navn.replace(/'/g, "\\'")}', ${nyesteData.lat}, ${nyesteData.lon}, 'input-bensin')"><span class="f-lbl" style="color:var(--bensin-color); font-size: 9px;">95</span><span class="f-val" style="font-size: 14px; color:inherit;">${nyesteData.bensin} ${getTrendHtml(nyesteData.bensin, nyesteData.prev_bensin)}</span></div>
                 ${b98Html} ${fdHtml}
             </div>
-            <div id="actions-global-feature" class="action-buttons" style="display:none; margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 8px;" onclick="event.stopPropagation()">
-                <div class="update-btn" style="border: 1px solid rgba(255,255,255,0.2); color: white;" onclick="apneModal('${nyesteData.id}','${nyesteData.navn.replace(/'/g, "\\'")}', ${nyesteData.lat}, ${nyesteData.lon})">OPPDATER</div>
-                <a class="nav-btn" style="border: 1px solid rgba(255,255,255,0.2); color: white;" href="https://maps.google.com/?q=$$$${nyesteData.lat},${nyesteData.lon}" target="_blank">KJØR HIT</a>
-                <div class="hist-btn" style="border: 1px solid rgba(255,255,255,0.2); color: white;" onclick="visHistorikk('${nyesteData.id}')">⌛ HISTORIKK</div>
+            <div id="actions-global-feature" class="actions-container" style="display:none;" onclick="event.stopPropagation()">
+                <div class="action-buttons-row">
+                    <div class="update-btn" onclick="apneModal('${nyesteData.id}','${nyesteData.navn.replace(/'/g, "\\'")}', ${nyesteData.lat}, ${nyesteData.lon})">OPPDATER</div>
+                    <a class="nav-btn" href="https://maps.google.com/?q=${nyesteData.lat},${nyesteData.lon}" target="_blank">KJØR HIT</a>
+                    <div class="hist-btn" onclick="visHistorikk('${nyesteData.id}', 'global-feature')">⌛ HISTORIKK</div>
+                </div>
+                ${rabattResultat.html ? `<div class="rabatt-panel">${rabattResultat.html}</div>` : ''}
             </div>
             <div id="hist-global-feature" class="history-panel" onclick="event.stopPropagation()"></div>
         </div>
@@ -1124,6 +2843,9 @@ window.visDagensEkstremer = function() {
         let b98Html = (data.bensin98 && data.bensin98 !== "--") ? `<div class="f-price-box" style="padding: 4px 6px;"><span class="f-lbl" style="color:var(--bensin98-color); font-size: 9px;">98</span><span class="f-val" style="font-size: 14px; color:inherit;">${data.bensin98} ${getTrendHtml(data.bensin98, data.prev_bensin98)}</span></div>` : '';
         let fdHtml = (data.fd && data.fd !== "--") ? `<div class="f-price-box" style="padding: 4px 6px;"><span class="f-lbl" style="color:var(--fd-color); font-size: 9px;">FD</span><span class="f-val" style="font-size: 14px; color:inherit;">${data.fd} ${getTrendHtml(data.fd, data.prev_fd)}</span></div>` : '';
 
+        const itemForRabatt = { kjedeNavn: kjedeNavnFeatured, navn: rawName, displayD: data.diesel, displayB: data.bensin, displayB98: data.bensin98, displayFd: data.fd };
+        const rabattResultat = byggRabattPanel(itemForRabatt);
+
         const cardId = "ekstrem-" + data.id + "-" + Math.floor(Math.random() * 1000);
 
         return `
@@ -1151,10 +2873,13 @@ window.visDagensEkstremer = function() {
                     ${b98Html} ${fdHtml}
                 </div>
 
-                <div id="actions-${cardId}" class="action-buttons" style="display:none; margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 8px;" onclick="event.stopPropagation()">
-                    <div class="update-btn" style="border: 1px solid rgba(255,255,255,0.2); color: white;" onclick="apneModal('${data.id}','${data.navn ? data.navn.replace(/'/g, "\\'") : ''}', ${data.lat}, ${data.lon})">OPPDATER</div>
-                    <a class="nav-btn" style="border: 1px solid rgba(255,255,255,0.2); color: white;" href="http://googleusercontent.com/maps.google.com/4${data.lat},${data.lon}" target="_blank">KJØR HIT</a>
-                    <div class="hist-btn" style="border: 1px solid rgba(255,255,255,0.2); color: white;" onclick="visHistorikk('${data.id}')">⌛ HISTORIKK</div>
+                <div id="actions-${cardId}" class="actions-container" style="display:none;" onclick="event.stopPropagation()">
+                    <div class="action-buttons-row">
+                        <div class="update-btn" onclick="apneModal('${data.id}','${data.navn ? data.navn.replace(/'/g, "\\'") : ''}', ${data.lat}, ${data.lon})">OPPDATER</div>
+                        <a class="nav-btn" href="https://maps.google.com/?q=${data.lat},${data.lon}" target="_blank">KJØR HIT</a>
+                        <div class="hist-btn" onclick="visHistorikk('${data.id}', '${cardId}')">⌛ HISTORIKK</div>
+                    </div>
+                    ${rabattResultat.html ? `<div class="rabatt-panel">${rabattResultat.html}</div>` : ''}
                 </div>
                 <div id="hist-${cardId}" class="history-panel" onclick="event.stopPropagation()"></div>
             </div>
@@ -1298,11 +3023,12 @@ window.visDagensEkstremer = function() {
         window.lukkModal();
     };
 
-    window.visHistorikk = async function(id) {
-        const p = document.getElementById('hist-' + id);
+    window.visHistorikk = async function(stationId, cardId) {
+        const panelId = cardId || stationId;
+        const p = document.getElementById('hist-' + panelId);
         if (p.style.display === 'block') { p.style.display = 'none'; return; }
         p.style.display = 'block'; p.innerText = "Henter...";
-        let safeId = String(id).replace(/[\.\#\$\[\]\/]/g, "_");
+        let safeId = String(stationId).replace(/[\.\#\$\[\]\/]/g, "_");
         const snap = await get(ref(db, 'historikk/' + safeId)); const data = snap.val();
         if (!data) { p.innerText = "Ingen historikk."; return; }
         const h = Object.values(data).reverse().slice(1, 4);
@@ -1313,6 +3039,11 @@ window.visDagensEkstremer = function() {
         const list = document.getElementById('station-list'); list.innerHTML = "";
         const featuredContainer = document.getElementById('featured-station-container');
         featuredContainer.innerHTML = ""; featuredContainer.style.display = 'none';
+
+        // NYTT: Hent prioritert drivstofftype fra lagret bil
+        const lagretDataJson = localStorage.getItem('min_garasje_data');
+        const lagretData = lagretDataJson ? JSON.parse(lagretDataJson) : null;
+        const prioritertDrivstoff = lagretData ? lagretData.drivstoff.toLowerCase() : null;
 
         let gyldigeStasjoner = stasjoner.filter(s => {
             let safeId = String(s.id).replace(/[\.\#\$\[\]\/]/g, "_");
@@ -1396,24 +3127,27 @@ window.visDagensEkstremer = function() {
             let isAuto = false;
             let verifiedHtml = "";
 
-            if (p.timestamp >= startOfDay) {
+            const twoDaysAgo = Date.now() - (2 * 24 * 60 * 60 * 1000);
+
+            if (p.timestamp > twoDaysAgo) {
                 displayD = p.diesel || "--";
                 displayB = p.bensin || "--";
                 displayB98 = p.bensin98 && p.bensin98 !== "--" ? p.bensin98 : "--";
                 displayFd = p.fd && p.fd !== "--" ? p.fd : "--";
-                
+
                 trendD = getTrendHtml(p.diesel, p.prev_diesel);
                 trendB = getTrendHtml(p.bensin, p.prev_bensin);
                 trendB98 = getTrendHtml(p.bensin98, p.prev_bensin98);
                 trendFd = getTrendHtml(p.fd, p.prev_fd);
-                
+
                 let safeUser = sanitize(p.user);
                 let verifiedBadge = p.verified ? '<span class="verify-badge">✅</span>' : '';
                 timeAgoHtml = `<div class="time-ago" style="color: inherit; opacity: 0.85;">${formaterTid(p.timestamp, safeUser)}</div>`;
-                
+
                 trendD += verifiedBadge;
                 trendB += verifiedBadge;
             } else {
+                // Prisen er eldre enn 2 dager (eller finnes ikke), så vi viser et estimat.
                 isAuto = true;
                 displayD = localAvgD;
                 displayB = localAvgB;
@@ -1422,14 +3156,61 @@ window.visDagensEkstremer = function() {
                 timeAgoHtml = `<div class="time-ago" style="color: inherit; opacity: 0.7;">🤖 ${avgTypeStr}</div>`;
             }
 
-            return { s, id, p, dist, navn, stedNavn, kjedeNavn, escapedName, style, flag, displayD, displayB, displayB98, displayFd, trendD, trendB, trendB98, trendFd, timeAgoHtml, isAuto, verifiedHtml, brukLat, brukLon };
+            const harValgtBil = !!localStorage.getItem('min_garasje_regnr');
+            let fyllHerKnappHtml = '';
+            if (harValgtBil) {
+                const prisData = JSON.stringify({d: displayD, b: displayB, b98: displayB98, fd: displayFd}).replace(/'/g, "\\'");
+                fyllHerKnappHtml = `<div class="update-btn" style="background: rgba(76, 175, 80, 0.2); border-color: rgba(76, 175, 80, 0.4); color: var(--success);" onclick='apneFyllingModal(${prisData})'>⛽ FYLL HER</div>`;
+            }
+
+            const item = { s, id, p, dist, navn, stedNavn, kjedeNavn, escapedName, style, flag, displayD, displayB, displayB98, displayFd, trendD, trendB, trendB98, trendFd, timeAgoHtml, isAuto, verifiedHtml, brukLat, brukLon, fyllHerKnappHtml };
+            
+            const rabattResultat = byggRabattPanel(item);
+            item.rabattHtml = rabattResultat.html;
+            
+            let prisForSortering = 999;
+
+            // 1. Prøv å få prisen for den prioriterte drivstofftypen (med rabatt)
+            if (prioritertDrivstoff && rabattResultat.bestePriser[prioritertDrivstoff] !== null) {
+                prisForSortering = rabattResultat.bestePriser[prioritertDrivstoff];
+            } 
+            // 2. Hvis ingen rabatt, prøv råprisen for den prioriterte typen
+            else if (prioritertDrivstoff) {
+                const rawPrioritizedPrice = parseFuelPrice(
+                    prioritertDrivstoff === 'bensin' ? item.displayB :
+                    prioritertDrivstoff === 'diesel' ? item.displayD :
+                    prioritertDrivstoff === 'bensin98' ? item.displayB98 :
+                    prioritertDrivstoff === 'fd' ? item.displayFd :
+                    null
+                );
+                if (rawPrioritizedPrice !== null) {
+                    prisForSortering = rawPrioritizedPrice;
+                }
+            }
+
+            // 3. Fallback til den originale logikken hvis prioritert drivstoff ikke har en pris
+            if (prisForSortering === 999) {
+                if (rabattResultat.bestePriser.overall !== null) {
+                    prisForSortering = rabattResultat.bestePriser.overall;
+                } else {
+                    const d = parseFuelPrice(item.displayD);
+                    const b = parseFuelPrice(item.displayB);
+                    if (d !== null && b !== null) prisForSortering = Math.min(d, b);
+                    else if (d !== null) prisForSortering = d;
+                    else if (b !== null) prisForSortering = b;
+                }
+            }
+
+            item.sorteringsPris = prisForSortering;
+
+            return item;
         });
 
         processedStasjoner.sort((a,b) => {
-            let valA = parseFloat(a.displayD !== "--" ? String(a.displayD).replace(',','.') : 999);
-            let valB = parseFloat(b.displayD !== "--" ? String(b.displayD).replace(',','.') : 999);
-            if (valA === valB) { return a.dist - b.dist; }
-            return valA - valB;
+            const prisA = a.sorteringsPris;
+            const prisB = b.sorteringsPris;
+            if (prisA === prisB) { return a.dist - b.dist; }
+            return prisA - prisB;
         });
 
         let foundLocalKupp = false;
@@ -1491,10 +3272,14 @@ window.visDagensEkstremer = function() {
                     </div>
                 </div>
                 
-                <div id="actions-${item.id}" class="action-buttons" style="display:none; margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 8px;" onclick="event.stopPropagation()">
-                    <div class="update-btn" style="border: 1px solid rgba(255,255,255,0.2); color: white;" onclick="apneModal('${item.id}','${item.escapedName}', ${item.brukLat}, ${item.brukLon})">OPPDATER</div>
-                    <a class="nav-btn" style="border: 1px solid rgba(255,255,255,0.2); color: white;" href="https://maps.google.com/?q=${item.brukLat},${item.brukLon}" target="_blank">KJØR HIT</a>
-                    <div class="hist-btn" style="border: 1px solid rgba(255,255,255,0.2); color: white;" onclick="visHistorikk('${item.id}')">⌛ HISTORIKK</div>
+                <div id="actions-${item.id}" class="actions-container" style="display:none;" onclick="event.stopPropagation()">
+                    ${item.fyllHerKnappHtml ? `<div class="action-buttons-row" style="margin-bottom: 8px;">${item.fyllHerKnappHtml}</div>` : ''}
+                    <div class="action-buttons-row">
+                        <div class="update-btn" onclick="apneModal('${item.id}','${item.escapedName}', ${item.brukLat}, ${item.brukLon})">OPPDATER</div>
+                        <a class="nav-btn" href="https://maps.google.com/?q=${item.brukLat},${item.brukLon}" target="_blank">KJØR HIT</a>
+                        <div class="hist-btn" onclick="visHistorikk('${item.id}', '${item.id}')">⌛ HISTORIKK</div>
+                    </div>
+                    ${item.rabattHtml ? `<div class="rabatt-panel">${item.rabattHtml}</div>` : ''}
                 </div>
                 
                 <div id="hist-${item.id}" class="history-panel" onclick="event.stopPropagation()"></div>
@@ -1528,7 +3313,7 @@ window.visDagensEkstremer = function() {
             addPrice("FD", item.displayFd, item.trendFd, "var(--fd-color)", "input-fd");
 
             // Den magiske koden som faktisk smetter prisene inn mellom headeren og knappene:
-            card.insertBefore(priceDiv, card.querySelector('.action-buttons'));
+            card.insertBefore(priceDiv, card.querySelector('#actions-' + item.id));
             list.appendChild(card);
         });
         
@@ -1588,58 +3373,121 @@ window.visDagensEkstremer = function() {
         );
     };
 
-    window.hentStasjoner = async function(lat, lon, retryCount = 0) { 
-            sisteLat=lat; sisteLon=lon; const r=document.getElementById('radius').value*1000; 
+    async function promiseAnyWithTimeout(promises, timeout = 10000) {
+        return new Promise((resolve, reject) => {
+            let rejected = 0;
+            const errors = [];
+            const timer = setTimeout(() => {
+                reject(new Error('Timeout: ingen server svarte raskt nok.'));
+            }, timeout);
+
+            promises.forEach(p => {
+                Promise.resolve(p).then(result => {
+                    clearTimeout(timer);
+                    resolve(result);
+                }).catch(err => {
+                    errors.push(err);
+                    rejected += 1;
+                    if (rejected === promises.length) {
+                        clearTimeout(timer);
+                        reject(new Error('Alle serverne feilet.'));
+                    }
+                });
+            });
+        });
+    }
+
+    async function hentOverpassFraFlere(endpoints, query, timeout = 10000) {
+        const controllers = endpoints.map(() => new AbortController());
+        const requests = endpoints.map((endpoint, index) => {
+            return fetch(`${endpoint}?data=${encodeURIComponent(query)}`, { signal: controllers[index].signal })
+                .then(async res => {
+                    if (!res.ok) throw new Error('Server overbelastet');
+                    const data = await res.json();
+                    if (!data || !Array.isArray(data.elements)) throw new Error('Ugyldig svar fra server');
+                    return data.elements;
+                });
+        });
+
+        try {
+            const result = await promiseAnyWithTimeout(requests, timeout);
+            controllers.forEach(ctrl => ctrl.abort());
+            return result;
+        } catch (error) {
+            controllers.forEach(ctrl => ctrl.abort());
+            throw error;
+        }
+    }
+
+    window.hentStasjoner = async function(lat, lon, retryAttempt = 0) { 
+            sisteLat = lat; sisteLon = lon; const r = document.getElementById('radius').value * 1000; 
             
             // --- NYTT: Lagrer siste posisjon i telefonens minne ---
             localStorage.setItem('drivstoff_siste_lat', lat);
             localStorage.setItem('drivstoff_siste_lon', lon);
             // ------------------------------------------------------
 
-            // Viser vanlig lastemelding første gang
-            if (retryCount === 0) {
-                document.getElementById('station-list').innerHTML = "<p class='loading-msg'>📡 Henter data (" + r/1000 + " km)...</p>";
-            }
+            document.getElementById('station-list').innerHTML = "<p class='loading-msg'>📡 Henter data (" + r/1000 + " km)...</p>";
 
-            // Liste over flere gratis reserve-servere vi kan bytte på
             const endpoints = [
                 "https://overpass-api.de/api/interpreter",
                 "https://overpass.kumi.systems/api/interpreter",
                 "https://lz4.overpass-api.de/api/interpreter"
             ];
-            
-            // Velger server basert på hvilket forsøk vi er på
-            const server = endpoints[retryCount % endpoints.length];
+
+            const query = `[out:json];nwr["amenity"="fuel"](around:${r},${lat},${lon});out center;`;
 
             try {
-// NYHET: Bruker 'nwr' for å hente bygninger/områder også, og 'out center;' for å få et midtpunkt!
-const res = await fetch(`${server}?data=${encodeURIComponent(`[out:json];nwr["amenity"="fuel"](around:${r},${lat},${lon});out center;`)}`); 
-                
-                // Hvis serveren svarer med en feil (f.eks "Too Many Requests"), tving frem en feilmelding for å trigge ny prøving
-                if (!res.ok) throw new Error("Server overbelastet");
+                document.getElementById('station-list').innerHTML = "<p class='loading-msg'>📡 Henter data fra det raskeste kartserveret...</p>";
+                const elements = await hentOverpassFraFlere(endpoints, query, 12000);
+                const stasjonerFraKart = elements || [];
 
-                const data = await res.json(); 
-                gjeldendeStasjoner = data.elements || []; 
+                // Bruker et Set for å effektivt sjekke hvilke stasjoner som allerede er hentet fra kartet
+                const kartStasjonIder = new Set(stasjonerFraKart.map(s => s.id));
                 
+                // Start med stasjonene fra kartet
+                gjeldendeStasjoner = [...stasjonerFraKart];
+
+                // Legg til dine egne stasjoner KUN hvis de ikke allerede finnes i kart-resultatet
                 for (const key in egneStasjoner) {
                     const cs = egneStasjoner[key];
                     if (cs.lat && cs.lon) {
                         const dist = regnUtAvstand(lat, lon, cs.lat, cs.lon);
                         if (dist <= r/1000) {
-                            gjeldendeStasjoner.push({ id: key, lat: cs.lat, lon: cs.lon, tags: { name: cs.navn, brand: cs.navn } });
+                            const numeriskId = parseInt(String(cs.id).split('_').pop(), 10);
+                            if (isNaN(numeriskId) || !kartStasjonIder.has(numeriskId)) {
+                                gjeldendeStasjoner.push({ id: key, lat: cs.lat, lon: cs.lon, tags: { name: cs.navn, brand: cs.navn } });
+                            }
                         }
                     }
                 }
                 visStasjoner(gjeldendeStasjoner, lat, lon);
                 visDagensEkstremer(); 
-            } catch (e) { 
-                // HVIS FEIL: Prøv automatisk igjen inntil 2 ekstra ganger med reserve-serverne!
-                if (retryCount < 2) {
-                    document.getElementById('station-list').innerHTML = `<p class='loading-msg' style='color:var(--diesel-color); text-shadow:none;'>⚠️ Kart-server opptatt, bytter til reserve (${retryCount + 1}/2)...</p>`;
-                    setTimeout(() => window.hentStasjoner(lat, lon, retryCount + 1), 1000); // Venter 1 sekund og prøver igjen automatisk
+            } catch (e) {
+                console.warn('Overpass-feil:', e);
+                const lokale = [];
+                for (const key in egneStasjoner) {
+                    const cs = egneStasjoner[key];
+                    if (cs.lat && cs.lon) {
+                        const dist = regnUtAvstand(lat, lon, cs.lat, cs.lon);
+                        if (dist <= r/1000) {
+                            lokale.push({ id: key, lat: cs.lat, lon: cs.lon, tags: { name: cs.navn, brand: cs.navn } });
+                        }
+                    }
+                }
+
+                if (lokale.length > 0) {
+                    gjeldendeStasjoner = lokale;
+                    visStasjoner(gjeldendeStasjoner, lat, lon);
+                    document.getElementById('station-list').insertAdjacentHTML('afterbegin', `<p class='loading-msg' style='color:var(--warning); text-shadow:none;'>⚠️ Kartserver utilgjengelig. Viser lokale stasjoner.</p>`);
+                    return;
+                }
+
+                if (retryAttempt < 2) {
+                    document.getElementById('station-list').innerHTML = `<p class='loading-msg' style='color:var(--diesel-color); text-shadow:none;'>⚠️ Kart-serverne er trege eller utilgjengelige. Prøver igjen (${retryAttempt + 1}/3)...</p>`;
+                    setTimeout(() => window.hentStasjoner(lat, lon, retryAttempt + 1), 2000);
                 } else {
-                    // Hvis den feiler 3 ganger på rad, gi en god forklaring til brukeren.
-                    document.getElementById('station-list').innerHTML = "<p style='text-align:center; color:var(--danger); text-shadow: 0 1px 2px rgba(0,0,0,0.8);'><b>Dårlig forbindelse til kartet.</b><br>Dugnadskartet er midlertidig overbelastet av for mange brukere globalt. Prøv igjen om et halvt minutt!</p>"; 
+                    document.getElementById('station-list').innerHTML = "<p style='text-align:center; color:var(--danger); text-shadow: 0 1px 2px rgba(0,0,0,0.8);'><b>Dårlig forbindelse til kartet.</b><br>Prøv igjen om litt eller endre radius.</p>";
                 }
             }
         }
@@ -1663,6 +3511,92 @@ const res = await fetch(`${server}?data=${encodeURIComponent(`[out:json];nwr["am
                 window.hentStasjoner(parseFloat(lagretLat), parseFloat(lagretLon));
             }, 1000);
         }
+
+    oppdaterGlobalBilVisning();
 </script>
+
+<!-- Flytende knapp for Min Lommebok -->
+<!-- Modal for Min Lommebok -->
+<div id="lommebok-modal" onclick="if(event.target==this) lukkLommebokModal()" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); z-index: 2000; overflow-y: auto; backdrop-filter: blur(5px);">
+    <div class="modal-content" style="margin-top: 100px;">
+        <h3 style="margin-top:0">Min Lommebok</h3>
+        <p style="font-size: 14px; color: var(--text-muted);">Kryss av for fordelskortene du eier:</p>
+        
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                <input type="checkbox" id="kort-trumf" onchange="lagreLommebok()">
+                <span>Trumf</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                <input type="checkbox" id="kort-coop" onchange="lagreLommebok()">
+                <span>Coop</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                <input type="checkbox" id="kort-naf" onchange="lagreLommebok()">
+                <span>NAF</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                <input type="checkbox" id="kort-yxvisa" onchange="lagreLommebok()">
+                <span>YX Visa kredittkort</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                <input type="checkbox" id="kort-agrol" onchange="lagreLommebok()">
+                <span>Agrol</span>
+            </label>
+        </div>
+        
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+            <button style="background-color:#555; flex: 1;" onclick="lukkLommebokModal()">Lukk</button>
+        </div>
+    </div>
+</div>
+
+<!-- NYTT: Modal for å logge fylling -->
+<div id="fylling-modal" onclick="if(event.target==this) lukkFyllingModal()" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); z-index: 2000; overflow-y: auto; backdrop-filter: blur(5px);">
+    <div class="modal-content" style="margin-top: 100px;">
+        <h3 style="margin-top:0">⛽ Logg fylling</h3>
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;">
+            Logg en full tank for å beregne reelt forbruk for din bil.
+        </p>
+        <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 20px;">
+            Drivstofftype: <b id="fylling-drivstoff-type" style="color: var(--text-main);"></b>
+        </p>
+        
+        <div style="margin-bottom:12px">
+            <label style="font-size:12px; color:var(--text-muted)">Nåværende kilometerstand</label>
+            <input type="text" inputmode="numeric" id="fylling-input-km" placeholder="Eks: 10400">
+        </div>
+        <div style="margin-bottom:12px">
+            <label style="font-size:12px; color:var(--text-muted)">Liter fylt (fra pumpa)</label>
+            <input type="text" inputmode="decimal" id="fylling-input-liter" placeholder="Eks: 25.0" oninput="this.value = this.value.replace(',', '.')">
+        </div>
+        <div style="margin-bottom:12px">
+            <label style="font-size:12px; color:var(--text-muted)">Pris per liter (valgfritt)</label>
+            <input type="text" inputmode="decimal" id="fylling-input-pris" placeholder="Eks: 21.50" oninput="this.value = this.value.replace(',', '.')">
+        </div>
+        
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+            <button style="background-color:#555; flex: 1;" onclick="lukkFyllingModal()">Avbryt</button>
+            <button onclick="loggForbrukFraModal()" style="flex: 1;">Lagre fylling</button>
+        </div>
+    </div>
+</div>
+
+<!-- NY BUNNMENY -->
+<div class="bottom-nav">
+    <div class="nav-item active" onclick="switchView('marked-view', this)">
+        <span class="icon">📈</span>
+        <span>Marked</span>
+    </div>
+    <div class="nav-item" onclick="switchView('garasje-view', this)">
+        <span class="icon">🚗</span>
+        <span>Garasje</span>
+    </div>
+    <div class="nav-item" onclick="switchView('profil-view', this)">
+        <span class="icon">👤</span>
+        <span>Profil</span>
+    </div>
+</div>
+
 </body>
 </html>
